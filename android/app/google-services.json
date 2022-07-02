@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "56442446408",
+    "project_id": "ani-capstone",
+    "storage_bucket": "ani-capstone.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56442446408:android:c0323e0eb0d7fa37e3ae7d",
+        "android_client_info": {
+          "package_name": "com.capstone.ani_capstone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56442446408-m1sb4u8o15hb8mtenjmnfoe50eftl5e6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwLVbO3AP3KnCwjmU0tbfB7anVLUzfYns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56442446408-m1sb4u8o15hb8mtenjmnfoe50eftl5e6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "56442446408-ek9cshlu9hddvjs1ggvmp3rda7bcbg5a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.aniCapstone"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
