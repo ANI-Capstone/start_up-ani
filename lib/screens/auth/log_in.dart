@@ -1,25 +1,49 @@
 // ignore_for_file: unnecessary_new, unnecessary_const, prefer_const_constructors, avoid_unnecessary_containers
 
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/providers/google_sign_in.dart';
-import 'package:ani_capstone/screens/auth/sign_in.dart';
+import 'package:ani_capstone/providers/email_provider.dart';
+import 'package:ani_capstone/providers/google_provider.dart';
+import 'package:ani_capstone/screens/auth/sign_up.dart';
+import 'package:ani_capstone/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 // ignore: use_key_in_widget_constructors
-class SignUp1 extends StatelessWidget {
+class LogIn extends StatefulWidget {
+  @override
+  State<LogIn> createState() => _LogInState();
+}
+
+class _LogInState extends State<LogIn> {
   // It's time to validat the text field
   final _formKey = GlobalKey<FormState>();
 
-  final emailEditingController = new TextEditingController();
-  final passwordEditingController = new TextEditingController();
+  final _email = new TextEditingController();
+
+  final _password = new TextEditingController();
+
+  bool rememberMe = false;
+
+  final textFieldFocusNode = FocusNode();
+  bool _obscured = true;
+
+  void _toggleObscured() {
+    setState(() {
+      _obscured = !_obscured;
+      if (textFieldFocusNode.hasPrimaryFocus) {
+        return;
+      } // If focus is on text field, dont unfocus
+      textFieldFocusNode.canRequestFocus =
+          false; // Prevents focus if tap on eye
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final emailField = TextFormField(
         autofocus: false,
-        controller: emailEditingController,
+        controller: _email,
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
           if (value!.isEmpty) {
@@ -32,7 +56,7 @@ class SignUp1 extends StatelessWidget {
           return null;
         },
         onSaved: (value) {
-          emailEditingController.text = value!;
+          _email.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -42,16 +66,28 @@ class SignUp1 extends StatelessWidget {
 
     final passwordField = TextFormField(
         autofocus: false,
-        controller: passwordEditingController,
-        obscureText: true,
+        controller: _password,
+        obscureText: _obscured,
         validator: passwordValidator,
         onSaved: (value) {
-          passwordEditingController.text = value!;
+          _password.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           border: textFieldBorder,
+          suffixIcon: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+            child: IconButton(
+              onPressed: _toggleObscured,
+              icon: Icon(
+                _obscured
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+                size: 18,
+              ),
+            ),
+          ),
         ));
 
     final signUpButton = Material(
@@ -63,11 +99,24 @@ class SignUp1 extends StatelessWidget {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
+
+              EmailProvider.loginAccountEmail(context,
+                      email: _email.text, password: _password.text)
+                  .then((value) => {
+                        if (value != null)
+                          {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(),
+                                ))
+                          }
+                      });
             }
-            // signUp(emailEditingController.text, passwordEditingController.text);
+            // signUp(_email.text, _password.text);
           },
           child: Text(
-            "Proceed",
+            "Log In",
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           )),
@@ -79,6 +128,7 @@ class SignUp1 extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: primaryColor,
           toolbarHeight: 45,
+          automaticallyImplyLeading: false,
           elevation: 0,
         ),
         body: SingleChildScrollView(
@@ -90,6 +140,7 @@ class SignUp1 extends StatelessWidget {
             ),
             Positioned(
                 child: Container(
+                    height: size.height * 0.90,
                     decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: const BorderRadius.only(
@@ -105,18 +156,14 @@ class SignUp1 extends StatelessWidget {
                             SizedBox(height: 50),
                             Container(
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "SIGN UP",
+                                    "LOG IN",
                                     style: Theme.of(context)
                                         .textTheme
                                         .headline5!
                                         .copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                  SvgPicture.asset(
-                                    "assets/icons/back.svg",
                                   ),
                                 ],
                               ),
@@ -124,7 +171,6 @@ class SignUp1 extends StatelessWidget {
                             Form(
                               key: _formKey,
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   SizedBox(height: 45),
@@ -133,7 +179,67 @@ class SignUp1 extends StatelessWidget {
                                   SizedBox(height: 20),
                                   TextFieldName(text: "Password"),
                                   passwordField,
-                                  SizedBox(height: 40),
+                                  SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 2, right: 8),
+                                              child: SizedBox(
+                                                height: 24,
+                                                width: 24,
+                                                child: Checkbox(
+                                                  value: rememberMe,
+                                                  checkColor: Colors.white,
+                                                  activeColor: linkColor,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      rememberMe = value!;
+                                                    });
+                                                  },
+                                                  side: BorderSide(
+                                                      width: 1,
+                                                      color: textColor
+                                                          .withOpacity(0.5)),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              2)),
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              'Remember me?',
+                                              style: TextStyle(fontSize: 12),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => {},
+                                        style: TextButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                            minimumSize: Size(50, 30),
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
+                                            alignment: Alignment.centerLeft),
+                                        child: Text(
+                                          "Forgot Password?",
+                                          style: TextStyle(
+                                            color: linkColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 20),
                                   signUpButton,
                                   SizedBox(height: 40),
                                   Container(
@@ -177,11 +283,24 @@ class SignUp1 extends StatelessWidget {
                                       GestureDetector(
                                         onTap: () {
                                           final provider =
-                                              Provider.of<GoogleSignInProvider>(
+                                              Provider.of<GoogleProvider>(
                                                   context,
                                                   listen: false);
 
-                                          provider.googleLogin();
+                                          provider
+                                              .googleLogin(context)
+                                              .then((value) => {
+                                                    if (value != null)
+                                                      {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      HomePage(),
+                                                            ))
+                                                      }
+                                                  });
                                         },
                                         child: SvgPicture.asset(
                                           "assets/icons/google.svg",
@@ -190,7 +309,8 @@ class SignUp1 extends StatelessWidget {
                                       SizedBox(width: 20),
                                       GestureDetector(
                                         onTap: () {
-                                          print("onTap called.");
+                                          // FacebookSignInProvider
+                                          //     .loginFacebook();
                                         },
                                         child: SvgPicture.asset(
                                           "assets/icons/facebook.svg",
@@ -202,19 +322,30 @@ class SignUp1 extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text("Already a user?"),
+                                      Text("Don't have an account?",
+                                          style: TextStyle(fontSize: 14)),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
                                       TextButton(
                                         onPressed: () => Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  SignInScreen(),
+                                              builder: (context) => SignUp(),
                                             )),
+                                        style: TextButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                            minimumSize: Size(50, 30),
+                                            tapTargetSize: MaterialTapTargetSize
+                                                .shrinkWrap,
+                                            alignment: Alignment.centerLeft),
                                         child: Text(
-                                          "Log In!",
+                                          "Sign Up",
                                           style: TextStyle(
                                               color: linkColor,
-                                              fontWeight: FontWeight.bold),
+                                              fontWeight: FontWeight.bold,
+                                              decoration:
+                                                  TextDecoration.underline),
                                         ),
                                       ),
                                     ],

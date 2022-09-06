@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,41 +49,21 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCuE8YicktAy95Nk71iBvSOwP2c5SGNa-g',
-    appId: '1:56442446408:web:e90ad42bc4c47df4e3ae7d',
-    messagingSenderId: '56442446408',
-    projectId: 'ani-capstone',
-    authDomain: 'ani-capstone.firebaseapp.com',
-    storageBucket: 'ani-capstone.appspot.com',
-    measurementId: 'G-H0KYE8RJEJ',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAwLVbO3AP3KnCwjmU0tbfB7anVLUzfYns',
-    appId: '1:56442446408:android:c0323e0eb0d7fa37e3ae7d',
-    messagingSenderId: '56442446408',
-    projectId: 'ani-capstone',
-    storageBucket: 'ani-capstone.appspot.com',
+    apiKey: 'AIzaSyDDkIWAWj1HqLCkwIUogSUHn0BCnS4OXDk',
+    appId: '1:464340532379:android:6263ee3f89c67b9c64da3e',
+    messagingSenderId: '464340532379',
+    projectId: 'capstone-ani',
+    storageBucket: 'capstone-ani.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDYT5cZempJuvWRJvx7nptqylu0N3hDDM8',
-    appId: '1:56442446408:ios:0ac021c915b8d466e3ae7d',
-    messagingSenderId: '56442446408',
-    projectId: 'ani-capstone',
-    storageBucket: 'ani-capstone.appspot.com',
-    iosClientId: '56442446408-ek9cshlu9hddvjs1ggvmp3rda7bcbg5a.apps.googleusercontent.com',
-    iosBundleId: 'com.example.aniCapstone',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDYT5cZempJuvWRJvx7nptqylu0N3hDDM8',
-    appId: '1:56442446408:ios:0ac021c915b8d466e3ae7d',
-    messagingSenderId: '56442446408',
-    projectId: 'ani-capstone',
-    storageBucket: 'ani-capstone.appspot.com',
-    iosClientId: '56442446408-ek9cshlu9hddvjs1ggvmp3rda7bcbg5a.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAjmyeuFT6_AsO07czsuzJsw-6q05DiKzc',
+    appId: '1:464340532379:ios:f4d1de4aabc6dee164da3e',
+    messagingSenderId: '464340532379',
+    projectId: 'capstone-ani',
+    storageBucket: 'capstone-ani.appspot.com',
+    iosClientId: '464340532379-tsju9p6e93cojqdrjvg9vc2jckuhnkkj.apps.googleusercontent.com',
     iosBundleId: 'com.example.aniCapstone',
   );
 }

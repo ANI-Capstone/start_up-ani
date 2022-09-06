@@ -14,6 +14,7 @@ class _UserNotificaitonState extends State<UserNotificaiton> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Center(
             child: Row(
               children: [Text('NOTIFICATIONS')],

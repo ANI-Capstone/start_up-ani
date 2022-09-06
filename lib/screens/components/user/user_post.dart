@@ -14,6 +14,7 @@ class _UserPostState extends State<UserPost> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Center(
             child: Row(
               children: [Text('CREATE POST')],

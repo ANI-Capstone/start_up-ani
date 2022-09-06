@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<string name="app_name">ANI</string>
+<string name="facebook_app_id">795719555136704</string>
+<string name="fb_login_protocol_scheme">fb795719555136704</string>
+<string name="facebook_client_token">f5716b65d37c2571bcb3707f8347fe9f</string>
+
+</resources>
