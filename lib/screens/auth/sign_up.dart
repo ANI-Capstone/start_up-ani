@@ -279,7 +279,7 @@ class _SignUpState extends State<SignUp> {
                                                   listen: false);
 
                                           provider
-                                              .googleLogin(context)
+                                              .googleSignin(context)
                                               .then((value) => {
                                                     if (value != null)
                                                       {
@@ -293,8 +293,6 @@ class _SignUpState extends State<SignUp> {
                                                           },
                                                         )
                                                       }
-                                                    else
-                                                      {}
                                                   });
                                         },
                                         child: SvgPicture.asset(

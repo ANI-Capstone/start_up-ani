@@ -26,49 +26,20 @@ class GoogleProvider extends ChangeNotifier {
           'Unable to verify, you are not connected to any network.', 5);
       return '';
     } else {
-      showDialog(
-          // The user CANNOT close this dialog  by pressing outsite it
-          barrierDismissible: false,
-          context: context,
-          builder: (_) {
-            return Dialog(
-              // The background color
-              backgroundColor: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Container(
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30))),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      // The loading indicator
-                      CircularProgressIndicator(
-                        color: primaryColor,
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      // Some text
-                      Text(
-                        'Validating, please wait...',
-                        style: TextStyle(fontFamily: 'Roboto'),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          });
-
       try {
+        if (googleSignIn.currentUser != null) {
+          await googleSignIn.disconnect();
+        }
         final googleUser = await googleSignIn.signIn();
 
-        if (googleUser == null) return;
+        if (googleUser == null) return null;
 
         _user = googleUser;
 
         final googleAuth = await googleUser.authentication;
+
+        ShoWInfo.showLoadingDialog(context,
+            message: "Validating, please wait...");
 
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
@@ -77,19 +48,27 @@ class GoogleProvider extends ChangeNotifier {
 
         final FirebaseAuth auth = FirebaseAuth.instance;
 
-        // await auth.c;
-
-        final currentUser = auth.currentUser!;
+        await auth.signInWithCredential(credential);
 
         Navigator.of(context, rootNavigator: true).pop(result);
 
-        await FirebaseFirestoreDb.getUser(context, userId: currentUser.uid);
+        final currentUser = auth.currentUser!;
 
+        var exist =
+            await FirebaseFirestoreDb.checkExistUser(userId: currentUser.uid);
+
+        if (exist) {
+          ShoWInfo.errorAlert(context,
+              'This email address is already in use by another account.', 5);
+          return null;
+        }
         notifyListeners();
         return [currentUser.email, currentUser.uid, currentUser.photoURL];
       } on FirebaseAuthException catch (e) {
+        Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, e.message.toString(), 5);
       } on Exception catch (_) {
+        Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, 'Failed due to an error occurred.', 5);
       }
     }
@@ -107,9 +86,13 @@ class GoogleProvider extends ChangeNotifier {
       return;
     } else {
       try {
+        if (googleSignIn.currentUser != null) {
+          await googleSignIn.disconnect();
+        }
+
         final googleUser = await googleSignIn.signIn();
 
-        if (googleUser == null) return;
+        if (googleUser == null) return null;
 
         _user = googleUser;
 
@@ -125,16 +108,16 @@ class GoogleProvider extends ChangeNotifier {
 
         final FirebaseAuth auth = FirebaseAuth.instance;
 
-        await auth.signInWithCredential(credential);
+        await auth
+            .signInWithCredential(credential)
+            .then((value) => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                )));
 
         Navigator.of(context, rootNavigator: true).pop(result);
-
-        final currentUser = auth.currentUser!;
-
-        await FirebaseFirestoreDb.getUser(context, userId: currentUser.uid);
-
         notifyListeners();
-        return [currentUser.email, currentUser.uid, currentUser.photoURL];
       } on FirebaseAuthException catch (e) {
         Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, e.message.toString(), 5);

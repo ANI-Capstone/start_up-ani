@@ -300,6 +300,16 @@ class _LogInState extends State<LogIn> {
                                                                       HomePage(),
                                                             ))
                                                       }
+                                                    else
+                                                      {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      LogIn(),
+                                                            ))
+                                                      }
                                                   });
                                         },
                                         child: SvgPicture.asset(

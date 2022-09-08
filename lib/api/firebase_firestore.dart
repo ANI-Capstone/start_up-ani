@@ -83,6 +83,18 @@ class FirebaseFirestoreDb {
     return 'Failed';
   }
 
+  static Future<bool> checkExistUser({required String userId}) async {
+    var exist;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((value) => {value.exists ? exist = true : exist = false});
+
+    return exist;
+  }
+
   static Future getUser(BuildContext context,
       {required String userId, String? email}) async {
     var userData;
