@@ -1,5 +1,6 @@
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/user/user_feeds.dart';
 import 'package:ani_capstone/screens/components/user/user_inbox.dart';
 import 'package:ani_capstone/screens/components/user/user_notification.dart';
@@ -21,22 +22,8 @@ class _UserControlState extends State<UserControl> {
   UserData? _userData;
   var user;
 
-  @override
-  void initState() {
-    super.initState();
-
-    user = FirebaseAuth.instance.currentUser;
-
-    FirebaseFirestoreDb.getUser(context, userId: user.uid);
-
-    if (user == null) {
-      FirebaseAuth.instance.signOut();
-    }
-  }
-
   Future getUserData() async {
-    return FirebaseFirestoreDb.getUser(context, userId: user.uid)
-        .then((value) => {_userData = value});
+    return AccountControl.accountCheck(context);
   }
 
   Widget checkUserType() {
@@ -58,7 +45,10 @@ class _UserControlState extends State<UserControl> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return ShoWInfo.errorAlert(context, snapshot.error.toString(), 5);
+          } else if (snapshot.data == null) {
+            return const Center(child: CircularProgressIndicator());
           } else {
+            _userData = snapshot.data;
             return checkUserType();
           }
         },

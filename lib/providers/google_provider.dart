@@ -170,4 +170,25 @@ class AccountControl {
       ShoWInfo.errorAlert(context, e.message.toString(), 5);
     }
   }
+
+  static Future accountCheck(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ShoWInfo.showAlertDialog(context,
+          title: 'Login Account',
+          message: 'Account has been logout, please login again.',
+          btnText: 'Login',
+          onClick: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LogIn(),
+                    ))
+              });
+    } else {
+      return await FirebaseFirestoreDb.getUser(context,
+          userId: user.uid, email: user.email);
+    }
+  }
 }
