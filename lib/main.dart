@@ -1,4 +1,5 @@
 import 'package:ani_capstone/providers/google_provider.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:ani_capstone/screens/auth/sign_up.dart';
 import 'package:ani_capstone/screens/home_page.dart';
 import 'package:ani_capstone/screens/test_screen.dart';
@@ -20,6 +21,8 @@ Future<void> main() async {
   );
 
   await initializeApp;
+
+  FlutterNativeSplash.remove();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   initScreen = prefs.getInt("initScreen");

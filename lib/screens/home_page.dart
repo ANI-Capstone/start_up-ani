@@ -86,32 +86,35 @@ class OnBoardPage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: defaultPadding + 10),
-                  child: Column(children: [
-                    SizedBox(height: 30),
-                    Image.asset('assets/images/logo.png'),
-                    SizedBox(height: 30),
-                    Text(
-                      'Offering You the Best Goods and Services',
-                      style: TextStyle(
-                          color: textColor,
-                          fontSize: 24,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w800,
-                          decoration: TextDecoration.none),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-                        style: TextStyle(
-                            color: textColor.withOpacity(0.5),
-                            fontSize: 12,
-                            fontFamily: 'Roboto',
-                            decoration: TextDecoration.none),
-                        textAlign: TextAlign.center),
-                    SizedBox(height: 50),
-                    getStartBtn,
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/images/ani-logo.png',
+                            width: 200,
+                            height: 200,
+                            filterQuality: FilterQuality.high),
+                        Text(
+                          'Offering You the Best Goods and Services',
+                          style: TextStyle(
+                              color: textColor,
+                              fontSize: 24,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w800,
+                              decoration: TextDecoration.none),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                            style: TextStyle(
+                                color: textColor.withOpacity(0.5),
+                                fontSize: 12,
+                                fontFamily: 'Roboto',
+                                decoration: TextDecoration.none),
+                            textAlign: TextAlign.center),
+                        SizedBox(height: 50),
+                        getStartBtn,
+                      ]),
                 ),
               )),
         ],

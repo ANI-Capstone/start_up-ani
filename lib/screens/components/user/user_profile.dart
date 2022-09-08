@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/auth/log_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -74,22 +75,7 @@ class _UserProfileState extends State<UserProfile> {
                       );
                     });
 
-                try {
-                  if (GoogleSignIn().currentUser != null) {
-                    GoogleSignIn().disconnect();
-                  }
-                  GoogleSignIn().signOut().then((value) => {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LogIn(),
-                            ))
-                      });
-                } on FirebaseAuthException catch (e) {
-                  Navigator.of(context).pop();
-
-                  ShoWInfo.errorAlert(context, e.message.toString(), 5);
-                }
+                AccountControl.logoutAccount(context);
               },
               child: Text(
                 "Log Out",

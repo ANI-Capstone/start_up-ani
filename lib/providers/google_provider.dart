@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../screens/auth/log_in.dart';
+
 class GoogleProvider extends ChangeNotifier {
   final googleSignIn = GoogleSignIn();
 
@@ -104,41 +106,6 @@ class GoogleProvider extends ChangeNotifier {
 
       return;
     } else {
-      showDialog(
-          // The user CANNOT close this dialog  by pressing outsite it
-          barrierDismissible: false,
-          context: context,
-          builder: (_) {
-            return Dialog(
-              // The background color
-              backgroundColor: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Container(
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30))),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      // The loading indicator
-                      CircularProgressIndicator(
-                        color: primaryColor,
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      // Some text
-                      Text(
-                        'Logging in, please wait...',
-                        style: TextStyle(fontFamily: 'Roboto'),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          });
-
       try {
         final googleUser = await googleSignIn.signIn();
 
@@ -147,6 +114,9 @@ class GoogleProvider extends ChangeNotifier {
         _user = googleUser;
 
         final googleAuth = await googleUser.authentication;
+
+        ShoWInfo.showLoadingDialog(context,
+            message: "Logging in, please wait...");
 
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
@@ -157,21 +127,47 @@ class GoogleProvider extends ChangeNotifier {
 
         await auth.signInWithCredential(credential);
 
-        final currentUser = auth.currentUser!;
-
         Navigator.of(context, rootNavigator: true).pop(result);
+
+        final currentUser = auth.currentUser!;
 
         await FirebaseFirestoreDb.getUser(context, userId: currentUser.uid);
 
         notifyListeners();
         return [currentUser.email, currentUser.uid, currentUser.photoURL];
       } on FirebaseAuthException catch (e) {
+        Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, e.message.toString(), 5);
       } on Exception catch (_) {
+        Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, 'Failed due to an error occurred.', 5);
       }
     }
 
     Navigator.of(context, rootNavigator: true).pop(result);
+  }
+}
+
+class AccountControl {
+  static Future logoutAccount(BuildContext context) async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final firebaseAuth = FirebaseAuth.instance;
+
+    try {
+      if (googleSignIn.currentUser != null) {
+        await googleSignIn.signOut();
+        await googleSignIn.disconnect();
+      }
+
+      await firebaseAuth.signOut().then((value) => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LogIn(),
+          )));
+    } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop();
+
+      ShoWInfo.errorAlert(context, e.message.toString(), 5);
+    }
   }
 }

@@ -91,6 +91,42 @@ class ShoWInfo {
     ));
   }
 
+  static showLoadingDialog(BuildContext context, {required String message}) {
+    showDialog(
+        // The user CANNOT close this dialog  by pressing outsite it
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Container(
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // The loading indicator
+                    const CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    // Some text
+                    Text(
+                      message,
+                      style: const TextStyle(fontFamily: 'Roboto'),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   static showAlertDialog(BuildContext context,
       {required String title,
       required String message,
