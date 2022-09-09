@@ -42,13 +42,11 @@ class _UserInboxState extends State<UserInbox> {
                     stream: FirebaseApi.getUsers(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        print(snapshot.error.toString());
                         return const Text('Something went wrong.');
                       } else if (snapshot.hasData) {
                         final users = snapshot.data!;
-
                         return SizedBox(
-                          height: 60,
+                          height: 90,
                           child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: users.map(buildUser).toList()),
@@ -84,9 +82,26 @@ class _UserInboxState extends State<UserInbox> {
       margin: const EdgeInsets.only(right: 14),
       child: GestureDetector(
         onTap: () {},
-        child: CircleAvatar(
-          radius: 32,
-          backgroundImage: NetworkImage(user.photoUrl),
+        child: SizedBox(
+          width: 70,
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundImage: NetworkImage(user.photoUrl),
+              ),
+              SizedBox(height: 5),
+              Text(
+                user.name,
+                style: const TextStyle(
+                    fontFamily: 'Roboto',
+                    color: linkColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              )
+            ],
+          ),
         ),
       ));
 }
