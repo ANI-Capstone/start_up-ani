@@ -718,15 +718,15 @@ class _SignUpState extends State<SignUp> {
                   var name = "${_firstName.text} ${_mi.text} ${_lastName.text}";
 
                   var userData = UserData(
-                      id: authID,
-                      name: name,
-                      email: _email.text,
-                      phone: _phone.text,
-                      street: _street.text,
-                      barangay: _barangay.text,
-                      city: _city.text,
-                      province: _province.text,
-                      zipcode: int.parse(_zipCode.text),
+                      id: authID!.trim(),
+                      name: name.trim(),
+                      email: _email.text.trim(),
+                      phone: _phone.text.trim(),
+                      street: _street.text.trim(),
+                      barangay: _barangay.text.trim(),
+                      city: _city.text.trim(),
+                      province: _province.text.trim(),
+                      zipcode: int.parse(_zipCode.text.trim()),
                       photoUrl: photoURL,
                       userTypeId: 0,
                       typeName: '');
