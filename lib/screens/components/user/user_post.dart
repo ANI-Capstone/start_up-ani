@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../constants.dart';
 
@@ -17,9 +18,22 @@ class _UserPostState extends State<UserPost> {
           automaticallyImplyLeading: false,
           title: Center(
             child: Row(
-              children: [Text('CREATE POST')],
+              children: [
+                Text('CREATE POST',
+                    style: TextStyle(
+                        color: linkColor, fontWeight: FontWeight.bold))
+              ],
             ),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(FontAwesomeIcons.circleXmark,
+                  size: 20, color: linkColor),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
           backgroundColor: primaryColor,
           elevation: 0),
     );

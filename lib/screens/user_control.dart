@@ -7,6 +7,7 @@ import 'package:ani_capstone/screens/components/user/user_notification.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -85,9 +86,15 @@ class _UserViewScreenState extends State<UserViewScreen> {
             UserNotificaiton(),
             UserProfile()
           ]
-        : [UserFeeds(), UserInbox(), UserNotificaiton(), UserProfile()];
+        : [
+            UserFeeds(),
+            UserInbox(),
+            UserPost(),
+            UserNotificaiton(),
+            UserProfile()
+          ];
 
-    navItems = userType == 1
+    /*navItems = userType == 1
         ? [
             const BottomNavigationBarItem(
                 icon: FaIcon(FontAwesomeIcons.house), label: 'Feed'),
@@ -107,20 +114,52 @@ class _UserViewScreenState extends State<UserViewScreen> {
             const BottomNavigationBarItem(
                 icon: FaIcon(FontAwesomeIcons.solidMessage), label: 'Inbox'),
             const BottomNavigationBarItem(
+                icon: FaIcon(FontAwesomeIcons.circlePlus), label: 'Post'),
+            const BottomNavigationBarItem(
                 icon: FaIcon(FontAwesomeIcons.solidBell),
                 label: 'Notification'),
             const BottomNavigationBarItem(
                 icon: FaIcon(FontAwesomeIcons.solidUser), label: 'Profile'),
+          ];*/
+
+    navItems = userType == 1
+        ? [
+            const FaIcon(FontAwesomeIcons.house),
+            const FaIcon(FontAwesomeIcons.solidMessage),
+            const FaIcon(FontAwesomeIcons.circlePlus),
+            const FaIcon(FontAwesomeIcons.solidBell),
+            const FaIcon(FontAwesomeIcons.solidUser),
+          ]
+        : [
+            const FaIcon(FontAwesomeIcons.house),
+            const FaIcon(FontAwesomeIcons.solidMessage),
+            const FaIcon(FontAwesomeIcons.circlePlus),
+            const FaIcon(FontAwesomeIcons.solidBell),
+            const FaIcon(FontAwesomeIcons.solidUser),
           ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: Container(
           color: Colors.white,
           child: IndexedStack(index: currentIndex, children: screens)),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: Theme(
+        data: Theme.of(context)
+            .copyWith(iconTheme: const IconThemeData(color: linkColor)),
+        child: CurvedNavigationBar(
+          color: primaryColor,
+          backgroundColor: Colors.transparent,
+          buttonBackgroundColor: Colors.transparent,
+          height: 66,
+          index: currentIndex,
+          onTap: (index) => setState(() => currentIndex = index),
+          items: navItems,
+        ),
+      ),
+      /*bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentIndex,
           onTap: (index) => setState(() => currentIndex = index),
           type: BottomNavigationBarType.fixed,
@@ -129,7 +168,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
           unselectedItemColor: Colors.white,
           selectedItemColor: linkColor,
           backgroundColor: primaryColor,
-          items: navItems),
+          items: navItems),*/
     );
   }
 }

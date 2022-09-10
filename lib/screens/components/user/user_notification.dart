@@ -17,7 +17,11 @@ class _UserNotificaitonState extends State<UserNotificaiton> {
           automaticallyImplyLeading: false,
           title: Center(
             child: Row(
-              children: [Text('NOTIFICATIONS')],
+              children: [
+                Text('NOTIFICATIONS',
+                    style: TextStyle(
+                        color: linkColor, fontWeight: FontWeight.bold))
+              ],
             ),
           ),
           backgroundColor: primaryColor,
