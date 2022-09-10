@@ -1,5 +1,7 @@
 import 'package:ani_capstone/api/firebase_message.dart';
+import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
+import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,9 +16,22 @@ class UserInbox extends StatefulWidget {
 }
 
 class _UserInboxState extends State<UserInbox> {
+  User user = User(
+      userId: '12121',
+      name: 'Mark Zuckmyberd',
+      photoUrl: 'https://i.ibb.co/StGZh5F/20180411134321-zuck.webp');
+  final sample = Message(
+      author: User(
+          userId: '12121',
+          name: 'Mark Zuckmyberd',
+          photoUrl: 'https://i.ibb.co/StGZh5F/20180411134321-zuck.webp'),
+      message: 'dawdLorem ipsum dolor sit amet, consecteturdadawdawdadadadad',
+      timeStamp: '8 min');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: userBgColor,
       appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Row(
@@ -39,7 +54,7 @@ class _UserInboxState extends State<UserInbox> {
               Container(
                 padding: const EdgeInsets.only(top: 15),
                 child: StreamBuilder<List<User>>(
-                    stream: FirebaseApi.getUsers(),
+                    stream: FirebaseMessageApi.getUsers(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return const Text('Something went wrong.');
@@ -65,12 +80,9 @@ class _UserInboxState extends State<UserInbox> {
                   ),
                 ),
               ),
-              Center(
-                child: SizedBox(
-                    child: Text(
-                  'No chats to load.',
-                )),
-              ),
+              ChatCard(message: sample),
+              ChatCard(message: sample),
+              ChatCard(message: sample)
             ]),
           ),
         ),
@@ -90,7 +102,7 @@ class _UserInboxState extends State<UserInbox> {
                 radius: 28,
                 backgroundImage: NetworkImage(user.photoUrl),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
                 user.name,
                 style: const TextStyle(

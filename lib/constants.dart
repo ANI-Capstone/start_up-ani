@@ -7,7 +7,7 @@ const backgroundColor = Color.fromARGB(255, 255, 255, 255);
 const redColor = Color(0xFFE85050);
 const borderColor = Color(0xFF121212);
 const linkColor = Color(0xFF315300);
-const profileDashboard = Color(0xF5F5F5F5);
+const userBgColor = Color(0xFFF5F5F5);
 
 const defaultPadding = 32.0;
 

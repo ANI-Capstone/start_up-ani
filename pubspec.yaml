@@ -57,14 +57,14 @@ dependencies:
   curved_navigation_bar: ^1.0.3
 
 flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/images/ani_logo.png
-  # background_image: assets/images/ani_branding.png
+  image: assets/images/ani_splash.png
+  background_image: assets/images/ani_background.png
+  branding: assets/images/ani_branding.png
 
   android_12:
-    color: "#FFFFFF"
-    image: assets/images/ani_logo.png
-    # background_image: assets/images/ani_branding.png
+    image: assets/images/ani_splash.png
+    background_image: assets/images/ani_background.png
+    branding: assets/images/ani_branding.png
 
   web: false
 

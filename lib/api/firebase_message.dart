@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/user.dart';
 
-class FirebaseApi {
+class FirebaseMessageApi {
   static Stream<List<User>> getUsers() => FirebaseFirestore.instance
       .collection('users')
       .snapshots()

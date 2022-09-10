@@ -86,7 +86,7 @@ class _UserProfileState extends State<UserProfile> {
         ));
 
     return Scaffold(
-      backgroundColor: profileDashboard,
+      backgroundColor: userBgColor,
       appBar: AppBar(
           leading: const BackButton(
             color: linkColor,

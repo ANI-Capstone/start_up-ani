@@ -1,4 +1,5 @@
 import 'package:ani_capstone/providers/google_provider.dart';
+import 'package:ani_capstone/screens/components/chat_page/chat_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:ani_capstone/screens/auth/sign_up.dart';
 import 'package:ani_capstone/screens/home_page.dart';
