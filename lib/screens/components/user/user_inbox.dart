@@ -1,7 +1,10 @@
+import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
+import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
+import 'package:ani_capstone/screens/components/chat_page/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,24 +12,25 @@ import 'package:image_picker/image_picker.dart';
 import '../../../constants.dart';
 
 class UserInbox extends StatefulWidget {
-  UserInbox({Key? key}) : super(key: key);
+  UserData user;
+
+  UserInbox({Key? key, required this.user}) : super(key: key);
 
   @override
   State<UserInbox> createState() => _UserInboxState();
 }
 
 class _UserInboxState extends State<UserInbox> {
-  User user = User(
-      userId: '12121',
-      name: 'Mark Zuckmyberd',
-      photoUrl: 'https://i.ibb.co/StGZh5F/20180411134321-zuck.webp');
-  final sample = Message(
-      author: User(
-          userId: '12121',
-          name: 'Mark Zuckmyberd',
-          photoUrl: 'https://i.ibb.co/StGZh5F/20180411134321-zuck.webp'),
-      message: 'dawdLorem ipsum dolor sit amet, consecteturdadawdawdadadadad',
-      timeStamp: '8 min');
+  User? author;
+
+  @override
+  void initState() {
+    super.initState();
+    author = User(
+        name: widget.user.name,
+        userId: widget.user.id,
+        photoUrl: widget.user.photoUrl!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +84,9 @@ class _UserInboxState extends State<UserInbox> {
                   ),
                 ),
               ),
-              ChatCard(message: sample),
-              ChatCard(message: sample),
-              ChatCard(message: sample)
+              // ChatCard(message: sample),
+              // ChatCard(message: sample),
+              // ChatCard(message: sample)
             ]),
           ),
         ),
@@ -93,7 +97,19 @@ class _UserInboxState extends State<UserInbox> {
   Widget buildUser(User user) => Container(
       margin: const EdgeInsets.only(right: 14),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatScreen(
+                      receiver: user,
+                      author: User(
+                          name: widget.user.name,
+                          userId: widget.user.id,
+                          photoUrl: widget.user.photoUrl!),
+                    )),
+          );
+        },
         child: SizedBox(
           width: 70,
           child: Column(

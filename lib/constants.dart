@@ -11,6 +11,8 @@ const userBgColor = Color(0xFFF5F5F5);
 
 const defaultPadding = 32.0;
 
+const userImage = AssetImage('assets/images/user.png');
+
 OutlineInputBorder textFieldBorder = OutlineInputBorder(
   borderSide: BorderSide(
     color: borderColor.withOpacity(0.1),

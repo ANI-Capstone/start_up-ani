@@ -55,6 +55,8 @@ dependencies:
   flutter_native_splash: ^2.2.0+1
   flutter_launcher_icons: ^0.10.0
   curved_navigation_bar: ^1.0.3
+  swipe_to: ^1.0.2
+  uuid: ^3.0.6
 
 flutter_native_splash:
   image: assets/images/ani_splash.png

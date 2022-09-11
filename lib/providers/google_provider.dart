@@ -132,6 +132,12 @@ class GoogleProvider extends ChangeNotifier {
 }
 
 class AccountControl {
+  static getUserId() {
+    final firebaseAuth = FirebaseAuth.instance;
+
+    return firebaseAuth.currentUser?.uid;
+  }
+
   static Future logoutAccount(BuildContext context) async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
     final firebaseAuth = FirebaseAuth.instance;

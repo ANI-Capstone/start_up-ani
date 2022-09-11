@@ -8,7 +8,6 @@ import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -30,7 +29,10 @@ class _UserControlState extends State<UserControl> {
   Widget checkUserType() {
     final userType = _userData?.userTypeId;
     if (userType != 0) {
-      return UserViewScreen(userType: userType);
+      return UserViewScreen(
+        userType: userType,
+        user: _userData,
+      );
     }
 
     return UserSelect();
@@ -60,7 +62,8 @@ class _UserControlState extends State<UserControl> {
 
 class UserViewScreen extends StatefulWidget {
   int? userType;
-  UserViewScreen({Key? key, this.userType}) : super(key: key);
+  UserData? user;
+  UserViewScreen({Key? key, this.userType, this.user}) : super(key: key);
 
   @override
   State<UserViewScreen> createState() => _UserViewScreenState();
@@ -69,6 +72,7 @@ class UserViewScreen extends StatefulWidget {
 class _UserViewScreenState extends State<UserViewScreen> {
   int currentIndex = 1;
   int? userType;
+  UserData? user;
   var screens;
   var navItems;
 
@@ -77,50 +81,22 @@ class _UserViewScreenState extends State<UserViewScreen> {
     super.initState();
 
     userType = widget.userType as int;
+    user = widget.user;
 
     screens = userType == 1
         ? [
             UserFeeds(),
-            UserInbox(),
+            UserInbox(user: user!),
             UserPost(),
             UserNotificaiton(),
             UserProfile()
           ]
         : [
             UserFeeds(),
-            UserInbox(),
-            UserPost(),
+            UserInbox(user: user!),
             UserNotificaiton(),
             UserProfile()
           ];
-
-    /*navItems = userType == 1
-        ? [
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.house), label: 'Feed'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.solidMessage), label: 'Inbox'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.circlePlus), label: 'Post'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.solidBell),
-                label: 'Notification'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.solidUser), label: 'Profile'),
-          ]
-        : [
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.house), label: 'Feed'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.solidMessage), label: 'Inbox'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.circlePlus), label: 'Post'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.solidBell),
-                label: 'Notification'),
-            const BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.solidUser), label: 'Profile'),
-          ];*/
 
     navItems = userType == 1
         ? [
@@ -133,7 +109,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
         : [
             const FaIcon(FontAwesomeIcons.house),
             const FaIcon(FontAwesomeIcons.solidMessage),
-            const FaIcon(FontAwesomeIcons.circlePlus),
             const FaIcon(FontAwesomeIcons.solidBell),
             const FaIcon(FontAwesomeIcons.solidUser),
           ];
@@ -159,16 +134,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
           items: navItems,
         ),
       ),
-      /*bottomNavigationBar: BottomNavigationBar(
-          currentIndex: currentIndex,
-          onTap: (index) => setState(() => currentIndex = index),
-          type: BottomNavigationBarType.fixed,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          unselectedItemColor: Colors.white,
-          selectedItemColor: linkColor,
-          backgroundColor: primaryColor,
-          items: navItems),*/
     );
   }
 }

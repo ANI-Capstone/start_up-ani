@@ -1,5 +1,7 @@
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TestScreen extends StatelessWidget {
@@ -24,14 +26,12 @@ class TestScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseFirestoreDb db;
+    final id = FirebaseAuth.instance.currentUser?.uid;
     return Center(
       child: Container(
         child: ElevatedButton(
           onPressed: () => {
-            FirebaseFirestoreDb.getUser(context,
-                    userId: 'v7R4WRbEk1W0CzpmQRrt7Uwbgbq2')
-                .then((value) => {print(value.photoUrl)})
+            // FirebaseMessageApi.sendMessage(id.toString(), 'user-id-01')
           },
           child: Text('Test'),
         ),
