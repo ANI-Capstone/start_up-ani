@@ -86,29 +86,26 @@ class _UserInboxState extends State<UserInbox> {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(top: 15),
-                child: StreamBuilder<List<Chat>>(
-                    stream:
-                        FirebaseMessageApi.getChats(AccountControl.getUserId()),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        print(snapshot.error);
-                        return const Center(
-                            child: Text('Something went wrong.'));
-                      } else if (snapshot.hasData) {
-                        final chats = snapshot.data!;
-                        return SizedBox(
-                          height: 90,
-                          child: ListView(
-                              scrollDirection: Axis.vertical,
-                              children: chats.map(buildChat).toList()),
-                        );
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    }),
-              ),
+              StreamBuilder<List<Chat>>(
+                  stream:
+                      FirebaseMessageApi.getChats(AccountControl.getUserId()),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Center(child: Text('Something went wrong.'));
+                    } else if (snapshot.hasData) {
+                      final chats = snapshot.data!;
+                      return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          itemCount: chats.length,
+                          itemBuilder: (context, index) {
+                            return buildChat(chats[index]);
+                          });
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  }),
             ]),
           ),
         ),
@@ -116,22 +113,21 @@ class _UserInboxState extends State<UserInbox> {
     );
   }
 
-  Widget buildChat(Chat chat) => Container(
-      child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ChatScreen(
-                        receiver: chat.contact,
-                        author: User(
-                            name: widget.user.name,
-                            userId: widget.user.id,
-                            photoUrl: widget.user.photoUrl!),
-                      )),
-            );
-          },
-          child: ChatCard(chat: chat)));
+  Widget buildChat(Chat chat) => GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                    receiver: chat.contact,
+                    author: User(
+                        name: widget.user.name,
+                        userId: widget.user.id,
+                        photoUrl: widget.user.photoUrl!),
+                  )),
+        );
+      },
+      child: ChatCard(chat: chat));
 
   Widget buildUser(User user) => Container(
       margin: const EdgeInsets.only(right: 14),

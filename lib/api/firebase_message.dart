@@ -150,56 +150,8 @@ class FirebaseMessageApi {
           .collection('users')
           .doc(userId)
           .collection('user_chats')
+          .orderBy('last_message.sentAt', descending: true)
           .snapshots()
           .map((snapshot) =>
               snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList());
-
-  // static Future getChats(String userId) async {
-  //   var chats;
-
-  //   print('fck');
-
-  //   final collection = await FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(userId)
-  //       .collection('user_chats')
-  //       .get()
-  //       .then((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
-
-  //   // .map((snapshot) =>
-  //   //     snapshot.docs.map((doc) =>
-
-  //   // .map((snapshot) => print(snapshot));
-
-  //   // Chat.fromJson(doc.data())).toList()
-  // }
-
-  // static Stream<List<Chat>> getChats(String userId) {
-
-  //   final ref = FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(userId)
-  //       .collection('user_chats')
-  //       .snapshots()
-  //       .map((event) => print(event));
-  //   // .map((snapshot) =>
-  //   //     snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList());
-
-  //   return chats;
-  // }
-  // static Future uploadMessage(
-  //     String idUser, String message, Message replyMessage) async {
-  //   final refMessages =
-  //       FirebaseFirestore.instance.collection('chats/$idUser/messages');
-
-  //   final newMessage = Message(
-  //     idUser: myId,
-  //     urlAvatar: myUrlAvatar,
-  //     username: myUsername,
-  //     message: message,
-  //     createdAt: DateTime.now(),
-  //     replyMessage: replyMessage,
-  //   );
-  //   await refMessages.add(newMessage.toJson());
-  // }
 }
