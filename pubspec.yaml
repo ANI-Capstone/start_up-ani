@@ -57,6 +57,7 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   swipe_to: ^1.0.2
   uuid: ^3.0.6
+  timeago: ^3.3.0
 
 flutter_native_splash:
   image: assets/images/ani_splash.png

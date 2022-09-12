@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/chat.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/message.dart';
 import '../models/user.dart';
+import '../utils.dart';
 
 class FirebaseMessageApi {
   static getAuthor(String userId) => FirebaseFirestore.instance
@@ -14,8 +16,10 @@ class FirebaseMessageApi {
       .then((DocumentSnapshot documentSnapshot) =>
           User.fromJson(documentSnapshot.data() as Map<String, dynamic>));
 
-  static Stream<List<Message>> getMessages(String chatPathId) =>
-      FirebaseFirestore.instance
+  static Stream<List<Message>> getMessages(String chatPathId) {
+    var messages;
+    try {
+      messages = FirebaseFirestore.instance
           .collection('chats')
           .doc(chatPathId)
           .collection('messages')
@@ -24,6 +28,13 @@ class FirebaseMessageApi {
           .map((snapshot) => snapshot.docs
               .map((doc) => Message.fromJson(doc.data()))
               .toList());
+    } on Exception catch (e) {
+      print(e);
+      return messages;
+    }
+
+    return messages;
+  }
 
   static Stream<List<User>> getUsers() => FirebaseFirestore.instance
       .collection('users')
@@ -33,7 +44,7 @@ class FirebaseMessageApi {
 
   static generateChatId(String ids) => const Uuid().v5(Uuid.NAMESPACE_OID, ids);
 
-  static addUserChat(String authorId, String receiverId) async {
+  static Future<String> addUserChat(String authorId, String receiverId) async {
     final chatPathId = generateChatId('$authorId-$receiverId').toString();
 
     final authorRef = FirebaseFirestore.instance
@@ -57,55 +68,125 @@ class FirebaseMessageApi {
   }
 
   static Future<String> getChatPath(String authorId, String receiverId) async {
-    String chatPathId = '';
+    var chatPathId = '';
+
+    final userChatsRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(authorId)
+        .collection('user_chats')
+        .doc(receiverId);
 
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(authorId)
-          .collection('user_chats')
-          .doc(receiverId)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        if (documentSnapshot.exists) {
-          final data = documentSnapshot.data() as Map<String, dynamic>;
+      await userChatsRef.get().then((value) {
+        if (value.data() != null) {
+          final data = value.data() as Map<String, dynamic>;
           chatPathId = data['chat_path'];
         } else {
-          chatPathId = addUserChat(authorId, receiverId);
+          chatPathId = addUserChat(authorId, receiverId).toString();
         }
       });
-    } on Exception catch (e) {
-      print(e.toString());
-      return '';
+    } on TypeError catch (e) {
+      return addUserChat(authorId, receiverId).toString();
     }
 
     return chatPathId;
   }
 
-  static sendMessage(String chatPathId, String message, User user,
-      {Message? replyMessage}) async {
-    try {
-      var chatPath;
+  static setLatestMessage(User author, User receiver, Message message) async {
+    final authorRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(author.userId)
+        .collection('user_chats')
+        .doc(receiver.userId);
 
-      final chatPathRef = FirebaseFirestore.instance
-          .collection('chats')
-          .doc(chatPathId)
-          .collection('messages');
+    final receiverRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(receiver.userId)
+        .collection('user_chats')
+        .doc(author.userId);
 
-      final newMessage = Message(
-          message: message,
-          userId: user.userId!,
-          urlAvatar: user.photoUrl,
-          username: user.name,
-          createdAt: DateTime.now(),
-          replyMessage: replyMessage);
+    final latestMessageA = {
+      "last_message": {
+        "contact": receiver.toJson(),
+        "message": message.toJson(),
+        "sentAt": Utils.fromDateTimeToJson(DateTime.now())
+      }
+    };
 
-      await chatPathRef.add(newMessage.toJson());
-    } on Exception catch (e) {
-      print(e.toString());
-    }
+    final latestMessageB = {
+      "last_message": {
+        "contact": author.toJson(),
+        "message": message.toJson(),
+        "sentAt": Utils.fromDateTimeToJson(DateTime.now())
+      }
+    };
+
+    await authorRef.update(latestMessageA);
+    await receiverRef.update(latestMessageB);
   }
 
+  static sendMessage(
+      String chatPathId, String message, User author, User receiver,
+      {Message? replyMessage}) async {
+    final chatPathRef = FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatPathId)
+        .collection('messages');
+
+    final newMessage = Message(
+        message: message,
+        userId: author.userId!,
+        urlAvatar: author.photoUrl,
+        username: author.name,
+        createdAt: DateTime.now(),
+        replyMessage: replyMessage);
+
+    await chatPathRef.add(newMessage.toJson());
+    await setLatestMessage(author, receiver, newMessage);
+  }
+
+  static Stream<List<Chat>> getChats(String userId) =>
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('user_chats')
+          .snapshots()
+          .map((snapshot) =>
+              snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList());
+
+  // static Future getChats(String userId) async {
+  //   var chats;
+
+  //   print('fck');
+
+  //   final collection = await FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(userId)
+  //       .collection('user_chats')
+  //       .get()
+  //       .then((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+
+  //   // .map((snapshot) =>
+  //   //     snapshot.docs.map((doc) =>
+
+  //   // .map((snapshot) => print(snapshot));
+
+  //   // Chat.fromJson(doc.data())).toList()
+  // }
+
+  // static Stream<List<Chat>> getChats(String userId) {
+
+  //   final ref = FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(userId)
+  //       .collection('user_chats')
+  //       .snapshots()
+  //       .map((event) => print(event));
+  //   // .map((snapshot) =>
+  //   //     snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList());
+
+  //   return chats;
+  // }
   // static Future uploadMessage(
   //     String idUser, String message, Message replyMessage) async {
   //   final refMessages =

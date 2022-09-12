@@ -128,7 +128,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
           color: primaryColor,
           backgroundColor: Colors.transparent,
           buttonBackgroundColor: Colors.transparent,
-          height: 66,
+          height: 55,
           index: currentIndex,
           onTap: (index) => setState(() => currentIndex = index),
           items: navItems,

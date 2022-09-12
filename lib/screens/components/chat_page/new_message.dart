@@ -9,17 +9,19 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NewMessageWidget extends StatefulWidget {
   final FocusNode focusNode;
-  final User user;
   final Message? replyMessage;
   final VoidCallback onCancelReply;
   final String chatPathId;
+  final User author;
+  final User receiver;
 
   const NewMessageWidget({
     required this.focusNode,
-    required this.user,
     this.replyMessage,
     required this.onCancelReply,
     required this.chatPathId,
+    required this.author,
+    required this.receiver,
     Key? key,
   }) : super(key: key);
 
@@ -31,29 +33,32 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
   final _controller = TextEditingController();
   String message = '';
   String? chatPathId;
+  User? author;
+  User? receiver;
   Message? replyMessage;
-  User? user;
 
   @override
   void initState() {
     super.initState();
     chatPathId = widget.chatPathId;
     replyMessage = widget.replyMessage;
-    user = widget.user;
+    author = widget.author;
+    receiver = widget.receiver;
   }
 
-  static final inputTopRadius = Radius.circular(12);
-  static final inputBottomRadius = Radius.circular(24);
+  static const inputTopRadius = Radius.circular(12);
+  static const inputBottomRadius = Radius.circular(24);
 
   void sendMessage() async {
     FocusScope.of(context).unfocus();
     widget.onCancelReply();
 
     try {
-      await FirebaseMessageApi.sendMessage(chatPathId!, message, user!,
+      await FirebaseMessageApi.sendMessage(
+          chatPathId!, message, author!, receiver!,
           replyMessage: replyMessage);
     } catch (e) {
-      print(e.toString());
+      ShoWInfo.errorAlert(context, e.toString(), 5);
     }
 
     _controller.clear();
@@ -65,7 +70,7 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
 
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -99,35 +104,35 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
               ],
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           GestureDetector(
             onTap: message.trim().isEmpty ? null : sendMessage,
             child: Container(
               height: 40,
               width: 40,
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: primaryColor,
               ),
-              child: FaIcon(
+              child: const FaIcon(
                 FontAwesomeIcons.solidPaperPlane,
                 color: Colors.white,
                 size: 20,
               ),
             ),
           ),
-          SizedBox(width: 5)
+          const SizedBox(width: 5)
         ],
       ),
     );
   }
 
   Widget buildReply() => Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.2),
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: inputTopRadius,
             topRight: inputTopRadius,
           ),

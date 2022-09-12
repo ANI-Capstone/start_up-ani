@@ -18,45 +18,46 @@ class MessagesWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<List<Message>>(
-        stream: FirebaseMessageApi.getMessages(chatPathId),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const Center(child: CircularProgressIndicator());
-            default:
-              if (snapshot.hasError) {
-                return buildText('Something went wrong.');
-              } else {
-                final messages = snapshot.data!;
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Message>>(
+      stream: FirebaseMessageApi.getMessages(chatPathId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return buildText('Something went wrong.');
+        } else if (snapshot.data == null) {
+          return Container();
+        } else {
+          final messages = snapshot.data!;
 
-                return messages.isEmpty
-                    ? buildText('Say Hi..')
-                    : ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        reverse: true,
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final message = messages[index];
+          return messages.isEmpty
+              ? buildText('Say Hi..')
+              : messageBuilder(messages);
+        }
+      },
+    );
+  }
 
-                          return SwipeTo(
-                            onRightSwipe: () => onSwipedMessage(message),
-                            child: MessageWidget(
-                              message: message,
-                              isMe: message.userId == authorId,
-                            ),
-                          );
-                        },
-                      );
-              }
-          }
+  Widget messageBuilder(List<Message> messages) => ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        reverse: true,
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          final message = messages[index];
+
+          return SwipeTo(
+            onRightSwipe: () => onSwipedMessage(message),
+            child: MessageWidget(
+              message: message,
+              isMe: message.userId == authorId,
+            ),
+          );
         },
       );
 
   Widget buildText(String text) => Center(
         child: Text(
           text,
-          style: TextStyle(fontSize: 15),
+          style: const TextStyle(fontSize: 15),
         ),
       );
 }

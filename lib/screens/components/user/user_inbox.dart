@@ -1,10 +1,12 @@
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
+import 'package:ani_capstone/models/chat.dart';
 import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_screen.dart';
+import 'package:ani_capstone/screens/user_control.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -84,15 +86,52 @@ class _UserInboxState extends State<UserInbox> {
                   ),
                 ),
               ),
-              // ChatCard(message: sample),
-              // ChatCard(message: sample),
-              // ChatCard(message: sample)
+              Container(
+                padding: const EdgeInsets.only(top: 15),
+                child: StreamBuilder<List<Chat>>(
+                    stream:
+                        FirebaseMessageApi.getChats(AccountControl.getUserId()),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        print(snapshot.error);
+                        return const Center(
+                            child: Text('Something went wrong.'));
+                      } else if (snapshot.hasData) {
+                        final chats = snapshot.data!;
+                        return SizedBox(
+                          height: 90,
+                          child: ListView(
+                              scrollDirection: Axis.vertical,
+                              children: chats.map(buildChat).toList()),
+                        );
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    }),
+              ),
             ]),
           ),
         ),
       ),
     );
   }
+
+  Widget buildChat(Chat chat) => Container(
+      child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                        receiver: chat.contact,
+                        author: User(
+                            name: widget.user.name,
+                            userId: widget.user.id,
+                            photoUrl: widget.user.photoUrl!),
+                      )),
+            );
+          },
+          child: ChatCard(chat: chat)));
 
   Widget buildUser(User user) => Container(
       margin: const EdgeInsets.only(right: 14),

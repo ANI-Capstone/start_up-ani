@@ -42,7 +42,8 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     Future getChatPath() async {
-      return await FirebaseMessageApi.getChatPath(authorId!, receiverId!);
+      return FirebaseMessageApi.getChatPath(authorId!, receiverId!)
+          .then((value) => value);
     }
 
     return Scaffold(
@@ -93,16 +94,13 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         body: FutureBuilder(
             future: getChatPath(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
+            builder: (BuildContext context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Container();
               } else if (snapshot.hasError) {
-                return ShoWInfo.errorAlert(
-                    context, snapshot.error.toString(), 5);
-              } else if (snapshot.data == null) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: Text('Something went wrong.'));
               } else {
-                final chatPathId = snapshot.data;
+                final chatPathId = snapshot.data.toString();
                 return Column(children: [
                   Expanded(
                       child: MessagesWidget(
@@ -115,10 +113,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   )),
                   NewMessageWidget(
                     focusNode: focusNode,
-                    user: author!,
                     onCancelReply: cancelReply,
                     replyMessage: replyMessage,
                     chatPathId: chatPathId,
+                    author: author!,
+                    receiver: receiver!,
                   )
                 ]);
               }
