@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/chat.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,7 +28,6 @@ class FirebaseMessageApi {
               .map((doc) => Message.fromJson(doc.data()))
               .toList());
     } on Exception catch (e) {
-      print(e);
       return messages;
     }
 
@@ -44,9 +42,8 @@ class FirebaseMessageApi {
 
   static generateChatId(String ids) => const Uuid().v5(Uuid.NAMESPACE_OID, ids);
 
-  static Future<String> addUserChat(String authorId, String receiverId) async {
-    final chatPathId = generateChatId('$authorId-$receiverId').toString();
-
+  static Future<String> addUserChat(
+      String chatPathId, String authorId, String receiverId) async {
     final authorRef = FirebaseFirestore.instance
         .collection('users')
         .doc(authorId)
@@ -80,13 +77,15 @@ class FirebaseMessageApi {
       await userChatsRef.get().then((value) {
         if (value.data() != null) {
           final data = value.data() as Map<String, dynamic>;
-          chatPathId = data['chat_path'];
+          chatPathId = data['chat_path'].toString();
         } else {
-          chatPathId = addUserChat(authorId, receiverId).toString();
+          chatPathId = generateChatId('$authorId-$receiverId').toString();
+          addUserChat(chatPathId, authorId, receiverId).toString();
         }
       });
     } on TypeError catch (e) {
-      return addUserChat(authorId, receiverId).toString();
+      chatPathId = generateChatId('$authorId-$receiverId').toString();
+      addUserChat(chatPathId, authorId, receiverId).toString();
     }
 
     return chatPathId;
