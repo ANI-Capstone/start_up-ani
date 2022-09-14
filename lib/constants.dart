@@ -8,6 +8,7 @@ const redColor = Color(0xFFE85050);
 const borderColor = Color(0xFF121212);
 const linkColor = Color(0xFF315300);
 const userBgColor = Color(0xFFF5F5F5);
+const starColor = Color(0xFFFFB800);
 
 const defaultPadding = 32.0;
 
