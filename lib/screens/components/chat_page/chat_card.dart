@@ -5,43 +5,14 @@ import 'package:ani_capstone/models/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class ChatCard extends StatefulWidget {
+class ChatCard extends StatelessWidget {
   Chat chat;
   ChatCard({Key? key, required this.chat}) : super(key: key);
 
   @override
-  _ChatCardState createState() => _ChatCardState();
-}
-
-class _ChatCardState extends State<ChatCard> {
-  Chat? chat;
-  Timer? timer;
-
-  String timeAgo = '';
-
-  @override
-  void initState() {
-    super.initState();
-    chat = widget.chat;
-
-    timer = Timer.periodic(
-      const Duration(seconds: 30),
-      (timer) {
-        setState(() {
-          timeAgo = timeago.format(chat!.sentAt, locale: 'en_short');
-        });
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    timer?.cancel();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    String timeAgo = '';
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Container(
@@ -55,7 +26,7 @@ class _ChatCardState extends State<ChatCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
-                  backgroundImage: NetworkImage(chat!.contact.photoUrl),
+                  backgroundImage: NetworkImage(chat.contact.photoUrl),
                   radius: 28),
               Expanded(
                 child: Padding(
@@ -65,9 +36,9 @@ class _ChatCardState extends State<ChatCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          (chat!.contact.name.length < 20)
-                              ? chat!.contact.name
-                              : '${chat!.contact.name.toString().characters.take(20)}...',
+                          (chat.contact.name.length < 20)
+                              ? chat.contact.name
+                              : '${chat.contact.name.toString().characters.take(20)}...',
                           style: const TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 14,
@@ -78,9 +49,9 @@ class _ChatCardState extends State<ChatCard> {
                           height: 5,
                         ),
                         Text(
-                            (chat!.message.message.length < 58)
-                                ? chat!.message.message
-                                : '${chat!.message.message.toString().characters.take(58)}...',
+                            (chat.message.message.length < 58)
+                                ? chat.message.message
+                                : '${chat.message.message.toString().characters.take(58)}...',
                             style: TextStyle(
                                 fontFamily: 'Roboto',
                                 fontSize: 12.5,
@@ -93,7 +64,7 @@ class _ChatCardState extends State<ChatCard> {
                   alignment: Alignment.centerRight,
                   child: Text(
                     timeAgo.isEmpty
-                        ? timeago.format(chat!.sentAt, locale: 'en_short')
+                        ? timeago.format(chat.sentAt, locale: 'en_short')
                         : timeAgo,
                     style: const TextStyle(color: linkColor, fontSize: 13),
                   ))

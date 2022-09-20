@@ -29,18 +29,18 @@ class TestScreen extends StatelessWidget {
     final id = FirebaseAuth.instance.currentUser?.uid;
     return Center(
       child: Container(
-          child: StreamBuilder(
-              stream:
-                  FirebaseMessageApi.getChats('L5VNZfQT0adonCslrmqBQtQjZ3s2'),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  print(snapshot.data);
-                  return Container();
-                } else {
-                  print(snapshot.data);
-                  return Container();
-                }
-              })
+          // child: StreamBuilder(
+          //     stream:
+          //         FirebaseMessageApi.getChats('L5VNZfQT0adonCslrmqBQtQjZ3s2'),
+          //     builder: (context, snapshot) {
+          //       if (snapshot.hasData) {
+          //         print(snapshot.data);
+          //         return Container();
+          //       } else {
+          //         print(snapshot.data);
+          //         return Container();
+          //       }
+          //     })
           // child: ElevatedButton(
           //   onPressed: () => {
           //     // FirebaseMessageApi.getChats('L5VNZfQT0adonCslrmqBQtQjZ3s2')

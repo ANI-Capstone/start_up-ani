@@ -91,6 +91,19 @@ class FirebaseMessageApi {
     return chatPathId;
   }
 
+  static setNotification(userId) async {
+    final notifRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('notification');
+
+    final notification = {
+      "message": {"timestamp": Utils.fromDateTimeToJson(DateTime.now())}
+    };
+
+    await notifRef.add(notification);
+  }
+
   static setLatestMessage(User author, User receiver, Message message) async {
     final authorRef = FirebaseFirestore.instance
         .collection('users')
@@ -142,15 +155,26 @@ class FirebaseMessageApi {
 
     await chatPathRef.add(newMessage.toJson());
     await setLatestMessage(author, receiver, newMessage);
+    await setNotification(author.userId);
+    await setNotification(receiver.userId);
   }
 
-  static Stream<List<Chat>> getChats(String userId) =>
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .collection('user_chats')
-          .orderBy('last_message.sentAt', descending: true)
-          .snapshots()
-          .map((snapshot) =>
-              snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList());
+  static Future<List<Chat>> getChats(String userId) {
+    final chats = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('user_chats')
+        .orderBy('last_message.sentAt', descending: true)
+        .get()
+        .then((chats) =>
+            chats.docs.map((doc) => Chat.fromJson(doc.data())).toList());
+
+    return chats;
+  }
+
+  static Stream chatStream(String userId) => FirebaseFirestore.instance
+      .collection('users')
+      .doc(userId)
+      .collection('notification')
+      .snapshots(includeMetadataChanges: true);
 }

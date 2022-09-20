@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/models/chat.dart';
@@ -7,11 +9,13 @@ import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_screen.dart';
 import 'package:ani_capstone/screens/user_control.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../constants.dart';
+import '../pull_refresh.dart';
 
 class UserInbox extends StatefulWidget {
   UserData user;
@@ -24,6 +28,8 @@ class UserInbox extends StatefulWidget {
 
 class _UserInboxState extends State<UserInbox> {
   User? author;
+  Timer? timer;
+  List<Chat> chats = [];
 
   @override
   void initState() {
@@ -32,6 +38,40 @@ class _UserInboxState extends State<UserInbox> {
         name: widget.user.name,
         userId: widget.user.id,
         photoUrl: widget.user.photoUrl!);
+
+    chatListener();
+    loadChats();
+
+    timer = Timer.periodic(
+      const Duration(seconds: 30),
+      (timer) {
+        setState(() {
+          loadChats();
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer?.cancel();
+  }
+
+  Future loadChats() async {
+    await FirebaseMessageApi.getChats(widget.user.id!).then((data) {
+      if (mounted) {
+        setState(() => chats = data);
+      }
+    });
+  }
+
+  void chatListener() async {
+    Stream chatStream = FirebaseMessageApi.chatStream(widget.user.id!);
+
+    chatStream.listen((snapshot) {
+      loadChats();
+    });
   }
 
   @override
@@ -86,32 +126,25 @@ class _UserInboxState extends State<UserInbox> {
                   ),
                 ),
               ),
-              StreamBuilder<List<Chat>>(
-                  stream:
-                      FirebaseMessageApi.getChats(AccountControl.getUserId()),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return const Center(child: Text('Something went wrong.'));
-                    } else if (snapshot.hasData) {
-                      final chats = snapshot.data!;
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          itemCount: chats.length,
-                          itemBuilder: (context, index) {
-                            return buildChat(chats[index]);
-                          });
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  }),
+              buildList()
             ]),
           ),
         ),
       ),
     );
   }
+
+  Widget buildList() => chats.isEmpty
+      ? const Center(child: CircularProgressIndicator())
+      : RefreshWidget(
+          onRefresh: loadChats,
+          child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                return buildChat(chats[index]);
+              }),
+        );
 
   Widget buildChat(Chat chat) => GestureDetector(
       onTap: () {
