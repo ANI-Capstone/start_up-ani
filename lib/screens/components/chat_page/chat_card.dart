@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/chat.dart';
+import 'package:ani_capstone/models/message.dart';
+import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -39,24 +41,18 @@ class ChatCard extends StatelessWidget {
                           (chat.contact.name.length < 20)
                               ? chat.contact.name
                               : '${chat.contact.name.toString().characters.take(20)}...',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: unread(chat.message)
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               color: linkColor),
                         ),
                         const SizedBox(
                           height: 5,
                         ),
-                        Text(
-                            (chat.message.message.length < 58)
-                                ? chat.message.message
-                                : '${chat.message.message.toString().characters.take(58)}...',
-                            style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w500,
-                                color: linkColor.withOpacity(0.8)))
+                        buildText(chat.message)
                       ]),
                 ),
               ),
@@ -66,12 +62,34 @@ class ChatCard extends StatelessWidget {
                     timeAgo.isEmpty
                         ? timeago.format(chat.sentAt, locale: 'en_short')
                         : timeAgo,
-                    style: const TextStyle(color: linkColor, fontSize: 13),
+                    style: TextStyle(
+                        color: linkColor,
+                        fontSize: 13,
+                        fontWeight: unread(chat.message)
+                            ? FontWeight.bold
+                            : FontWeight.normal),
                   ))
             ],
           ),
         ),
       ),
     );
+  }
+
+  bool unread(Message message) {
+    return message.userId == AccountControl.getUserId() ? false : !message.seen;
+  }
+
+  Widget buildText(Message message) {
+    String author = message.userId == AccountControl.getUserId() ? 'You: ' : '';
+    return Text(
+        (message.message.length < 53)
+            ? author + message.message
+            : '${message.message.toString().characters.take(53)}...',
+        style: TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 12.5,
+            fontWeight: unread(message) ? FontWeight.bold : FontWeight.normal,
+            color: linkColor.withOpacity(0.9)));
   }
 }

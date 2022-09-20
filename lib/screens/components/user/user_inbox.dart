@@ -135,7 +135,7 @@ class _UserInboxState extends State<UserInbox> {
   }
 
   Widget buildList() => chats.isEmpty
-      ? const Center(child: CircularProgressIndicator())
+      ? const Center(child: Text('No chats'))
       : RefreshWidget(
           onRefresh: loadChats,
           child: ListView.builder(
@@ -148,6 +148,9 @@ class _UserInboxState extends State<UserInbox> {
 
   Widget buildChat(Chat chat) => GestureDetector(
       onTap: () {
+        FirebaseMessageApi.readMessage(
+            AccountControl.getUserId(), chat.contact.userId!, chat.message);
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -190,10 +193,10 @@ class _UserInboxState extends State<UserInbox> {
               Text(
                 user.name,
                 style: const TextStyle(
-                    fontFamily: 'Roboto',
-                    color: linkColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold),
+                  fontFamily: 'Roboto',
+                  color: linkColor,
+                  fontSize: 11,
+                ),
                 textAlign: TextAlign.center,
               )
             ],

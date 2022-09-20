@@ -93,15 +93,26 @@ class FirebaseMessageApi {
 
   static setNotification(userId) async {
     final notifRef = FirebaseFirestore.instance
-        .collection('users')
+        .collection('notifications')
         .doc(userId)
-        .collection('notification');
+        .collection('message')
+        .doc('message_notif');
 
     final notification = {
-      "message": {"timestamp": Utils.fromDateTimeToJson(DateTime.now())}
+      "timestamp": Utils.fromDateTimeToJson(DateTime.now())
     };
 
-    await notifRef.add(notification);
+    try {
+      await notifRef.get().then((value) {
+        if (!value.exists) {
+          return notifRef.set(notification);
+        }
+      });
+    } on Exception catch (e) {
+      return notifRef.set(notification);
+    }
+
+    await notifRef.update(notification);
   }
 
   static setLatestMessage(User author, User receiver, Message message) async {
@@ -137,8 +148,8 @@ class FirebaseMessageApi {
     await receiverRef.update(latestMessageB);
   }
 
-  static sendMessage(
-      String chatPathId, String message, User author, User receiver,
+  static sendMessage(String chatPathId, String message, User author,
+      User receiver, String type,
       {Message? replyMessage}) async {
     final chatPathRef = FirebaseFirestore.instance
         .collection('chats')
@@ -151,12 +162,32 @@ class FirebaseMessageApi {
         urlAvatar: author.photoUrl,
         username: author.name,
         createdAt: DateTime.now(),
-        replyMessage: replyMessage);
+        replyMessage: replyMessage,
+        type: type,
+        seen: false);
 
     await chatPathRef.add(newMessage.toJson());
     await setLatestMessage(author, receiver, newMessage);
     await setNotification(author.userId);
     await setNotification(receiver.userId);
+  }
+
+  static readMessage(String author, String receiver, Message message) {
+    final authorRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(author)
+        .collection('user_chats')
+        .doc(receiver);
+
+    final latestMessageB = {
+      "last_message": {
+        "message": {"seen": true},
+      }
+    };
+
+    if (message.userId != author) {
+      authorRef.update(latestMessageB);
+    }
   }
 
   static Future<List<Chat>> getChats(String userId) {
@@ -173,8 +204,9 @@ class FirebaseMessageApi {
   }
 
   static Stream chatStream(String userId) => FirebaseFirestore.instance
-      .collection('users')
+      .collection('notifications')
       .doc(userId)
-      .collection('notification')
+      .collection('message')
+      .doc('message_notif')
       .snapshots(includeMetadataChanges: true);
 }

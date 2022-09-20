@@ -49,16 +49,16 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
   static const inputTopRadius = Radius.circular(12);
   static const inputBottomRadius = Radius.circular(24);
 
-  void sendMessage() async {
+  void sendMessage(String type) async {
     FocusScope.of(context).unfocus();
     widget.onCancelReply();
 
     try {
       await FirebaseMessageApi.sendMessage(
-          chatPathId!, message, author!, receiver!,
+          chatPathId!, message, author!, receiver!, type,
           replyMessage: replyMessage);
     } catch (e) {
-      ShoWInfo.errorAlert(context, e.toString(), 5);
+      null;
     }
 
     _controller.clear();
@@ -106,7 +106,9 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
           ),
           const SizedBox(width: 10),
           GestureDetector(
-            onTap: message.trim().isEmpty ? null : sendMessage,
+            onTap: () {
+              message.trim().isEmpty ? null : sendMessage('TEXT');
+            },
             child: Container(
               height: 40,
               width: 40,

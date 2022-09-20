@@ -98,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Container();
               } else if (snapshot.hasError) {
-                return Center(child: Text('Something went wrong.'));
+                return const Center(child: Text('Something went wrong.'));
               } else {
                 final chatPathId = snapshot.data.toString();
                 return Column(children: [

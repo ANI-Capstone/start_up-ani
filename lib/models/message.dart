@@ -2,11 +2,6 @@ import 'package:meta/meta.dart';
 
 import '../utils.dart';
 
-class MessageField {
-  static final String message = 'message';
-  static final String createdAt = 'createdAt';
-}
-
 class Message {
   final String userId;
   final String urlAvatar;
@@ -14,6 +9,8 @@ class Message {
   final String message;
   final DateTime createdAt;
   final Message? replyMessage;
+  final String type;
+  final bool seen;
 
   const Message({
     required this.userId,
@@ -21,19 +18,22 @@ class Message {
     required this.username,
     required this.message,
     required this.createdAt,
+    required this.type,
+    required this.seen,
     this.replyMessage,
   });
 
   static Message fromJson(Map<String, dynamic> json) => Message(
-        userId: json['idUser'],
-        urlAvatar: json['urlAvatar'],
-        username: json['username'],
-        message: json['message'],
-        createdAt: Utils.toDateTime(json['createdAt']),
-        replyMessage: json['replyMessage'] == null
-            ? null
-            : Message.fromJson(json['replyMessage']),
-      );
+      userId: json['idUser'],
+      urlAvatar: json['urlAvatar'],
+      username: json['username'],
+      message: json['message'],
+      createdAt: Utils.toDateTime(json['createdAt']),
+      replyMessage: json['replyMessage'] == null
+          ? null
+          : Message.fromJson(json['replyMessage']),
+      type: json['type'],
+      seen: json['seen']);
 
   Map<String, dynamic> toJson() => {
         'idUser': userId,
@@ -41,6 +41,8 @@ class Message {
         'username': username,
         'message': message,
         'createdAt': Utils.fromDateTimeToJson(createdAt),
-        'replyMessage': replyMessage == null ? null : replyMessage?.toJson(),
+        'replyMessage': replyMessage ?? replyMessage?.toJson(),
+        'type': type,
+        'seen': seen
       };
 }
