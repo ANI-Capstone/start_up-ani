@@ -179,14 +179,12 @@ class FirebaseMessageApi {
         .collection('user_chats')
         .doc(receiver);
 
-    final latestMessageB = {
-      "last_message": {
-        "message": {"seen": true},
-      }
-    };
-
     if (message.userId != author) {
-      authorRef.update(latestMessageB);
+      authorRef.update({
+        'last_message': {
+          'message': {'seen': true},
+        }
+      });
     }
   }
 
