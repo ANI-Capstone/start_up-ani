@@ -325,7 +325,7 @@ class _UserProfileState extends State<UserProfile> {
             SizedBox(height: 50),
             Center(
               child: Text(
-                "No post available",
+                "No posts",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             )

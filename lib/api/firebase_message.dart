@@ -181,9 +181,7 @@ class FirebaseMessageApi {
 
     if (message.userId != author) {
       authorRef.update({
-        'last_message': {
-          'message': {'seen': true},
-        }
+        'last_message.message.seen': true,
       });
     }
   }

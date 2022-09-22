@@ -174,8 +174,8 @@ class FirebaseFirestoreDb {
       {String? email}) {
     if (json.data() == null) {
       return ShoWInfo.showAlertDialog(context,
-          title: 'No Account Data',
-          message: "Please complete your account creation.",
+          title: 'Complete Registration',
+          message: "Please complete your account registration.",
           btnText: 'Continue', onClick: () {
         Navigator.push(
             context,

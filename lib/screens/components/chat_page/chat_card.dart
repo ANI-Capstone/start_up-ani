@@ -38,9 +38,9 @@ class ChatCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          (chat.contact.name.length < 20)
+                          (chat.contact.name.length < 25)
                               ? chat.contact.name
-                              : '${chat.contact.name.toString().characters.take(20)}...',
+                              : '${chat.contact.name.toString().characters.take(25)}...',
                           style: TextStyle(
                               fontFamily: 'Roboto',
                               fontSize: 14,

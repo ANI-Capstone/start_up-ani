@@ -144,8 +144,8 @@ class AccountControl {
 
     try {
       if (googleSignIn.currentUser != null) {
-        await googleSignIn.signOut();
         await googleSignIn.disconnect();
+        await googleSignIn.signOut();
       }
 
       await firebaseAuth.signOut().then((value) => Navigator.push(
