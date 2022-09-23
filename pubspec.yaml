@@ -58,6 +58,12 @@ dependencies:
   swipe_to: ^1.0.2
   uuid: ^3.0.6
   timeago: ^3.3.0
+  flutter_local_notifications: ^9.1.4
+  timezone: ^0.8.0
+  rxdart: ^0.27.5
+  path_provider: ^2.0.11
+  http: ^0.13.5
+  flutter_native_timezone: ^2.0.0
 
 flutter_native_splash:
   image: assets/images/ani_splash.png

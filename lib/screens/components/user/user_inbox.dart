@@ -30,6 +30,8 @@ class _UserInboxState extends State<UserInbox> {
   User? author;
   Timer? timer;
   List<Chat> chats = [];
+  late StreamSubscription listener;
+  var notifData;
 
   @override
   void initState() {
@@ -56,6 +58,7 @@ class _UserInboxState extends State<UserInbox> {
   void dispose() {
     super.dispose();
     timer?.cancel();
+    listener.cancel();
   }
 
   Future loadChats() async {
@@ -67,9 +70,14 @@ class _UserInboxState extends State<UserInbox> {
   }
 
   void chatListener() async {
-    Stream chatStream = FirebaseMessageApi.chatStream(widget.user.id!);
+    final chatRef = FirebaseMessageApi.chatStream(widget.user.id!);
 
-    chatStream.listen((snapshot) {
+    listener = chatRef.listen((event) {
+      for (var change in event.docChanges) {
+        if (change.type == DocumentChangeType.modified) {
+          print("Modified City: ${change.doc.data()}");
+        }
+      }
       loadChats();
     });
   }

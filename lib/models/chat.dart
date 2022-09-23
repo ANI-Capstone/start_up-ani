@@ -24,7 +24,7 @@ class Chat {
 
   Map<String, dynamic> toJson() => {
         'chat_path': chatPathId,
-        'contact': contact,
+        'contact': contact.toJson(),
         'message': message.toJson(),
         'sentAt': Utils.fromDateTimeToJson(sentAt),
       };

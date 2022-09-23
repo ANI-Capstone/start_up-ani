@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:ani_capstone/models/chat.dart';
+import 'package:ani_capstone/models/notification.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -91,7 +92,12 @@ class FirebaseMessageApi {
     return chatPathId;
   }
 
-  static setNotification(userId) async {
+  static setNotification(
+      {String? userId,
+      String? contactId,
+      String? name,
+      String? message,
+      String? payload}) async {
     final notifRef = FirebaseFirestore.instance
         .collection('notifications')
         .doc(userId)
@@ -99,7 +105,17 @@ class FirebaseMessageApi {
         .doc('message_notif');
 
     final notification = {
-      "timestamp": Utils.fromDateTimeToJson(DateTime.now())
+      'notification': {
+        "type": 0,
+        "type_name": "MESSAGE",
+        "notif": {
+          'contactId': contactId,
+          'title': name,
+          'body': message,
+          'payload': payload,
+          'timestamp': Utils.fromDateTimeToJson(DateTime.now())
+        }
+      }
     };
 
     try {
@@ -146,6 +162,8 @@ class FirebaseMessageApi {
 
     await authorRef.update(latestMessageA);
     await receiverRef.update(latestMessageB);
+
+    return [latestMessageA, latestMessageB];
   }
 
   static sendMessage(String chatPathId, String message, User author,
@@ -167,9 +185,21 @@ class FirebaseMessageApi {
         seen: false);
 
     await chatPathRef.add(newMessage.toJson());
-    await setLatestMessage(author, receiver, newMessage);
-    await setNotification(author.userId);
-    await setNotification(receiver.userId);
+    final messages = await setLatestMessage(author, receiver, newMessage);
+
+    await setNotification(
+        userId: author.userId,
+        contactId: messages[0]['last_message']['message']['idUser'],
+        name: messages[0]['last_message']['message']['username'],
+        message: messages[0]['last_message']['message']['message'],
+        payload: chatPathId);
+
+    await setNotification(
+        userId: receiver.userId,
+        contactId: messages[1]['last_message']['message']['idUser'],
+        name: messages[1]['last_message']['message']['username'],
+        message: messages[1]['last_message']['message']['message'],
+        payload: chatPathId);
   }
 
   static readMessage(String author, String receiver, Message message) {
@@ -199,10 +229,9 @@ class FirebaseMessageApi {
     return chats;
   }
 
-  static Stream chatStream(String userId) => FirebaseFirestore.instance
+  static chatStream(String userId) => FirebaseFirestore.instance
       .collection('notifications')
       .doc(userId)
       .collection('message')
-      .doc('message_notif')
       .snapshots(includeMetadataChanges: true);
 }
