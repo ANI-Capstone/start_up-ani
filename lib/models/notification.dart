@@ -18,11 +18,12 @@ class MessageNotification {
 
   static MessageNotification fromJson(Map<String, dynamic> json) =>
       MessageNotification(
-          contactId: json['notif']['userId'],
-          title: json['notif']['title'],
-          body: json['notif']['body'],
-          payload: (json['notif']['payload']),
-          timestamp: Utils.toDateTime(json['notif']['timestamp']));
+          contactId: json['notification']['notif']['contactId'],
+          title: json['notification']['notif']['title'],
+          body: json['notification']['notif']['body'],
+          payload: (json['notification']['notif']['payload']),
+          timestamp:
+              Utils.toDateTime(json['notification']['notif']['timestamp']));
 
   Map<String, dynamic> toJson() => {
         'userId': contactId,

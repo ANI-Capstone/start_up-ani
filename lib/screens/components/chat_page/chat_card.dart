@@ -85,7 +85,7 @@ class ChatCard extends StatelessWidget {
     return Text(
         (message.message.length < 53)
             ? author + message.message
-            : '${message.message.toString().characters.take(53)}...',
+            : '$author${message.message.toString().characters.take(53)}...',
         style: TextStyle(
             fontFamily: 'Roboto',
             fontSize: 12.5,

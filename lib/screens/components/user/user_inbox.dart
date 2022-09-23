@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
+import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/models/chat.dart';
 import 'package:ani_capstone/models/message.dart';
+import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
@@ -31,11 +33,16 @@ class _UserInboxState extends State<UserInbox> {
   Timer? timer;
   List<Chat> chats = [];
   late StreamSubscription listener;
+  late final NotificationApi notificationService;
   var notifData;
 
   @override
   void initState() {
     super.initState();
+
+    notificationService = NotificationApi();
+    notificationService.initializePlatformNotifications();
+
     author = User(
         name: widget.user.name,
         userId: widget.user.id,
@@ -72,10 +79,18 @@ class _UserInboxState extends State<UserInbox> {
   void chatListener() async {
     final chatRef = FirebaseMessageApi.chatStream(widget.user.id!);
 
-    listener = chatRef.listen((event) {
+    listener = chatRef.listen((event) async {
       for (var change in event.docChanges) {
         if (change.type == DocumentChangeType.modified) {
-          print("Modified City: ${change.doc.data()}");
+          final messageNotif = MessageNotification.fromJson(change.doc.data());
+
+          if (AccountControl.getUserId() != messageNotif.contactId) {
+            await notificationService.showLocalNotification(
+                id: 0,
+                title: messageNotif.title,
+                body: messageNotif.body,
+                payload: messageNotif.payload);
+          }
         }
       }
       loadChats();
