@@ -3,12 +3,14 @@ import 'package:form_field_validator/form_field_validator.dart';
 
 const primaryColor = Color(0xFFC6D8AF);
 const textColor = Color(0xFF121212);
-const backgroundColor = Color.fromARGB(255, 255, 255, 255);
+const backgroundColor = Colors.white;
 const redColor = Color(0xFFE85050);
 const borderColor = Color(0xFF121212);
 const linkColor = Color(0xFF315300);
 const userBgColor = Color(0xFFF5F5F5);
 const starColor = Color(0xFFFFB800);
+const badgeColor = Color(0xFFFF8C00);
+const plusColor = Color(0xFFD5D5D5);
 
 const defaultPadding = 32.0;
 
@@ -52,7 +54,7 @@ InputDecoration fieldDecoration = InputDecoration(
 final passwordValidator = MultiValidator(
   [
     RequiredValidator(errorText: 'Password is required'),
-    MinLengthValidator(6, errorText: 'Password must be at least 8 digits long'),
+    MinLengthValidator(8, errorText: 'Password must be at least 8 digits long'),
   ],
 );
 

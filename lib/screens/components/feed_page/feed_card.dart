@@ -100,19 +100,37 @@ class FeedCard extends StatelessWidget {
                           )),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Row(
-                              children: [
-                                Row(
+                            child: Row(children: [
+                              Row(
+                                children: const [
+                                  Padding(
+                                    padding: EdgeInsets.only(bottom: 2),
+                                    child: FaIcon(
+                                        FontAwesomeIcons.solidThumbsUp,
+                                        color: linkColor),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'Likes',
+                                    style: TextStyle(
+                                        fontFamily: 'Roboto',
+                                        color: linkColor,
+                                        fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Row(
                                   children: const [
                                     Padding(
-                                      padding: EdgeInsets.only(bottom: 2),
-                                      child: FaIcon(
-                                          FontAwesomeIcons.solidThumbsUp,
+                                      padding: EdgeInsets.only(top: 4),
+                                      child: Icon(Icons.reviews_rounded,
                                           color: linkColor),
                                     ),
                                     SizedBox(width: 5),
                                     Text(
-                                      'Likes',
+                                      'Reviews',
                                       style: TextStyle(
                                           fontFamily: 'Roboto',
                                           color: linkColor,
@@ -120,71 +138,44 @@ class FeedCard extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Row(
-                                    children: const [
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 4),
-                                        child: Icon(Icons.reviews_rounded,
-                                            color: linkColor),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'Reviews',
-                                        style: TextStyle(
-                                            fontFamily: 'Roboto',
-                                            color: linkColor,
-                                            fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Row(
+                                  children: const [
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 13),
+                                      child: FaIcon(
+                                          FontAwesomeIcons.handHolding,
+                                          color: linkColor),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      'Pick',
+                                      style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          color: linkColor,
+                                          fontSize: 14),
+                                    ),
+                                  ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Row(
-                                    children: const [
-                                      Padding(
-                                        padding: EdgeInsets.only(bottom: 13),
-                                        child: FaIcon(
-                                            FontAwesomeIcons.handHolding,
-                                            color: linkColor),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'Pick',
-                                        style: TextStyle(
-                                            fontFamily: 'Roboto',
-                                            color: linkColor,
-                                            fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(40, 0, 0, 3),
+                                child: Text(
+                                  '5.0',
+                                  style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                      fontSize: 8,
+                                      color: linkColor),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.fromLTRB(40, 0, 0, 3),
-                                  child: Text(
-                                    '5.0',
-                                    style: TextStyle(
-                                        fontFamily: 'Roboto',
-                                        fontSize: 8,
-                                        color: linkColor),
-                                  ),
-                                ),
-                                Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 0, 0, 5),
-                                    child: Row(
-                                      children: List.generate(
-                                          5,
-                                          (index) => const Icon(
-                                              FontAwesomeIcons.solidStar,
-                                              size: 10,
-                                              color: starColor)),
-                                    )),
-                              ],
-                            ),
+                              ),
+                              Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(5, 0, 0, 5),
+                                  child: Container()),
+                            ]),
                           ),
                         ],
                       ),

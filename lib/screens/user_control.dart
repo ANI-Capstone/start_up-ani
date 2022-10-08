@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
@@ -7,9 +10,11 @@ import 'package:ani_capstone/screens/components/user/user_notification.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
+import 'package:badges/badges.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class UserControl extends StatefulWidget {
   const UserControl({Key? key}) : super(key: key);
@@ -70,11 +75,19 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 1;
+  int currentIndex = 2;
   int? userType;
   UserData? user;
   var screens;
   var navItems;
+
+  var showMessageBadge = false;
+  var showBottomNavigation = true;
+
+  String messageBadge = "3";
+  late StreamSubscription<bool> keyboardSubscription;
+
+  var messageIcon;
 
   @override
   void initState() {
@@ -83,11 +96,12 @@ class _UserViewScreenState extends State<UserViewScreen> {
     userType = widget.userType as int;
     user = widget.user;
 
+    unReadListener();
     screens = userType == 1
         ? [
             UserFeeds(),
             UserInbox(user: user!),
-            UserPost(),
+            UserPost(user: user!),
             UserNotificaiton(),
             UserProfile()
           ]
@@ -101,39 +115,104 @@ class _UserViewScreenState extends State<UserViewScreen> {
     navItems = userType == 1
         ? [
             const FaIcon(FontAwesomeIcons.house),
-            const FaIcon(FontAwesomeIcons.solidMessage),
-            const FaIcon(FontAwesomeIcons.circlePlus),
+            Badge(
+              // badgeColor: badgeColor,
+              badgeContent: Text(
+                messageBadge,
+                style: TextStyle(color: Colors.white),
+              ),
+              showBadge: showMessageBadge,
+              elevation: 3,
+              position: BadgePosition.topEnd(top: -14, end: -12),
+              child: FaIcon(FontAwesomeIcons.solidMessage),
+            ),
+            FaIcon(FontAwesomeIcons.circlePlus),
             const FaIcon(FontAwesomeIcons.solidBell),
             const FaIcon(FontAwesomeIcons.solidUser),
           ]
         : [
             const FaIcon(FontAwesomeIcons.house),
             const FaIcon(FontAwesomeIcons.solidMessage),
+            FaIcon(FontAwesomeIcons.circlePlus),
             const FaIcon(FontAwesomeIcons.solidBell),
             const FaIcon(FontAwesomeIcons.solidUser),
           ];
+
+    var keyboardVisibilityController = KeyboardVisibilityController();
+
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (mounted) {
+        setState(() {
+          showBottomNavigation = !visible;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    keyboardSubscription.cancel();
+    super.dispose();
+  }
+
+  void unReadListener() async {
+    NotificationApi.unreadMessages().listen((event) {
+      if (event > 0) {
+        setState(() {
+          showMessageBadge = true;
+          messageBadge = event.toString();
+        });
+      } else {
+        setState(() {
+          showMessageBadge = false;
+          messageBadge = event.toString();
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
+      resizeToAvoidBottomInset: false,
       body: Container(
           color: Colors.white,
           child: IndexedStack(index: currentIndex, children: screens)),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context)
-            .copyWith(iconTheme: const IconThemeData(color: linkColor)),
-        child: CurvedNavigationBar(
-          color: primaryColor,
-          backgroundColor: Colors.transparent,
-          buttonBackgroundColor: Colors.transparent,
-          height: 55,
-          index: currentIndex,
-          onTap: (index) => setState(() => currentIndex = index),
-          items: navItems,
-        ),
-      ),
+      bottomNavigationBar: !showBottomNavigation
+          ? null
+          : Theme(
+              data: Theme.of(context)
+                  .copyWith(iconTheme: const IconThemeData(color: linkColor)),
+              child: CurvedNavigationBar(
+                color: primaryColor,
+                backgroundColor: Colors.transparent,
+                buttonBackgroundColor: Colors.transparent,
+                height: 55,
+                index: currentIndex,
+                onTap: (index) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  setState(() => currentIndex = index);
+                },
+                items: [
+                  const FaIcon(FontAwesomeIcons.house),
+                  Badge(
+                    // badgeColor: badgeColor,
+                    badgeContent: Text(
+                      messageBadge,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    showBadge: showMessageBadge,
+                    elevation: 3,
+                    position: BadgePosition.topEnd(top: -14, end: -12),
+                    child: FaIcon(FontAwesomeIcons.solidMessage),
+                  ),
+                  FaIcon(FontAwesomeIcons.circlePlus),
+                  const FaIcon(FontAwesomeIcons.solidBell),
+                  const FaIcon(FontAwesomeIcons.solidUser),
+                ],
+              ),
+            ),
     );
   }
 }

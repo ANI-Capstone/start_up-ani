@@ -17,7 +17,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../constants.dart';
-import '../pull_refresh.dart';
+import '../widgets/pull_refresh.dart';
 
 class UserInbox extends StatefulWidget {
   UserData user;
@@ -73,6 +73,17 @@ class _UserInboxState extends State<UserInbox> {
       if (mounted) {
         setState(() => chats = data);
       }
+
+      int unreadCount = 0;
+      final userId = AccountControl.getUserId();
+
+      for (var chat in data) {
+        if (chat.message.userId != userId && !chat.message.seen) {
+          unreadCount += 1;
+        }
+      }
+
+      NotificationApi.unReadMessages = unreadCount;
     });
   }
 

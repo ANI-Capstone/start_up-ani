@@ -3,8 +3,9 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 import '../constants.dart';
 
@@ -43,5 +44,23 @@ class FirebaseStorageDb {
 
       return imageUrl;
     }
+  }
+
+  static Future<List<String>> uploadPostImages(
+      {required String userId, required List<File> images}) async {
+    var imageUrls =
+        await Future.wait(images.map((img) => _uploadPostImage(img, userId)));
+    return imageUrls;
+  }
+
+  static Future<String> _uploadPostImage(File img, String userId) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('$userId/posts/${basename(img.path)}');
+
+    UploadTask uploadTask = ref.putFile(img);
+    await uploadTask.whenComplete(() => {});
+
+    return await ref.getDownloadURL();
   }
 }

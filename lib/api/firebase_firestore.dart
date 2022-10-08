@@ -118,7 +118,6 @@ class FirebaseFirestoreDb {
       return null;
     } else {
       showDialog(
-          // The user CANNOT close this dialog  by pressing outsite it
           barrierDismissible: false,
           context: context,
           builder: (_) {

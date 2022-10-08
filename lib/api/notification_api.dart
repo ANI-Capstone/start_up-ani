@@ -4,6 +4,8 @@ import 'package:rxdart/subjects.dart';
 class NotificationApi {
   NotificationApi();
 
+  static int unReadMessages = 0;
+
   final _localNotifications = FlutterLocalNotificationsPlugin();
   final BehaviorSubject<String> behaviorSubject = BehaviorSubject();
 
@@ -78,5 +80,9 @@ class NotificationApi {
       platformChannelSpecifics,
       payload: payload,
     );
+  }
+
+  static Stream<int> unreadMessages() async* {
+    yield unReadMessages;
   }
 }
