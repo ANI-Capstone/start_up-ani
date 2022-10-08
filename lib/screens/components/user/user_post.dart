@@ -155,39 +155,87 @@ class _UserPostState extends State<UserPost> {
                                     name: user!.name,
                                     photoUrl: user!.photoUrl!);
 
-                                List<String> imgUrls = [];
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (_) {
+                                      return Dialog(
+                                        // The background color
+                                        backgroundColor: Colors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 20),
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30))),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: const [
+                                                // The loading indicator
+                                                CircularProgressIndicator(
+                                                  color: primaryColor,
+                                                ),
+                                                SizedBox(
+                                                  height: 15,
+                                                ),
+                                                // Some text
+                                                Text(
+                                                  'Uploading your post, please wait...',
+                                                  style: TextStyle(
+                                                      fontFamily: 'Roboto'),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    });
 
                                 FirebaseStorageDb.uploadPostImages(
                                         userId: user!.id!,
                                         images: pickedImages!)
-                                    .then((value) => imgUrls.addAll(value));
+                                    .then((imgUrls) =>
+                                        ProductPost.uploadPost(context,
+                                            post: Post(
+                                              publisher: newUser,
+                                              postedAt: DateTime.now(),
+                                              name: _productName.text.trim(),
+                                              description: _productDescription
+                                                  .text
+                                                  .trim(),
+                                              price: double.parse(
+                                                  _productPrice.text.trim()),
+                                              unit: productUnit!,
+                                              location:
+                                                  _newLocation.text.trim(),
+                                              images: imgUrls,
+                                            )).then((value) {
+                                          if (value) {
+                                            Navigator.of(context).pop();
+                                            ShoWInfo.successAlert(
+                                                context,
+                                                'Your post has been posted successfully.',
+                                                5);
+                                            setState(() {
+                                              _formKey.currentState!.reset();
+                                              _productName.text = '';
+                                              _productDescription.text = '';
+                                              _productPrice.text = '';
+                                              _newLocation.text = '';
+                                              pickedImages!.clear();
+                                              productUnit = null;
+                                              location = null;
+                                            });
+                                          } else {
+                                            Navigator.of(context).pop();
+                                            ShoWInfo.errorAlert(
+                                                context,
+                                                'Failed to upload your post, please try again later.',
+                                                5);
+                                          }
+                                        }));
 
-                                ProductPost.uploadPost(context,
-                                    post: Post(
-                                      publisher: newUser,
-                                      postedAt: DateTime.now(),
-                                      name: _productName.text.trim(),
-                                      description:
-                                          _productDescription.text.trim(),
-                                      price: double.parse(
-                                          _productPrice.text.trim()),
-                                      unit: productUnit!,
-                                      location: _newLocation.text.trim(),
-                                      images: imgUrls,
-                                    )).then((value) {
-                                  if (value) {
-                                    setState(() {
-                                      _formKey.currentState!.reset();
-                                      _productName.text = '';
-                                      _productDescription.text = '';
-                                      _productPrice.text = '';
-                                      _newLocation.text = '';
-                                      pickedImages!.clear();
-                                      productUnit = null;
-                                      location = null;
-                                    });
-                                  }
-                                });
                                 confirmPost = false;
                               }
                             });
