@@ -69,22 +69,27 @@ class _UserInboxState extends State<UserInbox> {
   }
 
   Future loadChats() async {
-    await FirebaseMessageApi.getChats(widget.user.id!).then((data) {
-      if (mounted) {
-        setState(() => chats = data);
-      }
-
-      int unreadCount = 0;
-      final userId = AccountControl.getUserId();
-
-      for (var chat in data) {
-        if (chat.message.userId != userId && !chat.message.seen) {
-          unreadCount += 1;
+    if (AccountControl.isUserLoggedIn()) {
+      await FirebaseMessageApi.getChats(widget.user.id!).then((data) {
+        if (mounted) {
+          setState(() => chats = data);
         }
-      }
 
-      NotificationApi.unReadMessages = unreadCount;
-    });
+        int unreadCount = 0;
+        final userId = AccountControl.getUserId();
+
+        for (var chat in data) {
+          if (chat.message.userId != userId && !chat.message.seen) {
+            unreadCount += 1;
+          }
+        }
+
+        NotificationApi.unReadMessages = unreadCount;
+      });
+    } else {
+      timer?.cancel();
+      listener.cancel();
+    }
   }
 
   void chatListener() async {

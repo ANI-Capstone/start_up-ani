@@ -8,7 +8,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_place/google_place.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../api/firebase_firestore.dart';
 import '../../../constants.dart';
@@ -43,7 +42,6 @@ class _UserPostState extends State<UserPost> {
   List<AutocompletePrediction> predictions = [];
   List<File>? pickedImages = [];
 
-  PermissionStatus? _permissionStatus;
   var _autoValidate = AutovalidateMode.disabled;
 
   bool confirmPost = false;
@@ -53,21 +51,6 @@ class _UserPostState extends State<UserPost> {
     super.initState();
 
     user = widget.user;
-
-    String placesAPI = 'AIzaSyBGg06km8WnkuBzZ5lW2bag56CinoP1erg';
-
-    googlePlace = GooglePlace(placesAPI);
-
-    // () async {
-    //   _permissionStatus = await Permission.storage.status;
-
-    //   if (_permissionStatus != PermissionStatus.granted) {
-    //     PermissionStatus permissionStatus = await Permission.storage.request();
-    //     setState(() {
-    //       _permissionStatus = permissionStatus;
-    //     });
-    //   }
-    // }();
   }
 
   void autoCompleteSearch(String value) async {
@@ -215,7 +198,7 @@ class _UserPostState extends State<UserPost> {
                                             Navigator.of(context).pop();
                                             ShoWInfo.successAlert(
                                                 context,
-                                                'Your post has been posted successfully.',
+                                                'Your product has been posted successfully.',
                                                 5);
                                             setState(() {
                                               _formKey.currentState!.reset();

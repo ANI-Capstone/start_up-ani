@@ -11,6 +11,8 @@ const userBgColor = Color(0xFFF5F5F5);
 const starColor = Color(0xFFFFB800);
 const badgeColor = Color(0xFFFF8C00);
 const plusColor = Color(0xFFD5D5D5);
+const unLikeColor = Color(0xFFB5B5B5);
+const likeColor = Color(0xFF315300);
 
 const defaultPadding = 32.0;
 

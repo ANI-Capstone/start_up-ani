@@ -160,6 +160,16 @@ class AccountControl {
     }
   }
 
+  static bool isUserLoggedIn() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   static Future accountCheck(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
 

@@ -75,7 +75,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 2;
+  int currentIndex = 0;
   int? userType;
   UserData? user;
   var screens;
@@ -99,14 +99,14 @@ class _UserViewScreenState extends State<UserViewScreen> {
     unReadListener();
     screens = userType == 1
         ? [
-            UserFeeds(),
+            UserFeed(user: user!),
             UserInbox(user: user!),
             UserPost(user: user!),
             UserNotificaiton(),
             UserProfile()
           ]
         : [
-            UserFeeds(),
+            UserFeed(user: user!),
             UserInbox(user: user!),
             UserNotificaiton(),
             UserProfile()

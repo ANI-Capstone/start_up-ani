@@ -14,6 +14,8 @@ class Post {
   double? rating;
   int? rateCount;
   int? likes;
+  int? reviews;
+  String? postId;
 
   Post(
       {required this.publisher,
@@ -26,20 +28,24 @@ class Post {
       required this.images,
       this.rating = 0,
       this.rateCount = 0,
-      this.likes = 0});
+      this.likes = 0,
+      this.reviews = 0,
+      this.postId});
 
-  static Post fromJson(Map<String, dynamic> json) => Post(
-      publisher: User.fromJson(json['user']),
+  static Post fromJson(Map<String, dynamic> json, String postId) => Post(
+      publisher: User.fromJson(json['publisher']),
       postedAt: Utils.toDateTime(json['postedAt']),
       name: json['name'],
       description: json['description'],
       price: json['price'],
       unit: json['unit'],
       location: json['location'],
-      images: json['images'],
+      images: List.from(json['images']),
       rating: json['rating'],
       rateCount: json['rateCount'],
-      likes: json['likes']);
+      likes: json['likes'],
+      reviews: json['reviews'],
+      postId: postId);
 
   Map<String, dynamic> toJson() => {
         'publisher': publisher.toJson(),
@@ -52,6 +58,7 @@ class Post {
         'images': images,
         'rating': rating,
         'rateCount': rateCount,
+        'reviews': reviews,
         'likes': likes
       };
 }
