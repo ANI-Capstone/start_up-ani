@@ -9,6 +9,7 @@ import 'package:ani_capstone/screens/components/user/user_inbox.dart';
 import 'package:ani_capstone/screens/components/user/user_notification.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
+import 'package:ani_capstone/screens/components/user/user_reviews.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
 import 'package:badges/badges.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -78,8 +79,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
   int currentIndex = 0;
   int? userType;
   UserData? user;
-  var screens;
-  var navItems;
 
   var showMessageBadge = false;
   var showBottomNavigation = true;
@@ -87,56 +86,21 @@ class _UserViewScreenState extends State<UserViewScreen> {
   String messageBadge = "3";
   late StreamSubscription<bool> keyboardSubscription;
 
-  var messageIcon;
+  FaIcon homeNav = const FaIcon(FontAwesomeIcons.house);
+  FaIcon inboxNav = const FaIcon(FontAwesomeIcons.solidMessage);
+  FaIcon postNav = const FaIcon(FontAwesomeIcons.circlePlus);
+  FaIcon reviewNav = const FaIcon(FontAwesomeIcons.solidStar);
+  FaIcon notifNav = const FaIcon(FontAwesomeIcons.solidBell);
+  FaIcon userNav = const FaIcon(FontAwesomeIcons.solidUser);
 
   @override
   void initState() {
     super.initState();
 
-    userType = widget.userType as int;
+    userType = widget.userType!;
     user = widget.user;
 
     unReadListener();
-    screens = userType == 1
-        ? [
-            UserFeed(user: user!),
-            UserInbox(user: user!),
-            UserPost(user: user!),
-            UserNotificaiton(),
-            UserProfile()
-          ]
-        : [
-            UserFeed(user: user!),
-            UserInbox(user: user!),
-            UserNotificaiton(),
-            UserProfile()
-          ];
-
-    navItems = userType == 1
-        ? [
-            const FaIcon(FontAwesomeIcons.house),
-            Badge(
-              // badgeColor: badgeColor,
-              badgeContent: Text(
-                messageBadge,
-                style: TextStyle(color: Colors.white),
-              ),
-              showBadge: showMessageBadge,
-              elevation: 3,
-              position: BadgePosition.topEnd(top: -14, end: -12),
-              child: FaIcon(FontAwesomeIcons.solidMessage),
-            ),
-            FaIcon(FontAwesomeIcons.circlePlus),
-            const FaIcon(FontAwesomeIcons.solidBell),
-            const FaIcon(FontAwesomeIcons.solidUser),
-          ]
-        : [
-            const FaIcon(FontAwesomeIcons.house),
-            const FaIcon(FontAwesomeIcons.solidMessage),
-            FaIcon(FontAwesomeIcons.circlePlus),
-            const FaIcon(FontAwesomeIcons.solidBell),
-            const FaIcon(FontAwesomeIcons.solidUser),
-          ];
 
     var keyboardVisibilityController = KeyboardVisibilityController();
 
@@ -178,7 +142,13 @@ class _UserViewScreenState extends State<UserViewScreen> {
       resizeToAvoidBottomInset: false,
       body: Container(
           color: Colors.white,
-          child: IndexedStack(index: currentIndex, children: screens)),
+          child: IndexedStack(index: currentIndex, children: [
+            UserFeed(user: user!),
+            UserInbox(user: user!),
+            userType == 1 ? UserPost(user: user!) : const UserReviews(),
+            UserNotificaiton(),
+            UserProfile()
+          ])),
       bottomNavigationBar: !showBottomNavigation
           ? null
           : Theme(
@@ -195,21 +165,21 @@ class _UserViewScreenState extends State<UserViewScreen> {
                   setState(() => currentIndex = index);
                 },
                 items: [
-                  const FaIcon(FontAwesomeIcons.house),
+                  homeNav,
                   Badge(
                     // badgeColor: badgeColor,
                     badgeContent: Text(
                       messageBadge,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                     showBadge: showMessageBadge,
                     elevation: 3,
                     position: BadgePosition.topEnd(top: -14, end: -12),
-                    child: FaIcon(FontAwesomeIcons.solidMessage),
+                    child: inboxNav,
                   ),
-                  FaIcon(FontAwesomeIcons.circlePlus),
-                  const FaIcon(FontAwesomeIcons.solidBell),
-                  const FaIcon(FontAwesomeIcons.solidUser),
+                  userType == 1 ? postNav : reviewNav,
+                  notifNav,
+                  userNav
                 ],
               ),
             ),
