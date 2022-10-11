@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class PostCard extends StatefulWidget {
   Post post;
@@ -37,6 +38,10 @@ class _PostCardState extends State<PostCard> {
   int duration = 0;
 
   late SharedPreferences prefs;
+
+  final selectedColor = Colors.white;
+  final unSelectedColor = const Color(0xFFB5B5B5);
+  int selected = 0;
 
   @override
   void initState() {
@@ -98,6 +103,8 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Material(
@@ -197,10 +204,60 @@ class _PostCardState extends State<PostCard> {
                       topRight: Radius.circular(5)),
                   child: Stack(
                     children: [
-                      Image.network(post.images[0],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 150),
+                      CarouselSlider(
+                        options: CarouselOptions(
+                            enableInfiniteScroll: false,
+                            viewportFraction: 1,
+                            onScrolled: (value) {
+                              if (value! % 1 == 0) {
+                                setState(() {
+                                  selected = value.toInt();
+                                });
+                              }
+                            }),
+                        items: post.images
+                            .map((item) => Image.network(item,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 150))
+                            .toList(),
+                      ),
+                      Positioned.fill(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 40,
+                                width: post.images.length * 9,
+                                child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: post.images.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return InkWell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 1.5),
+                                          child: Container(
+                                            height: 6,
+                                            width: 6,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: index == selected
+                                                  ? selectedColor
+                                                  : unSelectedColor,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       Positioned(
                         bottom: 15,
                         right: 10,
