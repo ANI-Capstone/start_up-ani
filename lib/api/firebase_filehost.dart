@@ -63,4 +63,24 @@ class FirebaseStorageDb {
 
     return await ref.getDownloadURL();
   }
+
+  static Future<String> uploadMessageImage(File img, String userId) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('$userId/image-messages/${basename(img.path)}');
+
+    UploadTask uploadTask = ref.putFile(img);
+
+    bool doneUpload = false;
+
+    await uploadTask.whenComplete(() {
+      doneUpload = true;
+    });
+
+    if (doneUpload) {
+      return await ref.getDownloadURL();
+    }
+
+    return 'failed';
+  }
 }

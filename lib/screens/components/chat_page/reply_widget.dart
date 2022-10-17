@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/message.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +19,7 @@ class ReplyMessageWidget extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              color: Colors.green,
+              color: primaryColor,
               width: 4,
             ),
             const SizedBox(width: 8),
@@ -32,19 +35,32 @@ class ReplyMessageWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${message.username}',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  message.username,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               if (onCancelReply != null)
                 GestureDetector(
-                  child: Icon(Icons.close, size: 16),
                   onTap: onCancelReply,
+                  child: const Icon(Icons.close, size: 16),
                 )
             ],
           ),
           const SizedBox(height: 8),
-          Text(message.message, style: TextStyle(color: Colors.black54)),
+          message.typeId == 1
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: message.message.contains('https://')
+                      ? Image.network(
+                          message.message,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(File(message.message),
+                          width: 120, height: 120, fit: BoxFit.cover))
+              : Text(message.message,
+                  style: const TextStyle(color: Colors.black54)),
         ],
       );
 }

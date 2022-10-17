@@ -7,6 +7,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:rxdart/streams.dart';
 
 import '../screens/auth/log_in.dart';
 
@@ -106,7 +107,11 @@ class GoogleProvider extends ChangeNotifier {
           idToken: googleAuth.idToken,
         );
 
-        final FirebaseAuth auth = FirebaseAuth.instance;
+        FirebaseAuth auth = FirebaseAuth.instance;
+
+        while (auth == null) {
+          auth = FirebaseAuth.instance;
+        }
 
         await auth
             .signInWithCredential(credential)

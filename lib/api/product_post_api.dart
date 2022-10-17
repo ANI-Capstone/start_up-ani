@@ -17,6 +17,7 @@ class ProductPost {
 
   static Stream<List<Post>> getPosts() => FirebaseFirestore.instance
       .collection('posts')
+      .orderBy("postedAt", descending: true)
       .snapshots()
       .map((snapshot) => snapshot.docs
           .map((doc) => Post.fromJson(doc.data(), doc.id))

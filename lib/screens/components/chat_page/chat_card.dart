@@ -82,14 +82,26 @@ class ChatCard extends StatelessWidget {
 
   Widget buildText(Message message) {
     String author = message.userId == AccountControl.getUserId() ? 'You: ' : '';
-    return Text(
-        (message.message.length < 53)
-            ? author + message.message
-            : '$author${message.message.toString().characters.take(53)}...',
-        style: TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 12.5,
-            fontWeight: unread(message) ? FontWeight.bold : FontWeight.normal,
-            color: linkColor.withOpacity(0.9)));
+    String author2 = message.userId == AccountControl.getUserId()
+        ? 'You'
+        : message.username.split(" ")[0];
+    if (message.typeId == 1) {
+      return Text('$author2 sent a photo.',
+          style: TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 12.5,
+              fontWeight: unread(message) ? FontWeight.bold : FontWeight.normal,
+              color: linkColor.withOpacity(0.9)));
+    } else {
+      return Text(
+          (message.message.length < 53)
+              ? author + message.message
+              : '$author${message.message.toString().characters.take(53)}...',
+          style: TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 12.5,
+              fontWeight: unread(message) ? FontWeight.bold : FontWeight.normal,
+              color: linkColor.withOpacity(0.9)));
+    }
   }
 }

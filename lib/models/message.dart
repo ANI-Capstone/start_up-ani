@@ -1,27 +1,30 @@
-import 'package:meta/meta.dart';
-
 import '../utils.dart';
 
 class Message {
-  final String userId;
-  final String urlAvatar;
-  final String username;
-  final String message;
-  final DateTime createdAt;
-  final Message? replyMessage;
-  final String type;
-  final bool seen;
+  String userId;
+  String urlAvatar;
+  String username;
+  String message;
+  DateTime createdAt;
+  Message? replyMessage;
+  String? type;
+  bool seen;
+  int? typeId;
+  int? status;
+  int? index;
 
-  const Message({
-    required this.userId,
-    required this.urlAvatar,
-    required this.username,
-    required this.message,
-    required this.createdAt,
-    required this.type,
-    required this.seen,
-    this.replyMessage,
-  });
+  Message(
+      {required this.userId,
+      required this.urlAvatar,
+      required this.username,
+      required this.message,
+      required this.createdAt,
+      this.type,
+      required this.seen,
+      this.replyMessage,
+      this.typeId,
+      this.status,
+      this.index});
 
   static Message fromJson(Map<String, dynamic> json) => Message(
       userId: json['idUser'],
@@ -33,7 +36,9 @@ class Message {
           ? null
           : Message.fromJson(json['replyMessage']),
       type: json['type'],
-      seen: json['seen']);
+      typeId: json['typeId'],
+      seen: json['seen'],
+      status: json['status']);
 
   Map<String, dynamic> toJson() => {
         'idUser': userId,
@@ -41,8 +46,10 @@ class Message {
         'username': username,
         'message': message,
         'createdAt': Utils.fromDateTimeToJson(createdAt),
-        'replyMessage': replyMessage ?? replyMessage?.toJson(),
+        'replyMessage': replyMessage != null ? replyMessage!.toJson() : null,
         'type': type,
-        'seen': seen
+        'typeId': typeId,
+        'seen': seen,
+        'status': status ?? 0
       };
 }

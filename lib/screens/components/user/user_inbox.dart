@@ -4,17 +4,14 @@ import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/models/chat.dart';
-import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
+import 'package:ani_capstone/screens/components/chat_page/chat_box.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
-import 'package:ani_capstone/screens/components/chat_page/chat_screen.dart';
-import 'package:ani_capstone/screens/user_control.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../constants.dart';
 import '../widgets/pull_refresh.dart';
@@ -193,7 +190,7 @@ class _UserInboxState extends State<UserInbox> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ChatScreen(
+              builder: (context) => ChatBox(
                     receiver: chat.contact,
                     author: User(
                         name: widget.user.name,
@@ -211,7 +208,7 @@ class _UserInboxState extends State<UserInbox> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChatScreen(
+                builder: (context) => ChatBox(
                       receiver: user,
                       author: User(
                           name: widget.user.name,

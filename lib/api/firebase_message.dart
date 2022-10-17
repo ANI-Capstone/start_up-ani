@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:ani_capstone/models/chat.dart';
-import 'package:ani_capstone/models/notification.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -16,24 +15,22 @@ class FirebaseMessageApi {
       .then((DocumentSnapshot documentSnapshot) =>
           User.fromJson(documentSnapshot.data() as Map<String, dynamic>));
 
-  static Stream<List<Message>> getMessages(String chatPathId) {
-    var messages;
-    try {
-      messages = FirebaseFirestore.instance
-          .collection('chats')
-          .doc(chatPathId)
-          .collection('messages')
-          .orderBy("createdAt", descending: true)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => Message.fromJson(doc.data()))
-              .toList());
-    } on Exception catch (e) {
-      return messages;
-    }
-
-    return messages;
+  static Future<List<Message>> getMessages({required String chatPathId}) {
+    return FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatPathId)
+        .collection('messages')
+        .orderBy("createdAt", descending: true)
+        .get()
+        .then((messages) =>
+            messages.docs.map((doc) => Message.fromJson(doc.data())).toList());
   }
+
+  static messageStream(String chatPathId) => FirebaseFirestore.instance
+      .collection('chats')
+      .doc(chatPathId)
+      .collection('messages')
+      .snapshots();
 
   static Stream<List<User>> getUsers() => FirebaseFirestore.instance
       .collection('users')
@@ -84,7 +81,7 @@ class FirebaseMessageApi {
           addUserChat(chatPathId, authorId, receiverId).toString();
         }
       });
-    } on TypeError catch (e) {
+    } on TypeError catch (_) {
       chatPathId = generateChatId('$authorId-$receiverId').toString();
       addUserChat(chatPathId, authorId, receiverId).toString();
     }
@@ -124,7 +121,7 @@ class FirebaseMessageApi {
           return notifRef.set(notification);
         }
       });
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       return notifRef.set(notification);
     }
 
@@ -166,9 +163,11 @@ class FirebaseMessageApi {
     return [latestMessageA, latestMessageB];
   }
 
-  static sendMessage(String chatPathId, String message, User author,
-      User receiver, String type,
+  static Future sendMessage(
+      String chatPathId, String message, User author, User receiver, int typeId,
       {Message? replyMessage}) async {
+    bool sent = false;
+
     final chatPathRef = FirebaseFirestore.instance
         .collection('chats')
         .doc(chatPathId)
@@ -181,10 +180,18 @@ class FirebaseMessageApi {
         username: author.name,
         createdAt: DateTime.now(),
         replyMessage: replyMessage,
-        type: type,
+        typeId: typeId,
+        status: 1,
         seen: false);
 
-    await chatPathRef.add(newMessage.toJson());
+    try {
+      await chatPathRef.add(newMessage.toJson()).whenComplete(() {
+        sent = true;
+      });
+    } on Exception catch (_) {
+      sent = false;
+    }
+
     final messages = await setLatestMessage(author, receiver, newMessage);
 
     await setNotification(
@@ -200,6 +207,8 @@ class FirebaseMessageApi {
         name: messages[1]['last_message']['message']['username'],
         message: messages[1]['last_message']['message']['message'],
         payload: chatPathId);
+
+    return sent;
   }
 
   static readMessage(String author, String receiver, Message message) {
@@ -217,7 +226,7 @@ class FirebaseMessageApi {
   }
 
   static Future<List<Chat>> getChats(String userId) {
-    final chats = FirebaseFirestore.instance
+    return FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .collection('user_chats')
@@ -225,8 +234,6 @@ class FirebaseMessageApi {
         .get()
         .then((chats) =>
             chats.docs.map((doc) => Chat.fromJson(doc.data())).toList());
-
-    return chats;
   }
 
   static chatStream(String userId) => FirebaseFirestore.instance

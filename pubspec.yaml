@@ -70,6 +70,7 @@ dependencies:
   google_place: ^0.4.7
   permission_handler: ^10.1.0
   carousel_slider: ^4.1.1
+  grouped_list: ^5.1.2
 
 flutter_native_splash:
   image: assets/images/ani_splash.png
