@@ -55,6 +55,12 @@ class _ChatBoxState extends State<ChatBox> {
     getChatPath();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    listener.cancel();
+  }
+
   void getChatPath() async {
     prefs = await SharedPreferences.getInstance();
 
@@ -99,14 +105,16 @@ class _ChatBoxState extends State<ChatBox> {
 
     listener = messageRef.listen((event) async {
       for (var change in event.docChanges) {
-        // if (change.type == DocumentChangeType.added) {
-        //   if (mounted) {
-        //     setState(() {
-        //       messages.add(
-        //           Message.fromJson(change.doc.data() as Map<String, dynamic>));
-        //     });
-        //   }
-        // }
+        if (change.type == DocumentChangeType.added) {
+          final latest = change.doc.data() as Map<String, dynamic>;
+
+          if (mounted && !isMe(latest['idUser'])) {
+            setState(() {
+              messages.add(
+                  Message.fromJson(change.doc.data() as Map<String, dynamic>));
+            });
+          }
+        }
         // print(change);
       }
     });
