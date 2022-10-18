@@ -12,7 +12,9 @@ import '../../../constants.dart';
 import '../../../api/firebase_firestore.dart';
 
 class UserProfile extends StatefulWidget {
-  UserProfile({Key? key}) : super(key: key);
+  final Function(bool hide) hideNavigationBar;
+
+  UserProfile({Key? key, required this.hideNavigationBar}) : super(key: key);
 
   @override
   State<UserProfile> createState() => _UserProfileState();
@@ -27,6 +29,11 @@ class _UserProfileState extends State<UserProfile> {
         ? FirebaseFirestoreDb.getUser(context, userId: user.uid)
             .then((value) => {userData = value})
         : userData;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Widget _profileDashboard(BuildContext context) {
