@@ -120,6 +120,14 @@ class _UserViewScreenState extends State<UserViewScreen> {
     super.dispose();
   }
 
+  void hideNavigationBar(bool hide) {
+    if (mounted) {
+      setState(() {
+        showBottomNavigation = !hide;
+      });
+    }
+  }
+
   void unReadListener() async {
     NotificationApi.unreadMessages().listen((event) {
       if (event > 0) {
@@ -147,7 +155,9 @@ class _UserViewScreenState extends State<UserViewScreen> {
             UserInbox(user: user!),
             userType == 1 ? UserPost(user: user!) : const UserReviews(),
             UserNotificaiton(),
-            UserProfile()
+            UserProfile(hideNavigationBar: (hide) {
+              hideNavigationBar(hide);
+            })
           ])),
       bottomNavigationBar: !showBottomNavigation
           ? null
