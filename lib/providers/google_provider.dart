@@ -107,11 +107,11 @@ class GoogleProvider extends ChangeNotifier {
           idToken: googleAuth.idToken,
         );
 
-        FirebaseAuth auth = await FirebaseAuth.instance;
+        FirebaseAuth auth = FirebaseAuth.instance;
 
-        // while (auth == null) {
-        //   auth = FirebaseAuth.instance;
-        // }
+        while (auth == null) {
+          auth = FirebaseAuth.instance;
+        }
 
         await auth
             .signInWithCredential(credential)
