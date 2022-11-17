@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:ani_capstone/models/chat.dart';
+import 'package:ani_capstone/models/post.dart';
+import 'package:ani_capstone/models/product.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -241,4 +243,75 @@ class FirebaseMessageApi {
       .doc(userId)
       .collection('message')
       .snapshots(includeMetadataChanges: true);
+
+  static updateStatus({required String chatPathId, required int status}) async {
+    FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatPathId)
+        .collection('order_status')
+        .doc('status')
+        .update({'status': status});
+  }
+
+  static Future getStatus({required String chatPathId}) {
+    return FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatPathId)
+        .collection('order_status')
+        .doc('status')
+        .get()
+        .then((value) => value.data());
+  }
+
+  static Future<List<Product>> getUserBag({required String chatPathId}) =>
+      FirebaseFirestore.instance
+          .collection('chats')
+          .doc(chatPathId)
+          .collection('user_bag')
+          .get()
+          .then((docs) => docs.docs
+              .map((doc) => Product.fromJson(doc.data(), doc.id))
+              .toList());
+
+  static addToBag(
+      {required Post post, required String chatPathId, int? quantity}) async {
+    final product = Product(post: post, quantity: quantity).toJson();
+
+    final userBagRef =
+        FirebaseFirestore.instance.collection('chats').doc(chatPathId);
+
+    await userBagRef
+        .collection('order_status')
+        .doc('status')
+        .set({'status': 0});
+
+    return userBagRef.collection('user_bag').doc('${post.postId}').set(product);
+  }
+
+  static removeToBag(
+      {required String chatPathId, required String productId}) async {
+    await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatPathId)
+        .collection('user_bag')
+        .doc(productId)
+        .delete();
+  }
+
+  static removeAllToBag({required String chatPathId}) async {
+    final instance = FirebaseFirestore.instance;
+    final batch = instance.batch();
+
+    final snapshots = await instance
+        .collection('chats')
+        .doc(chatPathId)
+        .collection('user_bag')
+        .get();
+
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+
+    await batch.commit();
+  }
 }

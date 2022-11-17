@@ -13,6 +13,7 @@ const badgeColor = Color(0xFFFF8C00);
 const plusColor = Color(0xFFD5D5D5);
 const unLikeColor = Color(0xFFB5B5B5);
 const likeColor = Color(0xFF315300);
+final bannerBgColor = const Color(0xFFC6D8AF).withOpacity(0.4);
 
 const defaultPadding = 32.0;
 

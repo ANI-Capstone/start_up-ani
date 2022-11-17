@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/message.dart';
+import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/message_widget.dart';
 import 'package:ani_capstone/screens/components/chat_page/new_message.dart';
+import 'package:ani_capstone/screens/components/widgets/material_banner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,7 +19,7 @@ import 'package:swipe_to/swipe_to.dart';
 
 class ChatBox extends StatefulWidget {
   List<Message>? messages;
-  User author;
+  UserData author;
   User receiver;
 
   ChatBox(
@@ -41,15 +44,21 @@ class _ChatBoxState extends State<ChatBox> {
   late StreamSubscription listener;
 
   List<Message> messages = [];
+  List<Product> userBag = [];
 
   final focusNode = FocusNode();
+
+  int orderStatus = 0;
 
   @override
   void initState() {
     super.initState();
-    author = widget.author;
+    author = User(
+        name: widget.author.name,
+        photoUrl: widget.author.photoUrl!,
+        userId: widget.author.id!);
     receiver = widget.receiver;
-    authorId = widget.author.userId;
+    authorId = widget.author.id;
     receiverId = widget.receiver.userId;
 
     getChatPath();
@@ -59,6 +68,28 @@ class _ChatBoxState extends State<ChatBox> {
   void dispose() {
     super.dispose();
     listener.cancel();
+  }
+
+  void openBag() async {
+    FirebaseMessageApi.getUserBag(chatPathId: chatPathId!).then((value) {
+      if (mounted) {
+        setState(() {
+          userBag = value;
+        });
+      }
+
+      setOrderStatus();
+    });
+  }
+
+  void setOrderStatus() {
+    FirebaseMessageApi.getStatus(chatPathId: chatPathId!).then((value) {
+      if (mounted) {
+        setState(() {
+          orderStatus = value['status'];
+        });
+      }
+    });
   }
 
   void getChatPath() async {
@@ -72,6 +103,7 @@ class _ChatBoxState extends State<ChatBox> {
         isGetChatPathId = true;
         getMessages();
         messageListener();
+        openBag();
       });
     } else {
       FirebaseMessageApi.getChatPath(authorId!, receiverId!)
@@ -82,6 +114,7 @@ class _ChatBoxState extends State<ChatBox> {
             isGetChatPathId = true;
             getMessages();
             messageListener();
+            openBag();
           });
         }
 
@@ -222,7 +255,10 @@ class _ChatBoxState extends State<ChatBox> {
                   child: Text(
                     receiver!.name,
                     style: const TextStyle(
-                        color: linkColor, fontSize: 16, fontFamily: 'Roboto'),
+                        color: linkColor,
+                        fontSize: 14,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -247,6 +283,7 @@ class _ChatBoxState extends State<ChatBox> {
       body: !isGetChatPathId
           ? const Center(child: CircularProgressIndicator())
           : Column(children: [
+              if (userBag.isNotEmpty) buildBanner(),
               Expanded(
                   child: messages.isEmpty
                       ? const SizedBox()
@@ -254,6 +291,7 @@ class _ChatBoxState extends State<ChatBox> {
                           order: GroupedListOrder.DESC,
                           reverse: true,
                           elements: messages,
+                          cacheExtent: messages.length * 60,
                           groupBy: (message) => DateTime(
                                 message.createdAt.year,
                                 message.createdAt.month,
@@ -285,6 +323,25 @@ class _ChatBoxState extends State<ChatBox> {
               )
             ]),
     );
+  }
+
+  Widget buildBanner() {
+    if (widget.author.userTypeId == 1 && orderStatus > 0) {
+      return ConsumerBag(
+        chatPathId: chatPathId!,
+        user: widget.author,
+        userBag: userBag,
+        orderStatus: orderStatus,
+      );
+    } else if (widget.author.userTypeId != 1) {
+      return ConsumerBag(
+          chatPathId: chatPathId!,
+          user: widget.author,
+          userBag: userBag,
+          orderStatus: orderStatus);
+    } else {
+      return const SizedBox();
+    }
   }
 
   String buildDate(Message message) {

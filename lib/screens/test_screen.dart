@@ -24,16 +24,11 @@ class _TestScreenState extends State<TestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: ElevatedButton(
-      onPressed: () async {
-        await notificationService.showLocalNotification(
-            id: 0,
-            title: "From your cute Dev",
-            body: "Good night everyone!",
-            payload: "test payload");
-      },
+    return Scaffold(
+        body: Center(
+            child: ElevatedButton(
+      onPressed: () async {},
       child: const Text("Test"),
-    ));
+    )));
   }
 }

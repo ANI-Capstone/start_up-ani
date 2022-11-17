@@ -112,6 +112,8 @@ class _UserInboxState extends State<UserInbox> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: userBgColor,
       appBar: AppBar(
@@ -162,7 +164,7 @@ class _UserInboxState extends State<UserInbox> {
                   ),
                 ),
               ),
-              buildList()
+              SizedBox(height: height * 0.6, child: buildList())
             ]),
           ),
         ),
@@ -192,10 +194,7 @@ class _UserInboxState extends State<UserInbox> {
           MaterialPageRoute(
               builder: (context) => ChatBox(
                     receiver: chat.contact,
-                    author: User(
-                        name: widget.user.name,
-                        userId: widget.user.id,
-                        photoUrl: widget.user.photoUrl!),
+                    author: widget.user,
                   )),
         );
       },
@@ -210,10 +209,7 @@ class _UserInboxState extends State<UserInbox> {
             MaterialPageRoute(
                 builder: (context) => ChatBox(
                       receiver: user,
-                      author: User(
-                          name: widget.user.name,
-                          userId: widget.user.id,
-                          photoUrl: widget.user.photoUrl!),
+                      author: widget.user,
                     )),
           );
         },

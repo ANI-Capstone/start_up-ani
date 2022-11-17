@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/post.dart';
@@ -10,6 +11,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+
+import '../chat_page/chat_box.dart';
 
 class PostCard extends StatefulWidget {
   Post post;
@@ -79,7 +82,21 @@ class _PostCardState extends State<PostCard> {
         });
       });
 
-      await prefs.setBool(productId, liked);
+      await prefs.setBool('${user.id!} + $productId', liked);
+    }
+  }
+
+  Future getQuantity({required String productId}) async {
+    prefs = await SharedPreferences.getInstance();
+
+    final prefQuantity = prefs.getInt('${user.id!} + $productId - Q');
+
+    if (prefQuantity != null) {
+      await prefs.setInt('${user.id!} + $productId - Q', prefQuantity + 1);
+      return prefQuantity + 1;
+    } else {
+      await prefs.setInt('${user.id!} + $productId - Q', 1);
+      return 1;
     }
   }
 
@@ -390,22 +407,51 @@ class _PostCardState extends State<PostCard> {
                     ),
                     Positioned(
                       right: 60,
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            WidgetSpan(
-                                child: GestureDetector(
-                              child: const FaIcon(FontAwesomeIcons.bagShopping,
-                                  size: 18, color: linkColor),
-                            )),
-                            const WidgetSpan(
-                              child: SizedBox(width: 5),
-                            ),
-                            const TextSpan(
-                                text: 'Message',
-                                style:
-                                    TextStyle(color: linkColor, fontSize: 12)),
-                          ],
+                      child: GestureDetector(
+                        onTap: () {
+                          if (publisher.userId != user.id) {
+                            FirebaseMessageApi.getChatPath(
+                                    user.id!, publisher.userId!)
+                                .then((chatPathId) {
+                              getQuantity(productId: post.postId!)
+                                  .then((value) => FirebaseMessageApi.addToBag(
+                                      post: post,
+                                      chatPathId: chatPathId,
+                                      quantity: value))
+                                  .whenComplete(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatBox(
+                                            receiver: publisher,
+                                            author: user,
+                                          )),
+                                );
+                              });
+                            });
+                          }
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              WidgetSpan(
+                                  child: FaIcon(FontAwesomeIcons.bagShopping,
+                                      size: 18,
+                                      color: user.userTypeId != 1
+                                          ? linkColor
+                                          : unLikeColor)),
+                              const WidgetSpan(
+                                child: SizedBox(width: 5),
+                              ),
+                              TextSpan(
+                                  text: 'Message',
+                                  style: TextStyle(
+                                      color: user.userTypeId != 1
+                                          ? linkColor
+                                          : unLikeColor,
+                                      fontSize: 12)),
+                            ],
+                          ),
                         ),
                       ),
                     )

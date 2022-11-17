@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/chat.dart';
 import 'package:ani_capstone/models/message.dart';

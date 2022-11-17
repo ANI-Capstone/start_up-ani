@@ -78,10 +78,11 @@ class _MessageWidgetState extends State<MessageWidget> {
     return Row(
       mainAxisAlignment:
           widget.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
         if (!widget.isMe)
           Padding(
-            padding: const EdgeInsets.only(left: 8),
+            padding: const EdgeInsets.only(left: 8, bottom: 10),
             child: CircleAvatar(
                 radius: 20,
                 backgroundImage: NetworkImage(widget.message.urlAvatar)),
