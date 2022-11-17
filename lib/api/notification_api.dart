@@ -1,8 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/subjects.dart';
-
-import '../models/notification.dart';
 
 class NotificationApi {
   NotificationApi();
@@ -88,17 +85,4 @@ class NotificationApi {
   static Stream<int> unreadMessages() async* {
     yield unReadMessages;
   }
-
-  static Stream<List<PostNotification>> getNotification(
-          {required String userId}) =>
-      FirebaseFirestore.instance
-          .collection('notifications')
-          .doc(userId)
-          .collection('posts')
-          .orderBy("timestamp", descending: true)
-          .where('hide', isEqualTo: false)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => PostNotification.fromJson(doc.data(), doc.id))
-              .toList());
 }

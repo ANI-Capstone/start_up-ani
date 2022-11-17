@@ -69,7 +69,6 @@ class _UserControlState extends State<UserControl> {
 class UserViewScreen extends StatefulWidget {
   int? userType;
   UserData? user;
-
   UserViewScreen({Key? key, this.userType, this.user}) : super(key: key);
 
   @override
@@ -155,7 +154,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
             UserFeed(user: user!),
             UserInbox(user: user!),
             userType == 1 ? UserPost(user: user!) : const UserReviews(),
-            UserNotificaiton(user: user!),
+            UserNotificaiton(),
             UserProfile(hideNavigationBar: (hide) {
               hideNavigationBar(hide);
             })
