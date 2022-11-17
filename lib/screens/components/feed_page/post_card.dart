@@ -26,8 +26,9 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   late Post post;
-  late UserData user;
+  late UserData userData;
   late User publisher;
+  late User user;
 
   late String description;
   late Color like;
@@ -50,7 +51,7 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     super.initState();
     post = widget.post;
-    user = widget.user;
+    userData = widget.user;
     publisher = widget.post.publisher;
     description = widget.post.description.length > 85
         ? '${widget.post.description.characters.take(85)}...'
@@ -59,6 +60,11 @@ class _PostCardState extends State<PostCard> {
     like = unLikeColor;
     productId = post.postId!;
 
+    user = User(
+        name: widget.user.name,
+        userId: widget.user.id,
+        photoUrl: widget.user.photoUrl!);
+
     setLiked();
     _timer = Timer(Duration(seconds: duration), () {});
   }
@@ -66,7 +72,7 @@ class _PostCardState extends State<PostCard> {
   Future setLiked() async {
     prefs = await SharedPreferences.getInstance();
 
-    final prefLike = prefs.getBool('${user.id!} + $productId');
+    final prefLike = prefs.getBool('${userData.id!} + $productId');
 
     if (prefLike != null) {
       setState(() {
@@ -74,7 +80,7 @@ class _PostCardState extends State<PostCard> {
         liked ? like = likeColor : unLikeColor;
       });
     } else {
-      ProductPost.checkProductLike(userId: user.id!, productId: productId)
+      ProductPost.checkProductLike(userId: userData.id!, productId: productId)
           .then((value) {
         setState(() {
           liked = value;
@@ -105,10 +111,14 @@ class _PostCardState extends State<PostCard> {
       setState(() {
         duration = 10;
         ProductPost.updateLike(
-            userId: user.id!, liked: liked, productId: productId, likes: likes);
+            user: user,
+            publisherId: publisher.userId!,
+            liked: liked,
+            productId: productId,
+            likes: likes);
       });
 
-      await prefs.setBool('${user.id!} + $productId', liked);
+      await prefs.setBool('${userData.id!} + $productId', liked);
     });
   }
 
