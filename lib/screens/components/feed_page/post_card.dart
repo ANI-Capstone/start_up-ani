@@ -88,20 +88,20 @@ class _PostCardState extends State<PostCard> {
         });
       });
 
-      await prefs.setBool('${user.id!} + $productId', liked);
+      await prefs.setBool('${user.userId!} + $productId', liked);
     }
   }
 
   Future getQuantity({required String productId}) async {
     prefs = await SharedPreferences.getInstance();
 
-    final prefQuantity = prefs.getInt('${user.id!} + $productId - Q');
+    final prefQuantity = prefs.getInt('${user.userId!} + $productId - Q');
 
     if (prefQuantity != null) {
-      await prefs.setInt('${user.id!} + $productId - Q', prefQuantity + 1);
+      await prefs.setInt('${user.userId!} + $productId - Q', prefQuantity + 1);
       return prefQuantity + 1;
     } else {
-      await prefs.setInt('${user.id!} + $productId - Q', 1);
+      await prefs.setInt('${user.userId!} + $productId - Q', 1);
       return 1;
     }
   }
@@ -419,9 +419,9 @@ class _PostCardState extends State<PostCard> {
                       right: 60,
                       child: GestureDetector(
                         onTap: () {
-                          if (publisher.userId != user.id) {
+                          if (publisher.userId != user.userId) {
                             FirebaseMessageApi.getChatPath(
-                                    user.id!, publisher.userId!)
+                                    user.userId!, publisher.userId!)
                                 .then((chatPathId) {
                               getQuantity(productId: post.postId!)
                                   .then((value) => FirebaseMessageApi.addToBag(
@@ -434,7 +434,7 @@ class _PostCardState extends State<PostCard> {
                                   MaterialPageRoute(
                                       builder: (context) => ChatBox(
                                             receiver: publisher,
-                                            author: user,
+                                            author: widget.user,
                                           )),
                                 );
                               });
@@ -447,7 +447,7 @@ class _PostCardState extends State<PostCard> {
                               WidgetSpan(
                                   child: FaIcon(FontAwesomeIcons.bagShopping,
                                       size: 18,
-                                      color: user.userTypeId != 1
+                                      color: widget.user.userTypeId != 1
                                           ? linkColor
                                           : unLikeColor)),
                               const WidgetSpan(
@@ -456,7 +456,7 @@ class _PostCardState extends State<PostCard> {
                               TextSpan(
                                   text: 'Message',
                                   style: TextStyle(
-                                      color: user.userTypeId != 1
+                                      color: widget.user.userTypeId != 1
                                           ? linkColor
                                           : unLikeColor,
                                       fontSize: 12)),
