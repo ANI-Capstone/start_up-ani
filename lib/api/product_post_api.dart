@@ -1,7 +1,9 @@
-import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import '../models/user.dart';
 
 class ProductPost {
   static Future uploadPost(BuildContext context, {required Post post}) async {
@@ -44,7 +46,8 @@ class ProductPost {
   }
 
   static Future updateLike(
-      {required String userId,
+      {required User user,
+      required String publisherId,
       required bool liked,
       required String productId,
       required int likes}) async {
@@ -59,13 +62,52 @@ class ProductPost {
         .collection('posts')
         .doc(productId)
         .collection('user_likes')
-        .doc(userId);
+        .doc(user.userId);
 
     if (liked) {
       final likeData = {"liked": liked};
       await userLikesRef.set(likeData);
     } else {
       await userLikesRef.delete();
+    }
+
+    if (user.userId != publisherId) {
+      final postNotifRef = FirebaseFirestore.instance
+          .collection('notifications')
+          .doc(publisherId)
+          .collection('posts')
+          .doc('${user.userId}$productId');
+
+      bool exist = false;
+      bool hidden = false;
+
+      final newNotification = PostNotification(
+              participant: user,
+              notifType: 1,
+              postId: productId,
+              timestamp: DateTime.now())
+          .toJson();
+
+      try {
+        await postNotifRef.get().then((doc) {
+          exist = doc.exists;
+
+          if (exist) {
+            final data = doc.data() as Map<String, dynamic>;
+            hidden = data['hide'];
+          }
+        });
+
+        if (hidden) return;
+
+        if (exist) {
+          await postNotifRef.update({'hide': true});
+        } else {
+          await postNotifRef.set(newNotification);
+        }
+      } catch (e) {
+        print(e);
+      }
     }
   }
 }
