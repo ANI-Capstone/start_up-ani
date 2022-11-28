@@ -18,6 +18,8 @@ class GoogleProvider extends ChangeNotifier {
 
   GoogleSignInAccount get user => _user!;
 
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   Future googleSignin(BuildContext context) async {
     final ConnectivityResult result = await Connectivity().checkConnectivity();
 
@@ -107,21 +109,14 @@ class GoogleProvider extends ChangeNotifier {
           idToken: googleAuth.idToken,
         );
 
-        FirebaseAuth auth = FirebaseAuth.instance;
+        print(auth);
 
-        while (auth == null) {
-          auth = FirebaseAuth.instance;
-        }
-
-        await auth
-            .signInWithCredential(credential)
-            .then((value) => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
-                )));
+        await auth.signInWithCredential(credential).then((value) =>
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => HomePage())));
 
         Navigator.of(context, rootNavigator: true).pop(result);
+
         notifyListeners();
       } on FirebaseAuthException catch (e) {
         Navigator.of(context, rootNavigator: true).pop(result);

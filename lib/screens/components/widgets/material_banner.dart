@@ -91,20 +91,20 @@ class _ConsumerBagState extends State<ConsumerBag> {
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, bottom: 5),
-                                    child: ListView(
-                                      shrinkWrap: true,
-                                      children: widget.userBag
-                                          .take(expanded
-                                              ? widget.userBag.length
-                                              : 2)
-                                          .map((product) =>
-                                              buildProduct(product))
-                                          .toList(),
-                                    ),
-                                  ),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.only(
+                                  //       top: 5, bottom: 5),
+                                  //   child: ListView(
+                                  //     shrinkWrap: true,
+                                  //     children: widget.userBag
+                                  //         .take(expanded
+                                  //             ? widget.userBag.length
+                                  //             : 2)
+                                  //         .map((product) =>
+                                  //             buildProduct(product))
+                                  //         .toList(),
+                                  //   ),
+                                  // ),
                                   const SizedBox(height: 18),
                                   if (expanded)
                                     const SizedBox(
@@ -331,43 +331,43 @@ class _ConsumerBagState extends State<ConsumerBag> {
     }
   }
 
-  Widget buildProduct(Product product) {
-    return Row(
-      children: [
-        Text(
-          product.post.name.length > 15
-              ? '\u2022 ${product.post.name.characters.take(12)}'
-              : '\u2022 ${product.post.name}',
-          style: const TextStyle(
-              fontSize: 14, color: linkColor, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(width: 5),
-        Text(
-          '- \u20B1${product.post.price}/${buildUnit(product.post.unit)}',
-          style: const TextStyle(
-              fontSize: 14, color: linkColor, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(width: 10),
-        if (widget.user.userTypeId == 2)
-          GestureDetector(
-              onTap: () {
-                if (mounted) {
-                  setState(() {
-                    widget.userBag.removeWhere((element) {
-                      return element.post.postId == product.post.postId;
-                    });
-                  });
-                }
+  // Widget buildProduct(Product product) {
+  //   return Row(
+  //     children: [
+  //       Text(
+  //         product.post.name.length > 15
+  //             ? '\u2022 ${product.post.name.characters.take(12)}'
+  //             : '\u2022 ${product.post.name}',
+  //         style: const TextStyle(
+  //             fontSize: 14, color: linkColor, fontWeight: FontWeight.bold),
+  //       ),
+  //       const SizedBox(width: 5),
+  //       Text(
+  //         '- \u20B1${product.post.price}/${buildUnit(product.post.unit)}',
+  //         style: const TextStyle(
+  //             fontSize: 14, color: linkColor, fontWeight: FontWeight.w500),
+  //       ),
+  //       const SizedBox(width: 10),
+  //       if (widget.user.userTypeId == 2)
+  //         GestureDetector(
+  //             onTap: () {
+  //               if (mounted) {
+  //                 setState(() {
+  //                   widget.userBag.removeWhere((element) {
+  //                     return element.post.postId == product.post.postId;
+  //                   });
+  //                 });
+  //               }
 
-                FirebaseMessageApi.removeToBag(
-                    chatPathId: widget.chatPathId,
-                    productId: product.post.postId!);
-              },
-              child: const Icon(FontAwesomeIcons.xmark,
-                  color: linkColor, size: 12))
-      ],
-    );
-  }
+  //               FirebaseMessageApi.removeToBag(
+  //                   chatPathId: widget.chatPathId,
+  //                   productId: product.post.postId!);
+  //             },
+  //             child: const Icon(FontAwesomeIcons.xmark,
+  //                 color: linkColor, size: 12))
+  //     ],
+  //   );
+  // }
 
   String buildUnit(String unit) {
     if (unit == 'Gram') {

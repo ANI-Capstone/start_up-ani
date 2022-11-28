@@ -51,9 +51,8 @@ class FirebaseFirestoreDb {
           });
 
       try {
-        final userRef = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userData.id);
+        final userRef =
+            FirebaseFirestore.instance.collection('users').doc(userData.id);
 
         userRef.set({
           'id': userData.id,
@@ -84,15 +83,11 @@ class FirebaseFirestoreDb {
   }
 
   static Future<bool> checkExistUser({required String userId}) async {
-    var exist;
-
-    await FirebaseFirestore.instance
+    return await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .get()
-        .then((value) => {value.exists ? exist = true : exist = false});
-
-    return exist;
+        .then((value) => value.exists);
   }
 
   static Future getUser(BuildContext context,

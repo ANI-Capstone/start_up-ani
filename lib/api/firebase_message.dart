@@ -269,24 +269,23 @@ class FirebaseMessageApi {
           .doc(chatPathId)
           .collection('user_bag')
           .get()
-          .then((docs) => docs.docs
-              .map((doc) => Product.fromJson(doc.data(), doc.id))
-              .toList());
+          .then((docs) =>
+              docs.docs.map((doc) => Product.fromJson(doc.data())).toList());
 
-  static addToBag(
-      {required Post post, required String chatPathId, int? quantity}) async {
-    final product = Product(post: post, quantity: quantity).toJson();
+  // static addToBag(
+  //     {required Post post, required String chatPathId, int? quantity}) async {
+  //   final product = Product(post: post, quantity: quantity).toJson();
 
-    final userBagRef =
-        FirebaseFirestore.instance.collection('chats').doc(chatPathId);
+  //   final userBagRef =
+  //       FirebaseFirestore.instance.collection('chats').doc(chatPathId);
 
-    await userBagRef
-        .collection('order_status')
-        .doc('status')
-        .set({'status': 0});
+  //   await userBagRef
+  //       .collection('order_status')
+  //       .doc('status')
+  //       .set({'status': 0});
 
-    return userBagRef.collection('user_bag').doc('${post.postId}').set(product);
-  }
+  //   return userBagRef.collection('user_bag').doc('${post.postId}').set(product);
+  // }
 
   static removeToBag(
       {required String chatPathId, required String productId}) async {

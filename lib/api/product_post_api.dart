@@ -1,5 +1,6 @@
 import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/post.dart';
+import 'package:ani_capstone/models/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class ProductPost {
     try {
       await posts.add(post.toJson());
       return true;
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       return false;
     }
   }
@@ -105,9 +106,86 @@ class ProductPost {
         } else {
           await postNotifRef.set(newNotification);
         }
-      } catch (e) {
-        print(e);
+      } catch (_) {
+        return;
       }
     }
+  }
+
+  static Future addToBasket({
+    required String userId,
+    required Post post,
+  }) async {
+    final basketRef = FirebaseFirestore.instance
+        .collection('basket')
+        .doc(userId)
+        .collection('user_basket');
+
+    final product = Product(
+            productId: post.postId!,
+            quantity: 1,
+            orderStatus: 0,
+            publisher: post.publisher,
+            addedAt: DateTime.now())
+        .toJson();
+
+    return await basketRef.doc(post.postId).set(product);
+  }
+
+  static Future removeToBasket({
+    required String userId,
+    required String productId,
+  }) async {
+    final basketRef = FirebaseFirestore.instance
+        .collection('basket')
+        .doc(userId)
+        .collection('user_basket');
+
+    return await basketRef.doc(productId).delete();
+  }
+
+  static Future<List<Product>> getUserBasket({required String userId}) {
+    return FirebaseFirestore.instance
+        .collection('basket')
+        .doc(userId)
+        .collection('user_basket')
+        .orderBy("addedAt", descending: true)
+        .get()
+        .then((snapshot) =>
+            snapshot.docs.map((doc) => Product.fromJson(doc.data())).toList());
+  }
+
+  static basketStream({required String userId}) => FirebaseFirestore.instance
+      .collection('basket')
+      .doc(userId)
+      .collection('user_basket')
+      .snapshots(includeMetadataChanges: true);
+
+  static Future<List<Post>> getProducts({required List<String> productList}) =>
+      FirebaseFirestore.instance
+          .collection('posts')
+          .where(FieldPath.documentId, whereIn: productList)
+          .get()
+          .then((snapshot) => snapshot.docs
+              .map((doc) => Post.fromJson(doc.data(), doc.id))
+              .toList());
+
+  static Future updateOrderStatus(
+      {required String userId,
+      required List<Product?> product,
+      required int status}) async {
+    final batch = FirebaseFirestore.instance.batch();
+
+    final productRef = FirebaseFirestore.instance
+        .collection('basket')
+        .doc(userId)
+        .collection('user_basket');
+
+    product.map((product) {
+      batch.update(productRef.doc(product!.productId),
+          {'orderStatus': status, 'quantity': product.quantity});
+    });
+
+    return await batch.commit();
   }
 }

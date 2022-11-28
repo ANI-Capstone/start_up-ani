@@ -2,6 +2,8 @@ import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';
+import 'package:ani_capstone/screens/components/user/user_basket.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -9,7 +11,14 @@ import '../../../constants.dart';
 
 class UserFeed extends StatefulWidget {
   UserData user;
-  UserFeed({required this.user, super.key});
+  Function(bool open) openBasket;
+
+  int badgeCount;
+  UserFeed(
+      {required this.user,
+      required this.openBasket,
+      required this.badgeCount,
+      super.key});
 
   @override
   State<UserFeed> createState() => _UserFeedState();
@@ -30,15 +39,32 @@ class _UserFeedState extends State<UserFeed> {
         appBar: AppBar(
             automaticallyImplyLeading: false,
             title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text('FEED',
-                    style: TextStyle(
-                        color: linkColor, fontWeight: FontWeight.bold)),
-                Icon(FontAwesomeIcons.magnifyingGlass,
-                    size: 20, color: linkColor)
-              ],
-            ),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('FEED',
+                      style: TextStyle(
+                          color: linkColor, fontWeight: FontWeight.bold)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: GestureDetector(
+                        onTap: () {
+                          widget.openBasket(true);
+                        },
+                        child: Badge(
+                          // badgeColor: badgeColor,
+                          badgeContent: Text(
+                            '${widget.badgeCount}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                          showBadge: widget.badgeCount > 0,
+                          elevation: 3,
+                          position: BadgePosition.topEnd(top: -13, end: -11),
+                          child: const Icon(FontAwesomeIcons.bagShopping,
+                              size: 22, color: linkColor),
+                        )),
+                  )
+                ]),
             backgroundColor: primaryColor,
             elevation: 0),
         backgroundColor: userBgColor,

@@ -21,7 +21,7 @@ class FirebaseStorageDb {
 
     final ConnectivityResult result = await Connectivity().checkConnectivity();
 
-    var imageUrl = null;
+    var imageUrl;
 
     if (!(result == ConnectivityResult.wifi) &&
         !(result == ConnectivityResult.mobile)) {
@@ -59,7 +59,7 @@ class FirebaseStorageDb {
         .child('$userId/posts/${basename(img.path)}');
 
     UploadTask uploadTask = ref.putFile(img);
-    await uploadTask.whenComplete(() => {});
+    await uploadTask;
 
     return await ref.getDownloadURL();
   }

@@ -130,8 +130,6 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Material(
@@ -416,28 +414,15 @@ class _PostCardState extends State<PostCard> {
                       ),
                     ),
                     Positioned(
-                      right: 60,
+                      right: 34,
                       child: GestureDetector(
                         onTap: () {
                           if (publisher.userId != user.userId) {
-                            FirebaseMessageApi.getChatPath(
-                                    user.userId!, publisher.userId!)
-                                .then((chatPathId) {
-                              getQuantity(productId: post.postId!)
-                                  .then((value) => FirebaseMessageApi.addToBag(
-                                      post: post,
-                                      chatPathId: chatPathId,
-                                      quantity: value))
-                                  .whenComplete(() {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ChatBox(
-                                            receiver: publisher,
-                                            author: widget.user,
-                                          )),
-                                );
-                              });
+                            ProductPost.addToBasket(
+                                    userId: user.userId!, post: post)
+                                .whenComplete(() {
+                              ShoWInfo.showToast(
+                                  context, 'Added to basket.', 3);
                             });
                           }
                         },
@@ -454,7 +439,7 @@ class _PostCardState extends State<PostCard> {
                                 child: SizedBox(width: 5),
                               ),
                               TextSpan(
-                                  text: 'Message',
+                                  text: 'Add to basket',
                                   style: TextStyle(
                                       color: widget.user.userTypeId != 1
                                           ? linkColor

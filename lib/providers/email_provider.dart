@@ -120,12 +120,13 @@ class EmailProvider {
       try {
         final FirebaseAuth auth = FirebaseAuth.instance;
 
-        await auth.signInWithEmailAndPassword(
-          email: email.trim(),
-          password: password.trim(),
-        );
-
-        Navigator.of(context, rootNavigator: true).pop(result);
+        await auth
+            .signInWithEmailAndPassword(
+              email: email.trim(),
+              password: password.trim(),
+            )
+            .then((value) =>
+                Navigator.of(context, rootNavigator: true).pop(result));
 
         return auth.currentUser?.uid;
       } on FirebaseAuthException catch (e) {

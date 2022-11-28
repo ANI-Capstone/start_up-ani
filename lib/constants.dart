@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 const primaryColor = Color(0xFFC6D8AF);
 const textColor = Color(0xFF121212);
@@ -86,6 +87,17 @@ class ShoWInfo {
         style: const TextStyle(color: Colors.white),
       ),
     ));
+  }
+
+  static showToast(BuildContext context, String message, int seconds) {
+    return Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: seconds,
+        backgroundColor: Colors.white,
+        textColor: linkColor,
+        fontSize: 14);
   }
 
   static processAlert(BuildContext context, String message, int seconds) {
@@ -206,7 +218,7 @@ class CustomButton {
                     child: SizedBox(
                       width: (size.width - 30),
                       child: Text.rich(TextSpan(
-                          text: '${label}:  ',
+                          text: '$label:  ',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: linkColor,

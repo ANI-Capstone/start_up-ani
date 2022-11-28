@@ -1,16 +1,41 @@
 import 'package:ani_capstone/models/post.dart';
+import 'package:ani_capstone/models/user.dart';
+import 'package:ani_capstone/utils.dart';
 
 class Product {
-  Post post;
-  int? quantity;
+  String productId;
+  int quantity;
+  int orderStatus;
+  User publisher;
+  DateTime addedAt;
+  Post? post;
+  bool? checkBox;
+  int? tPrice;
+  int? index;
+  int? basketIndex;
 
-  Product({required this.post, this.quantity});
+  Product(
+      {required this.productId,
+      required this.quantity,
+      required this.orderStatus,
+      required this.publisher,
+      required this.addedAt,
+      this.post,
+      this.checkBox = false,
+      this.tPrice});
 
-  static Product fromJson(Map<String, dynamic> json, String productId) =>
-      Product(
-          post: Post.fromJson(json['post'], productId),
-          quantity: json['quantity']);
+  static Product fromJson(Map<String, dynamic> json) => Product(
+      productId: json['productId'],
+      quantity: json['quantity'],
+      orderStatus: json['orderStatus'],
+      publisher: User.fromJson(json['publisher']),
+      addedAt: Utils.toDateTime(json['addedAt']));
 
-  Map<String, dynamic> toJson() =>
-      {'post': post.toJson(), 'quantitiy': quantity};
+  Map<String, dynamic> toJson() => {
+        'productId': productId,
+        'quantity': quantity,
+        'orderStatus': orderStatus,
+        'publisher': publisher.toJson(),
+        'addedAt': Utils.fromDateTimeToJson(addedAt)
+      };
 }

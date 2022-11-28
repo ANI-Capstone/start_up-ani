@@ -4,6 +4,7 @@ import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
+import 'package:ani_capstone/screens/components/user/user_basket.dart';
 import 'package:ani_capstone/screens/components/user/user_feeds.dart';
 import 'package:ani_capstone/screens/components/user/user_inbox.dart';
 import 'package:ani_capstone/screens/components/user/user_notification.dart';
@@ -77,12 +78,15 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 1;
+  int currentIndex = 5;
   int? userType;
   UserData? user;
 
   var showMessageBadge = false;
   var showBottomNavigation = true;
+
+  int badgeCount = 0;
+  List<int> eachCount = [0, 0, 0];
 
   String messageBadge = "3";
   late StreamSubscription<bool> keyboardSubscription;
@@ -145,6 +149,30 @@ class _UserViewScreenState extends State<UserViewScreen> {
     });
   }
 
+  void toggleBasket(open) {
+    if (mounted) {
+      setState(() {
+        open == false ? currentIndex = 0 : currentIndex = 5;
+      });
+    }
+  }
+
+  void setFeedBadge(int count, int index) {
+    eachCount[index] = count;
+
+    if (mounted) {
+      int sum = 0;
+      for (int i = 0; i <= 0; i++) {
+        sum += eachCount[i];
+      }
+      badgeCount = 0;
+
+      setState(() {
+        badgeCount = sum;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,13 +180,27 @@ class _UserViewScreenState extends State<UserViewScreen> {
       body: Container(
           color: Colors.white,
           child: IndexedStack(index: currentIndex, children: [
-            UserFeed(user: user!),
+            UserFeed(
+              user: user!,
+              openBasket: (open) {
+                toggleBasket(open);
+              },
+              badgeCount: badgeCount,
+            ),
             UserInbox(user: user!),
             userType == 1 ? UserPost(user: user!) : const UserReviews(),
             UserNotificaiton(user: user!),
             UserProfile(hideNavigationBar: (hide) {
               hideNavigationBar(hide);
-            })
+            }),
+            UserBasket(
+                userData: user!,
+                toggleBasket: (open) {
+                  toggleBasket(open);
+                },
+                setFeedBadge: (int count, int index) {
+                  setFeedBadge(count, index);
+                })
           ])),
       bottomNavigationBar: !showBottomNavigation
           ? null
@@ -170,7 +212,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
                 backgroundColor: Colors.transparent,
                 buttonBackgroundColor: Colors.transparent,
                 height: 55,
-                index: currentIndex,
+                index: currentIndex > 4 ? 0 : currentIndex,
                 onTap: (index) {
                   FocusManager.instance.primaryFocus?.unfocus();
                   setState(() => currentIndex = index);

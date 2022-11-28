@@ -9,11 +9,13 @@ class Utils {
       StreamTransformer<QuerySnapshot, List<T>>.fromHandlers(
         handleData: (QuerySnapshot data, EventSink<List<T>> sink) {
           final snaps = data.docs.map((doc) => doc.data()).toList();
-          final users = snaps
+
+          print(snaps);
+
+          final products = snaps
               .map((json) => fromJson(json as Map<String, dynamic>))
               .toList();
-
-          sink.add(users);
+          sink.add(products);
         },
       );
 
