@@ -186,8 +186,8 @@ class _UserInboxState extends State<UserInbox> {
 
   Widget buildChat(Chat chat) => GestureDetector(
       onTap: () {
-        FirebaseMessageApi.readMessage(
-            AccountControl.getUserId(), chat.contact.userId!, chat.message);
+        // FirebaseMessageApi.readMessage(
+        //     AccountControl.getUserId(), chat.contact.userId!, chat.message);
 
         Navigator.push(
           context,

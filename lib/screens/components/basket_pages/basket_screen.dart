@@ -32,8 +32,6 @@ class _BasketScreenState extends State<BasketScreen> {
 
   late StreamSubscription listener;
 
-  final int orderStatus = 0;
-
   @override
   void initState() {
     super.initState();
@@ -108,7 +106,7 @@ class _BasketScreenState extends State<BasketScreen> {
   }
 
   void productListener() async {
-    final basketRef = ProductPost.basketStream(userId: userId, status: 0);
+    final basketRef = ProductPost.basketStream(userId: userId);
 
     listener = basketRef.listen((event) async {
       for (var change in event.docChanges) {
@@ -121,14 +119,10 @@ class _BasketScreenState extends State<BasketScreen> {
 
           if (basket.isNotEmpty) {
             for (var baskt in basket) {
-              if (baskt.publisherId == newProduct.publisher.userId) {
-                for (var product in baskt.products) {
-                  if (product.productId == newProduct.productId) {
-                    contain = true;
-                    break;
-                  }
-                }
-                if (contain) break;
+              if (baskt.products.any(
+                  (product) => newProduct.productId == product.productId)) {
+                contain = true;
+                break;
               }
             }
           }
@@ -208,8 +202,7 @@ class _BasketScreenState extends State<BasketScreen> {
   }
 
   void fetchBasket() async {
-    ProductPost.getUserBasket(userId: userId, status: orderStatus)
-        .then((value) {
+    ProductPost.getUserBasket(userId: userId).then((value) {
       if (value.isNotEmpty) {
         fetchProducts(value).then((products) {
           final productGroup =

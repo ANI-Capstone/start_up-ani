@@ -133,10 +133,8 @@ class ProductPost {
     return await basketRef.doc(post.postId).set(product);
   }
 
-  static Future removeToBasket({
-    required String userId,
-    required List<String> productIds
-  }) async {
+  static Future removeToBasket(
+      {required String userId, required List<String> productIds}) async {
     final basketRef = FirebaseFirestore.instance
         .collection('basket')
         .doc(userId)
@@ -156,21 +154,18 @@ class ProductPost {
         .collection('basket')
         .doc(userId)
         .collection('user_basket')
-        .where('orderStatus', isEqualTo: status)
         .orderBy("addedAt", descending: true)
         .get()
         .then((snapshot) =>
             snapshot.docs.map((doc) => Product.fromJson(doc.data())).toList());
   }
 
-  static basketStream({required String userId, required int status}) =>
-      FirebaseFirestore.instance
-          .collection('basket')
-          .doc(userId)
-          .collection('user_basket')
-          .where('orderStatus', isEqualTo: status)
-          .orderBy("addedAt", descending: true)
-          .snapshots(includeMetadataChanges: true);
+  static basketStream({required String userId}) => FirebaseFirestore.instance
+      .collection('basket')
+      .doc(userId)
+      .collection('user_basket')
+      .orderBy("addedAt", descending: true)
+      .snapshots(includeMetadataChanges: true);
 
   static Future<List<Order>> getOrders({required String userId}) =>
       FirebaseFirestore.instance
