@@ -32,6 +32,8 @@ class _BasketScreenState extends State<BasketScreen> {
 
   late StreamSubscription listener;
 
+  final int orderStatus = 0;
+
   @override
   void initState() {
     super.initState();
@@ -48,42 +50,52 @@ class _BasketScreenState extends State<BasketScreen> {
     listener.cancel();
   }
 
-  Future removeProduct({required String userId, required String postId}) {
+  Future removeProduct(
+      {required String userId,
+      required List<String> postId,
+      required int basketIndex}) {
     bool done = false;
 
     int sum = 0;
-    for (int i = 0; i < basket.length; i++) {
-      for (int j = 0; j < basket[i].products.length; j++) {
-        if (basket[i].products[j].productId == postId) {
-          if (mounted) {
-            setState(() {
-              basket[i].products.removeAt(j);
-            });
-          }
-          done = true;
-          break;
+    List<Product> products = [];
+
+    for (var product in basket[basketIndex].products) {
+      if (postId.contains(product.productId)) {
+        products.add(product);
+      }
+      done = true;
+    }
+
+    if (mounted && done) {
+      setState(() {
+        for (var product in products) {
+          basket[basketIndex].products.remove(product);
+        }
+      });
+    }
+
+    if (done) {
+      if (basket[basketIndex].products.isEmpty) {
+        if (mounted) {
+          setState(() {
+            basket.removeAt(basketIndex);
+          });
         }
       }
 
-      if (done) {
-        if (basket[i].products.isEmpty) {
-          if (mounted) {
-            setState(() {
-              basket.removeAt(i);
-            });
-          }
-        }
-
-        if (basket.isEmpty) {
-          if (mounted) {
-            setState(() {
-              fetchState = 2;
-            });
-          }
+      if (basket.isEmpty) {
+        if (mounted) {
+          setState(() {
+            fetchState = 2;
+          });
         }
       }
+    }
 
-      sum += basket[i].products.length;
+    if (basket.isNotEmpty) {
+      sum += basket[basketIndex].products.length;
+    } else {
+      sum = 0;
     }
 
     if (mounted) {
@@ -92,11 +104,11 @@ class _BasketScreenState extends State<BasketScreen> {
       });
     }
 
-    return ProductPost.removeToBasket(userId: userId, productId: postId);
+    return ProductPost.removeToBasket(userId: userId, productIds: postId);
   }
 
   void productListener() async {
-    final basketRef = ProductPost.basketStream(userId: userId);
+    final basketRef = ProductPost.basketStream(userId: userId, status: 0);
 
     listener = basketRef.listen((event) async {
       for (var change in event.docChanges) {
@@ -108,10 +120,10 @@ class _BasketScreenState extends State<BasketScreen> {
           bool contain = false;
 
           if (basket.isNotEmpty) {
-            for (int i = 0; i < basket.length; i++) {
-              if (basket[i].publisherId == newProduct.publisher.userId) {
-                for (int j = 0; j < basket[i].products.length; j++) {
-                  if (basket[i].products[j].productId == newProduct.productId) {
+            for (var baskt in basket) {
+              if (baskt.publisherId == newProduct.publisher.userId) {
+                for (var product in baskt.products) {
+                  if (product.productId == newProduct.productId) {
                     contain = true;
                     break;
                   }
@@ -121,7 +133,7 @@ class _BasketScreenState extends State<BasketScreen> {
             }
           }
 
-          if (contain) break;
+          if (contain) return;
 
           addNewProduct(newProduct).then((product) {
             bool added = false;
@@ -144,7 +156,8 @@ class _BasketScreenState extends State<BasketScreen> {
               setState(() {
                 basket.add(Basket(
                     publisherId: product.publisher.userId!,
-                    products: [product]));
+                    products: [product],
+                    basketIndex: 0));
 
                 sum += basket[basket.length - 1].products.length;
 
@@ -195,7 +208,8 @@ class _BasketScreenState extends State<BasketScreen> {
   }
 
   void fetchBasket() async {
-    ProductPost.getUserBasket(userId: userId).then((value) {
+    ProductPost.getUserBasket(userId: userId, status: orderStatus)
+        .then((value) {
       if (value.isNotEmpty) {
         fetchProducts(value).then((products) {
           final productGroup =
@@ -205,7 +219,9 @@ class _BasketScreenState extends State<BasketScreen> {
             final product = productGroup.toList()[i];
 
             basket.add(Basket(
-                publisherId: product[0].publisher.userId!, products: product));
+                publisherId: product[0].publisher.userId!,
+                products: product,
+                basketIndex: i));
           }
 
           setState(() {
@@ -274,9 +290,13 @@ class _BasketScreenState extends State<BasketScreen> {
         user: user,
         products: basket.products,
         removeProduct: <Future>(
-            {required String userId, required String postId}) {
-          return removeProduct(userId: userId, postId: postId);
+            {required String userId,
+            required List<String> postId,
+            required int basketIndex}) {
+          return removeProduct(
+              userId: userId, postId: postId, basketIndex: basketIndex);
         },
+        basketIndex: basket.basketIndex,
       ),
     );
   }

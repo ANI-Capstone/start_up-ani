@@ -23,7 +23,7 @@ class UserBasket extends StatefulWidget {
 }
 
 class _UserBasketState extends State<UserBasket> {
-  int tabIndex = 0;
+  int tabIndex = 1;
 
   List<int> badgeCount = [0, 0, 0];
 
@@ -175,7 +175,9 @@ class _UserBasketState extends State<UserBasket> {
               setBadgeCount(count, index);
             },
           ),
-          ActiveOrders(),
+          ActiveOrders(
+            user: widget.userData,
+          ),
           ToRate(),
         ],
       ),

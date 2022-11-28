@@ -13,14 +13,18 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class BasketCard extends StatefulWidget {
   User user;
   List<Product> products;
-  Function<Future>({required String userId, required String postId})
-      removeProduct;
+  int basketIndex;
+  Function<Future>(
+      {required String userId,
+      required List<String> postId,
+      required int basketIndex}) removeProduct;
 
   BasketCard(
       {Key? key,
       required this.user,
       required this.products,
-      required this.removeProduct})
+      required this.removeProduct,
+      required this.basketIndex})
       : super(key: key);
 
   @override
@@ -34,6 +38,13 @@ class _BasketCardState extends State<BasketCard> {
   Timer? timer;
 
   int totalPrice = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    publisher = widget.products[0].publisher;
+  }
 
   void updateTotalPrice() {
     if (mounted) {
@@ -52,14 +63,30 @@ class _BasketCardState extends State<BasketCard> {
   }
 
   Future checkout() {
-    final checkoutProducts = widget.products.map((product) {
-      if (product.checkBox!) {
-        return product;
-      }
-    }).toList();
+    List<Product> checkoutProducts = [];
 
-    return ProductPost.updateOrderStatus(
-        userId: widget.user.userId!, product: checkoutProducts, status: 1);
+    for (int i = 0; i < widget.products.length; i++) {
+      if (widget.products[i].checkBox!) {
+        checkoutProducts.add(widget.products[i]);
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        widget.removeProduct(
+            userId: widget.user.userId!,
+            postId:
+                checkoutProducts.map((product) => product.productId).toList(),
+            basketIndex: widget.basketIndex);
+      });
+    }
+
+    return ProductPost.checkOutOrder(
+      costumer: widget.user,
+      publisher: publisher,
+      products: checkoutProducts,
+      totalPrice: totalPrice,
+    );
   }
 
   @override
@@ -397,7 +424,9 @@ class _BasketCardState extends State<BasketCard> {
               widget
                   .removeProduct(
                       userId: widget.user.userId!,
-                      postId: product.post!.postId!)
+                      postId: [product.post!.postId!],
+                      basketIndex: widget.basketIndex)
+
                   .whenComplete(() {
                 ShoWInfo.showToast(context, 'Product has been removed.', 3);
               });
