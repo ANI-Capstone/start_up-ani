@@ -3,71 +3,73 @@ import 'package:ani_capstone/models/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class NotificationCard extends StatelessWidget {
-  PostNotification notif;
+class NotificationCard extends StatefulWidget {
+  NotificationModel notif;
 
   NotificationCard({Key? key, required this.notif}) : super(key: key);
 
+  @override
+  State<NotificationCard> createState() => _NotificationCardState();
+}
+
+class _NotificationCardState extends State<NotificationCard> {
   @override
   Widget build(BuildContext context) {
     String timeAgo = '';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Container(
         height: 80,
         alignment: Alignment.center,
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(15)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Row(children: [
-            CircleAvatar(
-                radius: 26,
-                backgroundImage: NetworkImage(notif.participant.photoUrl)),
-            const SizedBox(
-              width: 10,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListTile(
+          dense: true,
+          leading: CircleAvatar(
+              radius: 22,
+              backgroundImage: NetworkImage(widget.notif.participant.photoUrl)),
+          title: RichText(
+            text: TextSpan(
               children: [
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: notif.participant.name,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            color: linkColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const WidgetSpan(
-                          child: SizedBox(
-                        width: 5,
-                      )),
-                      TextSpan(
-                          text: notifBody(),
-                          style: const TextStyle(
-                            color: linkColor,
-                            fontSize: 14,
-                          )),
-                    ],
-                  ),
+                TextSpan(
+                  text: widget.notif.participant.name,
+                  style: const TextStyle(
+                      fontSize: 13,
+                      color: linkColor,
+                      fontWeight: FontWeight.bold),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    timeAgo.isEmpty
-                        ? timeago.format(notif.timestamp, locale: 'en_short')
-                        : timeAgo,
-                    style: TextStyle(
-                        fontSize: 12, color: Colors.black.withOpacity(0.7)),
-                  ),
-                )
+                const WidgetSpan(
+                    child: SizedBox(
+                  width: 5,
+                )),
+                TextSpan(
+                    text: notifBody(),
+                    style: const TextStyle(
+                      color: linkColor,
+                      fontSize: 13,
+                    )),
               ],
             ),
-          ]),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              timeAgo.isEmpty
+                  ? timeago.format(widget.notif.timestamp)
+                  : timeAgo,
+              style:
+                  TextStyle(fontSize: 12, color: Colors.black.withOpacity(0.7)),
+            ),
+          ),
+          trailing: widget.notif.read!
+              ? null
+              : Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: linkColor.withOpacity(0.7))),
         ),
       ),
     );
@@ -76,8 +78,14 @@ class NotificationCard extends StatelessWidget {
   String notifBody() {
     String body = '';
 
-    if (notif.notifType == 2) {
-      body = 'make a review of your product.';
+    if (widget.notif.notifType == 2) {
+      body = 'ordered your products.';
+    } else if (widget.notif.notifType == 3) {
+      body = 'accepted your order.';
+    } else if (widget.notif.notifType == 4) {
+      body = 'denied your order.';
+    } else if (widget.notif.notifType == 5) {
+      body = 'posted a review of your product.';
     } else {
       body = 'liked your post.';
     }

@@ -4,12 +4,10 @@ import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/models/chat.dart';
-import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_box.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -18,8 +16,10 @@ import '../widgets/pull_refresh.dart';
 
 class UserInbox extends StatefulWidget {
   UserData user;
+  Function(int count) setBadge;
 
-  UserInbox({Key? key, required this.user}) : super(key: key);
+  UserInbox({Key? key, required this.user, required this.setBadge})
+      : super(key: key);
 
   @override
   State<UserInbox> createState() => _UserInboxState();
@@ -29,9 +29,8 @@ class _UserInboxState extends State<UserInbox> {
   User? author;
   Timer? timer;
   List<Chat> chats = [];
-  late StreamSubscription listener;
   late final NotificationApi notificationService;
-  var notifData;
+  late StreamSubscription listener;
 
   @override
   void initState() {
@@ -45,67 +44,60 @@ class _UserInboxState extends State<UserInbox> {
         userId: widget.user.id,
         photoUrl: widget.user.photoUrl!);
 
-    chatListener();
     loadChats();
-
-    timer = Timer.periodic(
-      const Duration(seconds: 30),
-      (timer) {
-        setState(() {
-          loadChats();
-        });
-      },
-    );
+    chatListener();
   }
 
   @override
   void dispose() {
     super.dispose();
-    timer?.cancel();
     listener.cancel();
   }
 
   Future loadChats() async {
     if (AccountControl.isUserLoggedIn()) {
       await FirebaseMessageApi.getChats(widget.user.id!).then((data) {
-        if (mounted) {
-          setState(() => chats = data);
-        }
-
         int unreadCount = 0;
         final userId = AccountControl.getUserId();
 
         for (var chat in data) {
           if (chat.message.userId != userId && !chat.message.seen) {
             unreadCount += 1;
+
+            final now = DateTime.now().subtract(const Duration(seconds: 10));
+
+            if (chat.message.createdAt.isAfter(now) ||
+                chat.message.createdAt.isAtSameMomentAs(DateTime.now())) {
+              newChatNotifier(chat);
+            }
+
+            if (mounted) {
+              setState(() => chats = data);
+            }
           }
         }
 
-        NotificationApi.unReadMessages = unreadCount;
+        setState(() {
+          widget.setBadge(unreadCount);
+        });
       });
     } else {
       timer?.cancel();
-      listener.cancel();
     }
+  }
+
+  void newChatNotifier(Chat chat) async {
+    await notificationService.showLocalNotification(
+        id: 0,
+        title: chat.contact.name,
+        body: chat.message.message,
+        payload: chat.chatPathId);
   }
 
   void chatListener() async {
     final chatRef = FirebaseMessageApi.chatStream(widget.user.id!);
 
     listener = chatRef.listen((event) async {
-      for (var change in event.docChanges) {
-        if (change.type == DocumentChangeType.modified) {
-          final messageNotif = MessageNotification.fromJson(change.doc.data());
-
-          if (AccountControl.getUserId() != messageNotif.contactId) {
-            await notificationService.showLocalNotification(
-                id: 0,
-                title: messageNotif.title,
-                body: messageNotif.body,
-                payload: messageNotif.payload);
-          }
-        }
-      }
       loadChats();
     });
   }

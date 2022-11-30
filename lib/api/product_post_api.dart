@@ -1,3 +1,4 @@
+import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/models/post.dart';
@@ -49,66 +50,37 @@ class ProductPost {
 
   static Future updateLike(
       {required User user,
-      required String publisherId,
+      required User publisher,
       required bool liked,
-      required String productId,
-      required int likes}) async {
+      required String productId}) async {
     final productRef =
         FirebaseFirestore.instance.collection('posts').doc(productId);
 
-    final newLikes = {'likes': likes};
-
-    await productRef.update(newLikes);
-
-    final userLikesRef = FirebaseFirestore.instance
-        .collection('posts')
-        .doc(productId)
-        .collection('user_likes')
-        .doc(user.userId);
-
     if (liked) {
-      final likeData = {"liked": liked};
-      await userLikesRef.set(likeData);
+      await productRef.update({
+        'likes': FieldValue.arrayUnion([user.userId])
+      });
     } else {
-      await userLikesRef.delete();
+      await productRef.update({
+        'likes': FieldValue.arrayRemove([user.userId])
+      });
     }
 
-    if (user.userId != publisherId) {
-      final postNotifRef = FirebaseFirestore.instance
-          .collection('notifications')
-          .doc(publisherId)
-          .collection('posts')
-          .doc('${user.userId}$productId');
-
-      bool exist = false;
-      bool hidden = false;
-
-      final newNotification = PostNotification(
-              participant: user,
-              notifType: 1,
-              postId: productId,
-              timestamp: DateTime.now())
-          .toJson();
-
-      try {
-        await postNotifRef.get().then((doc) {
-          exist = doc.exists;
-
-          if (exist) {
-            final data = doc.data() as Map<String, dynamic>;
-            hidden = data['hide'];
-          }
-        });
-
-        if (hidden) return;
-
-        if (exist) {
-          await postNotifRef.update({'hide': true});
-        } else {
-          await postNotifRef.set(newNotification);
-        }
-      } catch (_) {
-        return;
+    if (user.userId != publisher.userId) {
+      if (liked) {
+        NotificationApi.addNotification(
+            notifTo: publisher.userId!,
+            notifFrom: user,
+            title: user.name,
+            body: '',
+            payload: productId,
+            notifType: 1);
+      } else {
+        NotificationApi.removeNotification(
+            notifTo: publisher.userId!,
+            notifFrom: user,
+            payload: productId,
+            notifType: 1);
       }
     }
   }
@@ -199,6 +171,13 @@ class ProductPost {
             status: 0)
         .toJson();
 
-    return await orderRef.set(order);
+    return await orderRef.set(order).whenComplete(() =>
+        NotificationApi.addNotification(
+            notifTo: publisher.userId!,
+            notifFrom: costumer,
+            title: costumer.name,
+            body: '',
+            payload: orderRef.id,
+            notifType: 2));
   }
 }

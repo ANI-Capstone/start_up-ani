@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:ani_capstone/api/firebase_firestore.dart';
-import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/post.dart';
@@ -11,8 +10,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
-import '../chat_page/chat_box.dart';
 
 class PostCard extends StatefulWidget {
   Post post;
@@ -25,23 +22,16 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
-  late Post post;
-  late UserData userData;
-  late User publisher;
-  late User user;
-
-  late String description;
-  late Color like;
-  late int likes;
   late Timer _timer;
-  late String productId;
-
+  late User user;
   String textButton = 'See more';
   bool liked = false;
 
   int duration = 0;
 
   late SharedPreferences prefs;
+  Color? like = unLikeColor;
+  late String description;
 
   final selectedColor = Colors.white;
   final unSelectedColor = const Color(0xFFB5B5B5);
@@ -50,59 +40,29 @@ class _PostCardState extends State<PostCard> {
   @override
   void initState() {
     super.initState();
-    post = widget.post;
-    userData = widget.user;
-    publisher = widget.post.publisher;
-    description = widget.post.description.length > 85
-        ? '${widget.post.description.characters.take(85)}...'
-        : widget.post.description;
-    likes = widget.post.likes!;
-    like = unLikeColor;
-    productId = post.postId!;
 
     user = User(
         name: widget.user.name,
         userId: widget.user.id,
         photoUrl: widget.user.photoUrl!);
 
+    description = widget.post.description.length > 85
+        ? '${widget.post.description.characters.take(85)}...'
+        : widget.post.description;
+
     setLiked();
     _timer = Timer(Duration(seconds: duration), () {});
   }
 
-  Future setLiked() async {
-    prefs = await SharedPreferences.getInstance();
-
-    final prefLike = prefs.getBool('${userData.id!} + $productId');
-
-    if (prefLike != null) {
-      setState(() {
-        liked = prefLike;
-        liked ? like = likeColor : unLikeColor;
-      });
-    } else {
-      ProductPost.checkProductLike(userId: userData.id!, productId: productId)
-          .then((value) {
+  void setLiked() async {
+    if (widget.post.likes!.isNotEmpty &&
+        widget.post.likes!.contains(user.userId)) {
+      if (mounted) {
         setState(() {
-          liked = value;
-          liked ? like = likeColor : unLikeColor;
+          liked = true;
+          like = likeColor;
         });
-      });
-
-      await prefs.setBool('${user.userId!} + $productId', liked);
-    }
-  }
-
-  Future getQuantity({required String productId}) async {
-    prefs = await SharedPreferences.getInstance();
-
-    final prefQuantity = prefs.getInt('${user.userId!} + $productId - Q');
-
-    if (prefQuantity != null) {
-      await prefs.setInt('${user.userId!} + $productId - Q', prefQuantity + 1);
-      return prefQuantity + 1;
-    } else {
-      await prefs.setInt('${user.userId!} + $productId - Q', 1);
-      return 1;
+      }
     }
   }
 
@@ -112,13 +72,10 @@ class _PostCardState extends State<PostCard> {
         duration = 10;
         ProductPost.updateLike(
             user: user,
-            publisherId: publisher.userId!,
+            publisher: widget.post.publisher,
             liked: liked,
-            productId: productId,
-            likes: likes);
+            productId: widget.post.postId!);
       });
-
-      await prefs.setBool('${userData.id!} + $productId', liked);
     });
   }
 
@@ -144,16 +101,17 @@ class _PostCardState extends State<PostCard> {
               ListTile(
                 leading: CircleAvatar(
                     radius: 22,
-                    backgroundImage: NetworkImage(publisher.photoUrl)),
+                    backgroundImage:
+                        NetworkImage(widget.post.publisher.photoUrl)),
                 title: Text(
-                  publisher.name,
+                  widget.post.publisher.name,
                   style: const TextStyle(
                       color: linkColor,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  DateFormat('MMMM dd, yyyy').format(post.postedAt),
+                  DateFormat('MMMM dd, yyyy').format(widget.post.postedAt),
                   style: const TextStyle(color: linkColor, fontSize: 12),
                 ),
               ),
@@ -173,7 +131,7 @@ class _PostCardState extends State<PostCard> {
                         child: SizedBox(width: 5),
                       ),
                       TextSpan(
-                          text: post.name,
+                          text: widget.post.name,
                           style: const TextStyle(
                               color: linkColor,
                               fontSize: 13,
@@ -197,12 +155,14 @@ class _PostCardState extends State<PostCard> {
                         ),
                         WidgetSpan(
                             child: Visibility(
-                          visible: post.description.length > 85 ? true : false,
+                          visible: widget.post.description.length > 85
+                              ? true
+                              : false,
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
                                 if (textButton == 'See more') {
-                                  description = post.description;
+                                  description = widget.post.description;
                                   textButton = 'Close';
                                 } else {
                                   description =
@@ -240,7 +200,7 @@ class _PostCardState extends State<PostCard> {
                                 });
                               }
                             }),
-                        items: post.images
+                        items: widget.post.images
                             .map((item) => Image.network(item,
                                 fit: BoxFit.cover,
                                 width: double.infinity,
@@ -255,10 +215,10 @@ class _PostCardState extends State<PostCard> {
                             children: [
                               SizedBox(
                                 height: 40,
-                                width: post.images.length * 9,
+                                width: widget.post.images.length * 9,
                                 child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    itemCount: post.images.length,
+                                    itemCount: widget.post.images.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return InkWell(
@@ -293,7 +253,8 @@ class _PostCardState extends State<PostCard> {
                               color: backgroundColor,
                               borderRadius: BorderRadius.circular(5)),
                           child: Center(
-                            child: Text('P${post.price}/${post.unit}',
+                            child: Text(
+                                'P${widget.post.price}/${widget.post.unit}',
                                 style: const TextStyle(
                                   color: linkColor,
                                   fontSize: 11,
@@ -333,9 +294,9 @@ class _PostCardState extends State<PostCard> {
                             child: SizedBox(width: 5),
                           ),
                           TextSpan(
-                              text: post.location.length > 48
-                                  ? '${post.location.characters.take(48)}...'
-                                  : post.location,
+                              text: widget.post.location.length > 48
+                                  ? '${widget.post.location.characters.take(48)}...'
+                                  : widget.post.location,
                               style: const TextStyle(
                                   color: linkColor,
                                   fontSize: 12,
@@ -366,11 +327,9 @@ class _PostCardState extends State<PostCard> {
                                   if (liked) {
                                     like = unLikeColor;
                                     liked = false;
-                                    likes -= 1;
                                   } else {
                                     like = likeColor;
                                     liked = true;
-                                    likes += 1;
                                   }
                                 });
 
@@ -383,8 +342,9 @@ class _PostCardState extends State<PostCard> {
                               child: SizedBox(width: 5),
                             ),
                             TextSpan(
-                                text:
-                                    likes == 1 ? '$likes Like' : '$likes Likes',
+                                text: widget.post.likes!.length == 1
+                                    ? '${widget.post.likes!.length} Like'
+                                    : '${widget.post.likes!.length} Likes',
                                 style: TextStyle(color: like, fontSize: 12)),
                           ],
                         ),
@@ -417,9 +377,9 @@ class _PostCardState extends State<PostCard> {
                       right: 34,
                       child: GestureDetector(
                         onTap: () {
-                          if (publisher.userId != user.userId) {
+                          if (widget.post.publisher.userId != user.userId) {
                             ProductPost.addToBasket(
-                                    userId: user.userId!, post: post)
+                                    userId: user.userId!, post: widget.post)
                                 .whenComplete(() {
                               ShoWInfo.showToast(
                                   context, 'Added to basket.', 3);

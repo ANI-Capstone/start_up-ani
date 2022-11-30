@@ -13,7 +13,7 @@ class Post {
   List<String> images;
   double? rating;
   int? rateCount;
-  int? likes;
+  List<String>? likes;
   int? reviews;
   String? postId;
 
@@ -28,7 +28,7 @@ class Post {
       required this.images,
       this.rating = 0,
       this.rateCount = 0,
-      this.likes = 0,
+      this.likes,
       this.reviews = 0,
       this.postId});
 
@@ -43,7 +43,7 @@ class Post {
       images: List.from(json['images']),
       rating: json['rating'],
       rateCount: json['rateCount'],
-      likes: json['likes'],
+      likes: List.from(json['likes'] ?? []),
       reviews: json['reviews'],
       postId: postId);
 

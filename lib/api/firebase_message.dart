@@ -227,6 +227,12 @@ class FirebaseMessageApi {
     }
   }
 
+  static chatStream(String userId) => FirebaseFirestore.instance
+      .collection('notifications')
+      .doc(userId)
+      .collection('message')
+      .snapshots(includeMetadataChanges: true);
+
   static Future<List<Chat>> getChats(String userId) {
     return FirebaseFirestore.instance
         .collection('users')
@@ -237,12 +243,6 @@ class FirebaseMessageApi {
         .then((chats) =>
             chats.docs.map((doc) => Chat.fromJson(doc.data())).toList());
   }
-
-  static chatStream(String userId) => FirebaseFirestore.instance
-      .collection('notifications')
-      .doc(userId)
-      .collection('message')
-      .snapshots(includeMetadataChanges: true);
 
   static updateStatus({required String chatPathId, required int status}) async {
     FirebaseFirestore.instance

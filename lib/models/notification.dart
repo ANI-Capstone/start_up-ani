@@ -1,74 +1,50 @@
-import 'package:ani_capstone/models/chat.dart';
 import 'package:ani_capstone/models/user.dart';
 
 import '../utils.dart';
 
-class MessageNotification {
-  String contactId;
+class NotificationModel {
+  String? notifId;
+  User participant;
   String title;
   String body;
+  int notifType;
   String payload;
   DateTime timestamp;
+  bool? read;
+  bool? hide;
 
-  MessageNotification(
-      {required this.contactId,
+  NotificationModel(
+      {required this.participant,
       required this.title,
       required this.body,
-      required this.payload,
-      required this.timestamp});
-
-  static MessageNotification fromJson(Map<String, dynamic> json) =>
-      MessageNotification(
-          contactId: json['notification']['notif']['contactId'],
-          title: json['notification']['notif']['title'],
-          body: json['notification']['notif']['body'],
-          payload: (json['notification']['notif']['payload']),
-          timestamp:
-              Utils.toDateTime(json['notification']['notif']['timestamp']));
-
-  Map<String, dynamic> toJson() => {
-        'userId': contactId,
-        'title': title,
-        'body': body,
-        'payload': payload,
-        'timestamp': Utils.fromDateTimeToJson(timestamp),
-      };
-}
-
-class PostNotification {
-  User participant;
-  int notifType;
-  String postId;
-  DateTime timestamp;
-  bool? unread;
-  String? notifId;
-  bool hide;
-
-  PostNotification(
-      {required this.participant,
       required this.notifType,
-      required this.postId,
+      required this.payload,
       required this.timestamp,
-      this.unread = true,
-      this.notifId,
-      this.hide = false});
+      this.read = false,
+      this.hide = false,
+      this.notifId});
 
-  static PostNotification fromJson(Map<String, dynamic> json, String notifId) =>
-      PostNotification(
+  static NotificationModel fromJson(
+          Map<String, dynamic> json, String notifId) =>
+      NotificationModel(
           participant: User.fromJson(json['participant']),
+          title: json['title'],
+          body: json['body'],
           notifType: json['notifType'],
-          postId: json['postId'],
+          payload: json['payload'],
           timestamp: Utils.toDateTime(json['timestamp']),
-          unread: json['unread'],
-          notifId: notifId,
-          hide: json['hide']);
+          read: json['read'],
+          hide: json['hide'],
+          notifId: notifId);
 
   Map<String, dynamic> toJson() => {
         'participant': participant.toJson(),
+        'title': title,
+        'body': body,
         'notifType': notifType,
-        'postId': postId,
+        'payload': payload,
         'timestamp': Utils.fromDateTimeToJson(timestamp),
-        'unread': unread,
+        'read': read,
         'hide': hide
       };
 }

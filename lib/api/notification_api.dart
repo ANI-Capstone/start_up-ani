@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../models/notification.dart';
+import '../models/user.dart';
 
 class NotificationApi {
   NotificationApi();
@@ -85,20 +86,114 @@ class NotificationApi {
     );
   }
 
-  static Stream<int> unreadMessages() async* {
-    yield unReadMessages;
-  }
-
-  static Stream<List<PostNotification>> getNotification(
+  static Future<List<NotificationModel>> getNotification(
           {required String userId}) =>
       FirebaseFirestore.instance
           .collection('notifications')
           .doc(userId)
-          .collection('posts')
+          .collection('user_notif')
           .orderBy("timestamp", descending: true)
-          .where('hide', isEqualTo: false)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => PostNotification.fromJson(doc.data(), doc.id))
+          .get()
+          .then((snapshot) => snapshot.docs
+              .map((doc) => NotificationModel.fromJson(doc.data(), doc.id))
               .toList());
+
+  static notifStream(String userId) => FirebaseFirestore.instance
+      .collection('notifications')
+      .doc(userId)
+      .collection('user_notif')
+      .snapshots(includeMetadataChanges: true);
+
+  static Future addNotification(
+      {required String notifTo,
+      required User notifFrom,
+      required String title,
+      required String body,
+      required String payload,
+      required int notifType}) async {
+    final notifRef = FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(notifTo)
+        .collection('user_notif');
+
+    String notifId = payload + notifFrom.userId!;
+
+    switch (notifType) {
+      case 1:
+        notifId = '$notifId-TYPE=1';
+        break;
+      case 2:
+        notifId = '$notifId-TYPE=2';
+        break;
+      case 3:
+        notifId = '$notifId-TYPE=3';
+        break;
+      case 4:
+        notifId = '$notifId-TYPE=4';
+        break;
+      case 5:
+        notifId = '$notifId-TYPE=5';
+        break;
+    }
+
+    final notif = NotificationModel(
+            participant: notifFrom,
+            title: title,
+            body: body,
+            notifType: notifType,
+            payload: payload,
+            timestamp: DateTime.now())
+        .toJson();
+
+    await notifRef.doc(notifId).set(notif);
+  }
+
+  static Future markAllRead(
+      {required String userId, required List<String> notifIds}) async {
+    final notifRef = FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(userId)
+        .collection('user_notif');
+
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (var element in notifIds) {
+      batch.update(notifRef.doc(element), {'read': true});
+    }
+
+    return await batch.commit();
+  }
+
+  static removeNotification(
+      {required String notifTo,
+      required User notifFrom,
+      required String payload,
+      required int notifType}) async {
+    final notifRef = FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(notifTo)
+        .collection('user_notif');
+
+    String notifId = payload + notifFrom.userId!;
+
+    switch (notifType) {
+      case 1:
+        notifId = '$notifId-TYPE=1';
+        break;
+      case 2:
+        notifId = '$notifId-TYPE=2';
+        break;
+      case 3:
+        notifId = '$notifId-TYPE=3';
+        break;
+      case 4:
+        notifId = '$notifId-TYPE=4';
+        break;
+      case 5:
+        notifId = '$notifId-TYPE=5';
+        break;
+    }
+
+    await notifRef.doc(notifId).delete();
+  }
 }

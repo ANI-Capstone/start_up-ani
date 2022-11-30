@@ -78,14 +78,14 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 5;
+  int currentIndex = 3;
   int? userType;
   UserData? user;
 
   var showMessageBadge = false;
   var showBottomNavigation = true;
 
-  int badgeCount = 0;
+  List<int> badgeCount = [0, 0, 0];
   List<int> eachCount = [0, 0, 0];
 
   String messageBadge = "3";
@@ -104,8 +104,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
 
     userType = widget.userType!;
     user = widget.user;
-
-    unReadListener();
 
     var keyboardVisibilityController = KeyboardVisibilityController();
 
@@ -133,20 +131,20 @@ class _UserViewScreenState extends State<UserViewScreen> {
     }
   }
 
-  void unReadListener() async {
-    NotificationApi.unreadMessages().listen((event) {
-      if (event > 0) {
-        setState(() {
-          showMessageBadge = true;
-          messageBadge = event.toString();
-        });
-      } else {
-        setState(() {
-          showMessageBadge = false;
-          messageBadge = event.toString();
-        });
-      }
-    });
+  void setMessageBadge(int count) {
+    if (mounted) {
+      setState(() {
+        badgeCount[1] = count;
+      });
+    }
+  }
+
+  void setNotifBadge(int count) {
+    if (mounted) {
+      setState(() {
+        badgeCount[2] = count;
+      });
+    }
   }
 
   void toggleBasket(open) {
@@ -165,10 +163,10 @@ class _UserViewScreenState extends State<UserViewScreen> {
       for (int i = 0; i <= 0; i++) {
         sum += eachCount[i];
       }
-      badgeCount = 0;
+      badgeCount[0] = 0;
 
       setState(() {
-        badgeCount = sum;
+        badgeCount[0] = sum;
       });
     }
   }
@@ -185,11 +183,21 @@ class _UserViewScreenState extends State<UserViewScreen> {
               openBasket: (open) {
                 toggleBasket(open);
               },
-              badgeCount: badgeCount,
+              badgeCount: badgeCount[0],
             ),
-            UserInbox(user: user!),
+            UserInbox(
+              user: user!,
+              setBadge: (int count) {
+                setMessageBadge(count);
+              },
+            ),
             userType == 1 ? UserPost(user: user!) : const UserReviews(),
-            UserNotificaiton(user: user!),
+            UserNotificaiton(
+              user: user!,
+              setBadge: (int count) {
+                setNotifBadge(count);
+              },
+            ),
             UserProfile(hideNavigationBar: (hide) {
               hideNavigationBar(hide);
             }),
@@ -220,18 +228,25 @@ class _UserViewScreenState extends State<UserViewScreen> {
                 items: [
                   homeNav,
                   Badge(
-                    // badgeColor: badgeColor,
                     badgeContent: Text(
-                      messageBadge,
+                      '${badgeCount[1]}',
                       style: const TextStyle(color: Colors.white),
                     ),
-                    showBadge: showMessageBadge,
+                    showBadge: badgeCount[1] > 0,
                     elevation: 3,
                     position: BadgePosition.topEnd(top: -14, end: -12),
                     child: inboxNav,
                   ),
                   userType == 1 ? postNav : reviewNav,
-                  notifNav,
+                  Badge(
+                      badgeContent: Text(
+                        '${badgeCount[2]}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      showBadge: badgeCount[2] > 0,
+                      elevation: 3,
+                      position: BadgePosition.topEnd(top: -14, end: -12),
+                      child: notifNav),
                   userNav
                 ],
               ),
