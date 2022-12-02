@@ -11,6 +11,7 @@ import 'package:ani_capstone/screens/components/user/user_notification.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/components/user/user_reviews.dart';
+import 'package:ani_capstone/screens/components/user/user_store.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
 import 'package:badges/badges.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -78,7 +79,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 3;
+  int currentIndex = 5;
   int? userType;
   UserData? user;
 
@@ -201,14 +202,24 @@ class _UserViewScreenState extends State<UserViewScreen> {
             UserProfile(hideNavigationBar: (hide) {
               hideNavigationBar(hide);
             }),
-            UserBasket(
-                userData: user!,
-                toggleBasket: (open) {
-                  toggleBasket(open);
-                },
-                setFeedBadge: (int count, int index) {
-                  setFeedBadge(count, index);
-                })
+            user!.userTypeId == 1
+                ? UserStore(
+                    userData: user!,
+                    toggleBasket: (open) {
+                      toggleBasket(open);
+                    },
+                    setFeedBadge: (int count, int index) {
+                      setFeedBadge(count, index);
+                    },
+                  )
+                : UserBasket(
+                    userData: user!,
+                    toggleBasket: (open) {
+                      toggleBasket(open);
+                    },
+                    setFeedBadge: (int count, int index) {
+                      setFeedBadge(count, index);
+                    })
           ])),
       bottomNavigationBar: !showBottomNavigation
           ? null

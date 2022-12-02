@@ -1,4 +1,5 @@
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/models/product.dart';
@@ -21,6 +22,7 @@ class OrdersCard extends StatefulWidget {
 class _OrdersCardState extends State<OrdersCard> {
   late Order order;
   late User publisher;
+  late User costumer;
   late UserData user;
 
   late List<Product> products;
@@ -31,6 +33,7 @@ class _OrdersCardState extends State<OrdersCard> {
 
     order = widget.order;
     publisher = widget.order.publisher;
+    costumer = widget.order.costumer;
     products = widget.order.products;
     user = widget.user;
   }
@@ -56,9 +59,11 @@ class _OrdersCardState extends State<OrdersCard> {
                 dense: true,
                 leading: CircleAvatar(
                     radius: 18,
-                    backgroundImage: NetworkImage(publisher.photoUrl)),
+                    backgroundImage: NetworkImage(widget.user.userTypeId == 1
+                        ? costumer.photoUrl
+                        : publisher.photoUrl)),
                 title: Text(
-                  publisher.name,
+                  widget.user.userTypeId == 1 ? costumer.name : publisher.name,
                   style: const TextStyle(
                       color: linkColor,
                       fontSize: 12.5,
@@ -72,23 +77,27 @@ class _OrdersCardState extends State<OrdersCard> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => ChatBox(
-                                  receiver: publisher,
+                                  receiver: widget.user.userTypeId == 1
+                                      ? costumer
+                                      : publisher,
                                   author: user,
                                 )),
                       );
                     },
                     child: RichText(
-                      text: const TextSpan(
+                      text: TextSpan(
                         children: [
-                          WidgetSpan(
+                          const WidgetSpan(
                               child: FaIcon(FontAwesomeIcons.solidComment,
                                   size: 18, color: linkColor)),
-                          WidgetSpan(
+                          const WidgetSpan(
                             child: SizedBox(width: 5),
                           ),
                           TextSpan(
-                              text: 'Contact Farmer',
-                              style: TextStyle(
+                              text: widget.user.userTypeId == 1
+                                  ? 'Contact Consumer'
+                                  : 'Contact Farmer',
+                              style: const TextStyle(
                                   color: linkColor,
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold)),
@@ -147,39 +156,120 @@ class _OrdersCardState extends State<OrdersCard> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: SizedBox(
-                        height: 26,
-                        width: 160,
-                        child: Center(
-                            child: Text(buildStatus(),
-                                style: TextStyle(
-                                    color: widget.order.status == 2
-                                        ? Colors.red
-                                        : widget.order.status == 0
-                                            ? linkColor.withOpacity(0.7)
-                                            : linkColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold)))),
-                  )
+                  widget.user.userTypeId == 1
+                      ? buildStatusFarmer()
+                      : buildStatusConsumer()
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  String buildStatus() {
-    if (widget.order.status == 1) {
-      return 'Order is ready for pick up';
-    } else if (widget.order.status == 2) {
-      return 'Your order was denied';
+  Row buildStatusFarmer() {
+    if (order.status == 0) {
+      return Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: GestureDetector(
+              onTap: () {
+                ProductPost.updateOrderStatus(
+                    orderId: widget.order.orderId!, orderStatus: 1);
+              },
+              child: Container(
+                  height: 26,
+                  width: 64,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5), color: linkColor),
+                  child: const Center(
+                      child: Text('Accept',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)))),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 2),
+            child: SizedBox(
+                height: 26,
+                width: 55,
+                child: Center(
+                    child: Text('Deny',
+                        style: TextStyle(
+                            color: linkColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)))),
+          )
+        ],
+      );
     } else {
-      return 'Waiting for confirmation';
+      return Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                  height: 26,
+                  width: 64,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5), color: linkColor),
+                  child: const Center(
+                      child: Text('Paid',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)))),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 2),
+            child: SizedBox(
+                height: 26,
+                width: 55,
+                child: Center(
+                    child: Text('Delete',
+                        style: TextStyle(
+                            color: linkColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)))),
+          )
+        ],
+      );
     }
+  }
+
+  Widget buildStatusConsumer() {
+    String msg = '';
+
+    if (widget.order.status == 1) {
+      msg = 'Order is ready for pick up';
+    } else if (widget.order.status == 2) {
+      msg = 'Your order was denied';
+    } else {
+      msg = 'Waiting for confirmation';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: SizedBox(
+          height: 26,
+          width: 160,
+          child: Center(
+              child: Text(msg,
+                  style: TextStyle(
+                      color: widget.order.status == 2
+                          ? Colors.red
+                          : widget.order.status == 0
+                              ? linkColor.withOpacity(0.7)
+                              : linkColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold)))),
+    );
   }
 
   Widget buildLabel(String label, int index, double space) {

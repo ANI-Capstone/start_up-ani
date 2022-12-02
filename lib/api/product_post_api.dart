@@ -137,15 +137,28 @@ class ProductPost {
       .doc(userId)
       .collection('user_basket')
       .orderBy("addedAt", descending: true)
-      .snapshots(includeMetadataChanges: true);
+      .snapshots(includeMetadataChanges: false);
 
-  static Future<List<Order>> getOrders({required String userId}) =>
-      FirebaseFirestore.instance
-          .collection('orders')
-          .where('costumer.id', isEqualTo: userId)
-          .get()
-          .then((snapshot) =>
-              snapshot.docs.map((doc) => Order.fromJson(doc.data())).toList());
+  static orderStream({required String userId, required int userType}) {
+    final id = userType == 1 ? 'publisher.id' : 'costumer.id';
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .where(id, isEqualTo: userId)
+        .snapshots(includeMetadataChanges: false);
+  }
+
+  static Future<List<Order>> getOrders(
+      {required String userId, required int userType}) {
+    final id = userType == 1 ? 'publisher.id' : 'costumer.id';
+
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .where(id, isEqualTo: userId)
+        .get()
+        .then((snapshot) => snapshot.docs
+            .map((doc) => Order.fromJson(doc.data(), doc.id))
+            .toList());
+  }
 
   static Future<List<Post>> getProducts({required List<String> productList}) =>
       FirebaseFirestore.instance
@@ -155,6 +168,14 @@ class ProductPost {
           .then((snapshot) => snapshot.docs
               .map((doc) => Post.fromJson(doc.data(), doc.id))
               .toList());
+
+  static void updateOrderStatus(
+      {required String orderId, required int orderStatus}) async {
+    final orderRef =
+        FirebaseFirestore.instance.collection('orders').doc(orderId);
+
+    await orderRef.update({'status': orderStatus});
+  }
 
   static Future checkOutOrder(
       {required User costumer,

@@ -1,17 +1,19 @@
+import 'dart:async';
+
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/screens/components/basket_pages/active_orders.dart';
-import 'package:ani_capstone/screens/components/basket_pages/basket_screen.dart';
-import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class UserBasket extends StatefulWidget {
+class UserStore extends StatefulWidget {
   UserData userData;
   final Function(bool open) toggleBasket;
   final Function(int count, int index) setFeedBadge;
-  UserBasket(
+  UserStore(
       {Key? key,
       required this.userData,
       required this.toggleBasket,
@@ -19,13 +21,33 @@ class UserBasket extends StatefulWidget {
       : super(key: key);
 
   @override
-  _UserBasketState createState() => _UserBasketState();
+  _UserStoreState createState() => _UserStoreState();
 }
 
-class _UserBasketState extends State<UserBasket> {
-  int tabIndex = 1;
+class _UserStoreState extends State<UserStore> {
+  int tabIndex = 0;
 
   List<int> badgeCount = [0, 0, 0];
+
+  List<List<Order>> order = [[], [], []];
+
+  List<int> fetchState = [0, 0, 0];
+  late StreamSubscription listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchOrders();
+    orderListener();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    listener.cancel();
+  }
 
   void setBadgeCount(int count, int index) {
     if (mounted) {
@@ -36,10 +58,73 @@ class _UserBasketState extends State<UserBasket> {
     }
   }
 
+  void orderListener() {
+    final orderRef = ProductPost.orderStream(
+        userId: widget.userData.id!, userType: widget.userData.userTypeId);
+
+    listener = orderRef.listen((event) async {
+      fetchOrders();
+    });
+  }
+
+  void fetchOrders() async {
+    ProductPost.getOrders(
+            userId: widget.userData.id!, userType: widget.userData.userTypeId)
+        .then((orders) {
+      order.clear();
+
+      order = [[], [], []];
+
+      if (orders.isNotEmpty) {
+        for (var order in orders) {
+          if (order.status == 0) {
+            this.order[0].add(order);
+          } else if (order.status == 1) {
+            this.order[1].add(order);
+          } else {
+            this.order[2].add(order);
+          }
+        }
+
+        for (int i = 0; i < order.length; i++) {
+          if (order[i].isNotEmpty) {
+            if (mounted) {
+              setState(() {
+                fetchState[i] = 1;
+              });
+            }
+          } else {
+            if (mounted) {
+              setState(() {
+                fetchState[i] = 2;
+              });
+            }
+          }
+
+          setBadgeCount(order[i].length, i);
+        }
+      } else {
+        for (int i = 0; i < order.length; i++) {
+          if (mounted) {
+            setState(() {
+              fetchState[i] = 2;
+            });
+          }
+        }
+      }
+    }).onError((error, stackTrace) {
+      for (int i = 0; i < order.length; i++) {
+        if (mounted) {
+          setState(() {
+            fetchState[i] = -1;
+          });
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -74,27 +159,27 @@ class _UserBasketState extends State<UserBasket> {
           height: 80,
           decoration: const BoxDecoration(color: primaryColor),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            buildTabs(context, 'Your Basket', tabIndex, index: 0, onTap: () {
+            buildTabs(context, 'Orders', tabIndex, index: 0, onTap: () {
               if (mounted) {
                 setState(() {
                   tabIndex = 0;
                 });
               }
-            }, icon: FontAwesomeIcons.bagShopping, count: badgeCount[0]),
-            buildTabs(context, 'Active Orders', tabIndex, index: 1, onTap: () {
+            }, icon: FontAwesomeIcons.store, count: badgeCount[0]),
+            buildTabs(context, 'To Pick-up', tabIndex, index: 1, onTap: () {
               if (mounted) {
                 setState(() {
                   tabIndex = 1;
                 });
               }
             }, icon: FontAwesomeIcons.boxOpen, count: badgeCount[1]),
-            buildTabs(context, 'To Rate', tabIndex, index: 2, onTap: () {
+            buildTabs(context, 'Sold', tabIndex, index: 2, onTap: () {
               if (mounted) {
                 setState(() {
                   tabIndex = 2;
                 });
               }
-            }, icon: FontAwesomeIcons.solidStar, count: badgeCount[2])
+            }, icon: FontAwesomeIcons.moneyCheckDollar, count: badgeCount[2])
           ]),
         ),
         buildBasketPage(context, tabIndex)
@@ -169,19 +254,22 @@ class _UserBasketState extends State<UserBasket> {
       child: IndexedStack(
         index: tabIndex,
         children: [
-          BasketScreen(
-            user: widget.userData,
-            setBadgeCount: (int count, int index) {
-              setBadgeCount(count, index);
-            },
-          ),
           ActiveOrders(
             user: widget.userData,
             orderStatus: 0,
-            order: [],
-            fetchState: 2,
+            order: fetchState[0] == 0 ? [] : order[0],
+            fetchState: fetchState[0],
           ),
-          ToRate(),
+          ActiveOrders(
+              user: widget.userData,
+              orderStatus: 1,
+              order: fetchState[1] == 0 ? [] : order[1],
+              fetchState: fetchState[1]),
+          ActiveOrders(
+              user: widget.userData,
+              orderStatus: 2,
+              order: fetchState[2] == 0 ? [] : order[2],
+              fetchState: fetchState[2]),
         ],
       ),
     );

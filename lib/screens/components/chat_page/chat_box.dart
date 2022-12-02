@@ -103,7 +103,6 @@ class _ChatBoxState extends State<ChatBox> {
         isGetChatPathId = true;
         getMessages();
         messageListener();
-        openBag();
       });
     } else {
       FirebaseMessageApi.getChatPath(authorId!, receiverId!)
@@ -114,7 +113,6 @@ class _ChatBoxState extends State<ChatBox> {
             isGetChatPathId = true;
             getMessages();
             messageListener();
-            openBag();
           });
         }
 

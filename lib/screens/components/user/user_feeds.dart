@@ -25,7 +25,7 @@ class UserFeed extends StatefulWidget {
 }
 
 class _UserFeedState extends State<UserFeed> {
-  UserData? user;
+  late UserData user;
 
   @override
   void initState() {
@@ -51,7 +51,6 @@ class _UserFeedState extends State<UserFeed> {
                           widget.openBasket(true);
                         },
                         child: Badge(
-                          // badgeColor: badgeColor,
                           badgeContent: Text(
                             '${widget.badgeCount}',
                             style: const TextStyle(
@@ -60,8 +59,11 @@ class _UserFeedState extends State<UserFeed> {
                           showBadge: widget.badgeCount > 0,
                           elevation: 3,
                           position: BadgePosition.topEnd(top: -13, end: -11),
-                          child: const Icon(FontAwesomeIcons.bagShopping,
-                              size: 22, color: linkColor),
+                          child: user.userTypeId == 1
+                              ? const Icon(FontAwesomeIcons.store,
+                                  size: 22, color: linkColor)
+                              : const Icon(FontAwesomeIcons.bagShopping,
+                                  size: 22, color: linkColor),
                         )),
                   )
                 ]),
@@ -93,6 +95,6 @@ class _UserFeedState extends State<UserFeed> {
 
   Widget buildPost(Post post) => PostCard(
         post: post,
-        user: user!,
+        user: user,
       );
 }

@@ -109,8 +109,6 @@ class GoogleProvider extends ChangeNotifier {
           idToken: googleAuth.idToken,
         );
 
-        print(auth);
-
         await auth.signInWithCredential(credential).then((value) =>
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => HomePage())));
@@ -131,28 +129,30 @@ class GoogleProvider extends ChangeNotifier {
   }
 }
 
-class AccountControl {
+class AccountControl extends ChangeNotifier {
+  static GoogleSignIn googleSignIn = GoogleSignIn();
+  static FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   static getUserId() {
     final firebaseAuth = FirebaseAuth.instance;
 
     return firebaseAuth.currentUser?.uid;
   }
 
-  static Future logoutAccount(BuildContext context) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final firebaseAuth = FirebaseAuth.instance;
-
+  static logoutAccount(BuildContext context) async {
     try {
       if (googleSignIn.currentUser != null) {
         await googleSignIn.disconnect();
         await googleSignIn.signOut();
       }
 
-      await firebaseAuth.signOut().then((value) => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LogIn(),
-          )));
+      await firebaseAuth.signOut().whenComplete(() {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LogIn(),
+            ));
+      });
     } on FirebaseAuthException catch (e) {
       Navigator.of(context).pop();
 
