@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/screens/components/basket_pages/active_orders.dart';
 import 'package:ani_capstone/screens/components/basket_pages/basket_screen.dart';
 import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
@@ -26,6 +30,89 @@ class _UserBasketState extends State<UserBasket> {
   int tabIndex = 1;
 
   List<int> badgeCount = [0, 0, 0];
+
+  List<List<Order>> order = [[], []];
+
+  List<int> fetchState = [0, 0];
+  late StreamSubscription listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchOrders();
+    orderListener();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    listener.cancel();
+  }
+
+  void orderListener() {
+    final orderRef = ProductPost.orderStream(
+        userId: widget.userData.id!, userType: widget.userData.userTypeId);
+
+    listener = orderRef.listen((event) async {
+      fetchOrders();
+    });
+  }
+
+  void fetchOrders() async {
+    ProductPost.getOrders(
+            userId: widget.userData.id!, userType: widget.userData.userTypeId)
+        .then((orders) {
+      order.clear();
+
+      order = [[], []];
+
+      if (orders.isNotEmpty) {
+        for (var order in orders) {
+          if (order.status == 0 || order.status == 1 || order.status == 5) {
+            this.order[0].add(order);
+          } else if (order.status == 2) {
+            this.order[1].add(order);
+          }
+        }
+
+        for (int i = 0; i < order.length; i++) {
+          if (order[i].isNotEmpty) {
+            if (mounted) {
+              setState(() {
+                fetchState[i] = 1;
+              });
+            }
+          } else {
+            if (mounted) {
+              setState(() {
+                fetchState[i] = 2;
+              });
+            }
+          }
+
+          setBadgeCount(order[i].length, i + 1);
+        }
+      } else {
+        for (int i = 0; i < order.length; i++) {
+          if (mounted) {
+            setState(() {
+              fetchState[i] = 2;
+            });
+          }
+        }
+      }
+    }).onError((error, stackTrace) {
+      for (int i = 0; i < order.length; i++) {
+        if (mounted) {
+          setState(() {
+            fetchState[i] = -1;
+          });
+        }
+      }
+    });
+  }
 
   void setBadgeCount(int count, int index) {
     if (mounted) {
@@ -177,9 +264,9 @@ class _UserBasketState extends State<UserBasket> {
           ),
           ActiveOrders(
             user: widget.userData,
-            orderStatus: 0,
-            order: [],
-            fetchState: 2,
+            orderStatus: 1,
+            order: order[0],
+            fetchState: fetchState[0],
           ),
           ToRate(),
         ],

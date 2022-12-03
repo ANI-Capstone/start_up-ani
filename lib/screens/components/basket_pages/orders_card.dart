@@ -1,4 +1,5 @@
 import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/order.dart';
@@ -177,7 +178,9 @@ class _OrdersCardState extends State<OrdersCard> {
             child: GestureDetector(
               onTap: () {
                 ProductPost.updateOrderStatus(
-                    orderId: widget.order.orderId!, orderStatus: 1);
+                    order: widget.order,
+                    orderStatus: 1,
+                    userTypeId: user.userTypeId);
               },
               child: Container(
                   height: 26,

@@ -161,7 +161,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
 
     if (mounted) {
       int sum = 0;
-      for (int i = 0; i <= 0; i++) {
+      for (int i = 0; i < 3; i++) {
         sum += eachCount[i];
       }
       badgeCount[0] = 0;

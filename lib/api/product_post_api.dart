@@ -169,12 +169,34 @@ class ProductPost {
               .map((doc) => Post.fromJson(doc.data(), doc.id))
               .toList());
 
-  static void updateOrderStatus(
-      {required String orderId, required int orderStatus}) async {
+  static Future updateOrderStatus(
+      {required int orderStatus,
+      required int userTypeId,
+      required Order order}) async {
     final orderRef =
-        FirebaseFirestore.instance.collection('orders').doc(orderId);
+        FirebaseFirestore.instance.collection('orders').doc(order.orderId!);
 
-    await orderRef.update({'status': orderStatus});
+    final List<int> notifStatus = [3, 4, 5];
+
+    await orderRef.update({'status': orderStatus}).whenComplete(() {
+      if (userTypeId == 1) {
+        NotificationApi.addNotification(
+            notifTo: order.costumer.userId!,
+            notifFrom: order.publisher,
+            title: order.publisher.name,
+            body: '',
+            payload: orderRef.id,
+            notifType: notifStatus[orderStatus - 1]);
+      } else {
+        NotificationApi.addNotification(
+            notifTo: order.publisher.userId!,
+            notifFrom: order.costumer,
+            title: order.publisher.name,
+            body: '',
+            payload: orderRef.id,
+            notifType: notifStatus[orderStatus - 1]);
+      }
+    });
   }
 
   static Future checkOutOrder(

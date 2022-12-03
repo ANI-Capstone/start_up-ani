@@ -41,7 +41,7 @@ class _NotificationCardState extends State<NotificationCard> {
                 ),
                 const WidgetSpan(
                     child: SizedBox(
-                  width: 5,
+                  width: 2,
                 )),
                 TextSpan(
                     text: notifBody(),
@@ -81,10 +81,10 @@ class _NotificationCardState extends State<NotificationCard> {
     if (widget.notif.notifType == 2) {
       body = 'ordered your products.';
     } else if (widget.notif.notifType == 3) {
-      body = 'accepted your order.';
-    } else if (widget.notif.notifType == 4) {
-      body = 'denied your order.';
+      body = 'accepted your order. It is ready to be pickup.';
     } else if (widget.notif.notifType == 5) {
+      body = 'denied your order.';
+    } else if (widget.notif.notifType == 4) {
       body = 'posted a review of your product.';
     } else {
       body = 'liked your post.';
