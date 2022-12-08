@@ -46,6 +46,23 @@ class FirebaseStorageDb {
     }
   }
 
+  static Future changeProfilePic(
+      {required String userId, required File? imageFile}) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('$userId/image-url/$userId-image-url');
+
+    UploadTask uploadTask = ref.putFile(imageFile!);
+
+    var imageUrl;
+
+    await uploadTask.whenComplete(() {
+      imageUrl = ref.getDownloadURL();
+    });
+
+    return imageUrl;
+  }
+
   static Future<List<String>> uploadPostImages(
       {required String userId, required List<File> images}) async {
     var imageUrls =

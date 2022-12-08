@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/models/notification.dart';
 import 'package:flutter/material.dart';
@@ -94,7 +94,7 @@ class _UserNotificaitonState extends State<UserNotificaiton> {
     }
 
     NotificationApi.markAllRead(userId: user.id!, notifIds: notifIds)
-        .whenComplete(() => ShoWInfo.showToast(context, 'Marked as read.', 3));
+        .whenComplete(() => ShoWInfo.showToast('Marked as read.', 3));
   }
 
   @override

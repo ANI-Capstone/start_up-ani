@@ -89,11 +89,12 @@ class GoogleProvider extends ChangeNotifier {
       return;
     } else {
       try {
-        if (googleSignIn.currentUser != null) {
-          await googleSignIn.disconnect();
-        }
+        // if (googleSignIn.currentUser != null) {
+        //   await googleSignIn.disconnect();
+        // }
 
-        final googleUser = await googleSignIn.signIn();
+        final googleUser =
+            await GoogleSignIn(scopes: ['profile', 'email']).signIn();
 
         if (googleUser == null) return null;
 
@@ -109,18 +110,19 @@ class GoogleProvider extends ChangeNotifier {
           idToken: googleAuth.idToken,
         );
 
-        await auth.signInWithCredential(credential).then((value) =>
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => HomePage())));
+        await auth.signInWithCredential(credential).whenComplete(() =>
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const HomePage())));
 
-        Navigator.of(context, rootNavigator: true).pop(result);
+        // Navigator.of(context, rootNavigator: true).pop(result);
 
         notifyListeners();
       } on FirebaseAuthException catch (e) {
         Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, e.message.toString(), 5);
-      } on Exception catch (_) {
+      } on Exception catch (e) {
         Navigator.of(context, rootNavigator: true).pop(result);
+        print(e);
         ShoWInfo.errorAlert(context, 'Failed due to an error occurred.', 5);
       }
     }
@@ -139,12 +141,17 @@ class AccountControl extends ChangeNotifier {
     return firebaseAuth.currentUser?.uid;
   }
 
+  static User getCurrentUser() {
+    return firebaseAuth.currentUser!;
+  }
+
   static logoutAccount(BuildContext context) async {
     try {
       if (googleSignIn.currentUser != null) {
         await googleSignIn.disconnect();
-        await googleSignIn.signOut();
       }
+
+      await googleSignIn.signOut();
 
       await firebaseAuth.signOut().whenComplete(() {
         Navigator.push(

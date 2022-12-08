@@ -9,7 +9,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_place/google_place.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../api/firebase_firestore.dart';
+import 'package:ani_capstone/models/user_data.dart';
 import '../../../constants.dart';
 import '../../../models/post.dart';
 import '../../../models/user.dart';
@@ -57,7 +57,6 @@ class _UserPostState extends State<UserPost> {
     var result = await googlePlace.autocomplete.get(value);
 
     if (result != null && result.predictions != null && mounted) {
-      print(result.status);
       setState(() {
         predictions = result.predictions!;
       });

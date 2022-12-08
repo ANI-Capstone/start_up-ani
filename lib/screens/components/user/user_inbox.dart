@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/models/chat.dart';

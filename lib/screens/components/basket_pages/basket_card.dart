@@ -192,7 +192,7 @@ class _BasketCardState extends State<BasketCard> {
                       onTap: () {
                         if (totalPrice > 0) {
                           checkout().whenComplete(() => ShoWInfo.showToast(
-                              context, 'Order checkout successfully.', 3));
+                              'Order checkout successfully.', 3));
                         }
                       },
                       child: Container(
@@ -426,9 +426,8 @@ class _BasketCardState extends State<BasketCard> {
                       userId: widget.user.userId!,
                       postId: [product.post!.postId!],
                       basketIndex: widget.basketIndex)
-
                   .whenComplete(() {
-                ShoWInfo.showToast(context, 'Product has been removed.', 3);
+                ShoWInfo.showToast('Product has been removed.', 3);
               });
               updateTotalPrice();
             },

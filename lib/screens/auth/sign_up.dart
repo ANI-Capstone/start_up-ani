@@ -14,6 +14,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:ani_capstone/models/user_data.dart';
 
 import '../../providers/facebook_provider.dart';
 import '../home_page.dart';
@@ -715,11 +716,13 @@ class _SignUpState extends State<SignUp> {
                     return;
                   }
 
-                  var name = "${_firstName.text} ${_mi.text} ${_lastName.text}";
+                  var mi = _mi.text.length > 1 ? ' ${_mi.text.trim()} ' : ' ';
+                  var name =
+                      "${_firstName.text.trim()}$mi${_lastName.text.trim()}";
 
                   var userData = UserData(
-                      id: authID!.trim(),
-                      name: name.trim(),
+                      id: authID!,
+                      name: name,
                       email: _email.text.trim(),
                       phone: _phone.text.trim(),
                       street: _street.text.trim(),

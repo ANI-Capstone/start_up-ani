@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/user/user_basket.dart';
 import 'package:ani_capstone/screens/components/user/user_feeds.dart';
@@ -28,7 +28,6 @@ class UserControl extends StatefulWidget {
 
 class _UserControlState extends State<UserControl> {
   UserData? _userData;
-  var user;
 
   Future getUserData() async {
     return AccountControl.accountCheck(context);
@@ -79,7 +78,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 5;
+  int currentIndex = 4;
   int? userType;
   UserData? user;
 
@@ -122,6 +121,16 @@ class _UserViewScreenState extends State<UserViewScreen> {
   void dispose() {
     keyboardSubscription.cancel();
     super.dispose();
+  }
+
+  void getUserData() async {
+    AccountControl.accountCheck(context).then((value) {
+      if (mounted) {
+        setState(() {
+          user = value;
+        });
+      }
+    });
   }
 
   void hideNavigationBar(bool hide) {
@@ -199,9 +208,12 @@ class _UserViewScreenState extends State<UserViewScreen> {
                 setNotifBadge(count);
               },
             ),
-            UserProfile(hideNavigationBar: (hide) {
-              hideNavigationBar(hide);
-            }),
+            UserProfile(
+              user: user!,
+              getUserData: () {
+                getUserData();
+              },
+            ),
             user!.userTypeId == 1
                 ? UserStore(
                     userData: user!,

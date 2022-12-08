@@ -1,4 +1,4 @@
-import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';

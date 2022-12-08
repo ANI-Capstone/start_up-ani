@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
+import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/auth/sign_up.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,12 +16,10 @@ class FirebaseFirestoreDb {
           'Unable to create account, you are not connected to any network.', 5);
     } else {
       showDialog(
-          // The user CANNOT close this dialog  by pressing outsite it
           barrierDismissible: false,
           context: context,
           builder: (_) {
             return Dialog(
-              // The background color
               backgroundColor: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -31,14 +29,12 @@ class FirebaseFirestoreDb {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
-                      // The loading indicator
                       CircularProgressIndicator(
                         color: primaryColor,
                       ),
                       SizedBox(
                         height: 15,
                       ),
-                      // Some text
                       Text(
                         'Creating account, please wait...',
                         style: TextStyle(fontFamily: 'Roboto'),
@@ -196,25 +192,4 @@ class FirebaseFirestoreDb {
 
     return userData;
   }
-}
-
-class UserData {
-  String name, email, phone, street, barangay, city, province, typeName;
-
-  String? id, photoUrl;
-  int zipcode, userTypeId;
-
-  UserData(
-      {this.id,
-      this.photoUrl,
-      required this.name,
-      required this.email,
-      required this.phone,
-      required this.street,
-      required this.barangay,
-      required this.city,
-      required this.province,
-      required this.zipcode,
-      required this.userTypeId,
-      required this.typeName});
 }

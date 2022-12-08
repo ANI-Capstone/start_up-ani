@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ani_capstone/api/firebase_firestore.dart';
+import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/post.dart';
@@ -381,8 +381,7 @@ class _PostCardState extends State<PostCard> {
                             ProductPost.addToBasket(
                                     userId: user.userId!, post: widget.post)
                                 .whenComplete(() {
-                              ShoWInfo.showToast(
-                                  context, 'Added to basket.', 3);
+                              ShoWInfo.showToast('Added to basket.', 3);
                             });
                           }
                         },

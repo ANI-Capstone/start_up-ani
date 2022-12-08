@@ -1,52 +1,131 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
+import 'package:ani_capstone/models/user_data.dart';
+import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
-import 'package:ani_capstone/screens/auth/log_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:ani_capstone/screens/components/profile_page/edit_profile.dart';
+import 'package:ani_capstone/screens/components/profile_page/my_profile.dart';
+import 'package:ani_capstone/screens/components/profile_page/profile_management.dart';
+import 'package:ani_capstone/screens/components/profile_page/security_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
-import '../../../constants.dart';
-import '../../../api/firebase_firestore.dart';
+import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
 
 class UserProfile extends StatefulWidget {
-  final Function(bool hide) hideNavigationBar;
-
-  UserProfile({Key? key, required this.hideNavigationBar}) : super(key: key);
+  UserData user;
+  VoidCallback getUserData;
+  UserProfile({Key? key, required this.user, required this.getUserData})
+      : super(key: key);
 
   @override
   State<UserProfile> createState() => _UserProfileState();
 }
 
 class _UserProfileState extends State<UserProfile> {
-  final user = FirebaseAuth.instance.currentUser!;
-  UserData? userData;
+  @override
+  Widget build(BuildContext context) {
+    late Widget screenCurrent;
 
-  Future getUserData() async {
-    return mounted
-        ? FirebaseFirestoreDb.getUser(context, userId: user.uid)
-            .then((value) => {userData = value})
-        : userData;
+    return SimpleHiddenDrawer(
+      withShadow: false,
+      typeOpen: TypeOpen.FROM_RIGHT,
+      slidePercent: 70,
+      contentCornerRadius: 25,
+      menu: Menu(),
+      screenSelectedBuilder: (position, controller) {
+        switch (position) {
+          case 0:
+            screenCurrent = MyProfile(
+              user: widget.user,
+              toggleDrawer: () {
+                controller.toggle();
+              },
+            );
+
+            break;
+          case 1:
+            screenCurrent = ProfileAction(
+              user: widget.user,
+              toggleDrawer: () {
+                controller.toggle();
+              },
+              getUserData: () {
+                widget.getUserData();
+              },
+            );
+            break;
+          case 2:
+            screenCurrent = SecuritySettings(
+                user: widget.user,
+                toggleDrawer: () {
+                  controller.toggle();
+                });
+            break;
+        }
+
+        return SizedBox(child: screenCurrent);
+      },
+    );
+  }
+}
+
+class Menu extends StatefulWidget {
+  Menu({Key? key}) : super(key: key);
+
+  @override
+  _MenuState createState() => _MenuState();
+}
+
+class _MenuState extends State<Menu> {
+  late SimpleHiddenDrawerController controller;
+
+  int currentIndex = 0;
+
+  @override
+  void didChangeDependencies() {
+    controller = SimpleHiddenDrawerController.of(context);
+    super.didChangeDependencies();
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
 
-  Widget _profileDashboard(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
-    final logOutButton = SizedBox(
-        height: small,
-        child: Material(
-          borderRadius: BorderRadius.circular(15),
-          color: primaryColor,
-          child: MaterialButton(
-              minWidth: MediaQuery.of(context).size.width,
-              onPressed: () {
+    return Padding(
+      padding: EdgeInsets.only(left: size.width * 0.3),
+      child: Container(
+        width: double.maxFinite,
+        height: double.maxFinite,
+        color: Colors.white,
+        // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              buildLabel(
+                  FontAwesomeIcons.solidUser, 'My Profile', 0, currentIndex,
+                  onTap: () {
+                setState(() {
+                  currentIndex = 0;
+                });
+                controller.setSelectedMenuPosition(0);
+              }),
+              buildLabel(
+                  FontAwesomeIcons.edit, 'Manage Profile', 1, currentIndex,
+                  onTap: () {
+                setState(() {
+                  currentIndex = 1;
+                });
+                controller.setSelectedMenuPosition(1);
+              }),
+              buildLabel(
+                  FontAwesomeIcons.gear, 'Security Settings', 2, currentIndex,
+                  onTap: () {
+                setState(() {
+                  currentIndex = 2;
+                });
+                controller.setSelectedMenuPosition(2);
+              }),
+              buildLabel(FontAwesomeIcons.lock, 'Logout', 3, currentIndex,
+                  onTap: () {
                 showDialog(
                     barrierDismissible: false,
                     context: context,
@@ -83,262 +162,53 @@ class _UserProfileState extends State<UserProfile> {
                     });
 
                 AccountControl.logoutAccount(context);
-              },
-              child: Text(
-                "Log Out",
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              )),
-        ));
-
-    return Scaffold(
-      backgroundColor: userBgColor,
-      appBar: AppBar(
-          leading: const BackButton(
-            color: linkColor,
-          ),
-          centerTitle: true,
-          title: Text('MY PROFILE',
-              style: TextStyle(
-                color: linkColor,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto',
-              )),
-          backgroundColor: primaryColor,
-          elevation: 0),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(defaultPadding),
-          child: FutureBuilder(
-            future: getUserData(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return ShoWInfo.errorAlert(
-                    context, snapshot.error.toString(), 5);
-              } else {
-                return Column(children: [
-                  SingleChildScrollView(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Column(
-                              children: [
-                                InkWell(
-                                  child: CircleAvatar(
-                                    backgroundColor: linkColor,
-                                    radius: 70,
-                                    child: CircleAvatar(
-                                      radius: 68,
-                                      backgroundColor: Colors.white,
-                                      backgroundImage: userData?.photoUrl !=
-                                              null
-                                          ? NetworkImage(
-                                              userData?.photoUrl as String)
-                                          : AssetImage('assets/images/user.png')
-                                              as ImageProvider,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  userData?.name as String,
-                                  style: const TextStyle(
-                                      color: linkColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 40),
-                          CustomButton.customIconButton(context,
-                              size: size,
-                              height: small,
-                              icon: FontAwesomeIcons.solidUser,
-                              label: 'Name',
-                              text: userData?.name),
-                          SizedBox(height: 10),
-                          CustomButton.customIconButton(context,
-                              size: size,
-                              height: small,
-                              icon: FontAwesomeIcons.solidEnvelope,
-                              label: 'Email',
-                              text: userData?.email),
-                          SizedBox(height: 10),
-                          CustomButton.customIconButton(context,
-                              size: size,
-                              height: small,
-                              icon: FontAwesomeIcons.lock,
-                              label: 'Password',
-                              text: "*************"),
-                          SizedBox(height: 10),
-                          CustomButton.customIconButton(context,
-                              size: size,
-                              height: small,
-                              icon: FontAwesomeIcons.phone,
-                              label: 'Phone',
-                              text: userData?.phone),
-                          SizedBox(height: 20),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(
-                              'ADDRESS',
-                              style: TextStyle(
-                                  color: textColor.withOpacity(0.4),
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ]),
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                      width: size.width,
-                      height: medium,
-                      child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: backgroundColor,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20, right: 20),
-                            child: Row(
-                              children: <Widget>[
-                                Icon(
-                                  FontAwesomeIcons.locationDot,
-                                  color: primaryColor,
-                                  size: 20,
-                                ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                Flexible(
-                                  child: SizedBox(
-                                    width: (size.width - 30),
-                                    child: Text(
-                                        ('${userData?.street}, ${userData?.barangay}, ${userData?.city}, ${userData?.province}, ${userData?.zipcode}'
-                                                    .length <
-                                                60)
-                                            ? '${userData?.street}, ${userData?.barangay}, ${userData?.city}, ${userData?.province}, ${userData?.zipcode}'
-                                            : '${'${userData?.street}, ${userData?.barangay}, ${userData?.city}, ${userData?.province}, ${userData?.zipcode}'.characters.take(57)}...',
-                                        style: TextStyle(
-                                          color: linkColor.withOpacity(0.8),
-                                        )),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ))),
-                  SizedBox(height: 30),
-                  logOutButton
-                ]);
-              }
-            },
+              })
+            ],
           ),
         ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Center(
-            child: Text('MY PROFILE',
-                style: TextStyle(
-                  color: linkColor,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Roboto',
-                )),
+  Widget buildLabel(IconData icon, String label, int index, int currentIndex,
+      {required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 15, bottom: 15, left: 30),
+        child: SizedBox(
+          width: double.infinity,
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: linkColor,
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                      color: linkColor,
+                      fontSize: 16,
+                      fontWeight: currentIndex == index
+                          ? FontWeight.bold
+                          : FontWeight.normal),
+                ),
+              ),
+              if (currentIndex == index)
+                Container(
+                  width: 5,
+                  height: 22,
+                  decoration: const BoxDecoration(color: likeColor),
+                )
+            ],
           ),
-          backgroundColor: primaryColor,
-          elevation: 0),
-      body: SingleChildScrollView(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(
-            vertical: (defaultPadding - 20), horizontal: (defaultPadding - 10)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: size.width,
-              height: 70,
-              child: FutureBuilder(
-                future: getUserData(),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return ShoWInfo.errorAlert(
-                        context, snapshot.error.toString(), 5);
-                  } else {
-                    return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(children: [
-                            CircleAvatar(
-                              radius: 26,
-                              backgroundColor: Colors.white,
-                              backgroundImage: userData?.photoUrl != null
-                                  ? NetworkImage(userData?.photoUrl as String)
-                                  : const AssetImage('assets/images/user.png')
-                                      as ImageProvider,
-                            ),
-                            const SizedBox(width: 20),
-                            Text(
-                              userData?.name != null
-                                  ? userData?.name as String
-                                  : 'No user data',
-                              style: const TextStyle(
-                                  color: linkColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          ]),
-                          SizedBox(
-                              width: 24,
-                              child: IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              _profileDashboard(context),
-                                        ));
-                                  },
-                                  icon: const Icon(FontAwesomeIcons.bars,
-                                      size: 24, color: linkColor))),
-                        ]);
-                  }
-                },
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'My Posts',
-              style: TextStyle(
-                  color: textColor.withOpacity(0.2),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 50),
-            Center(
-              child: Text(
-                "No posts",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            )
-          ],
         ),
-      )),
+      ),
     );
   }
 }
