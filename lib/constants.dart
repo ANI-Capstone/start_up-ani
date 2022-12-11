@@ -89,12 +89,12 @@ class ShoWInfo {
     ));
   }
 
-  static showToast(String message, int seconds) {
+  static showToast(String message, int? seconds) {
     return Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: seconds,
+        timeInSecForIosWeb: seconds ?? 0,
         backgroundColor: Colors.white,
         textColor: linkColor,
         fontSize: 14);

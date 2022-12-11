@@ -8,6 +8,7 @@ import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_box.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class OrdersCard extends StatefulWidget {
@@ -21,21 +22,11 @@ class OrdersCard extends StatefulWidget {
 }
 
 class _OrdersCardState extends State<OrdersCard> {
-  late Order order;
-  late User publisher;
-  late User costumer;
   late UserData user;
-
-  late List<Product> products;
 
   @override
   void initState() {
     super.initState();
-
-    order = widget.order;
-    publisher = widget.order.publisher;
-    costumer = widget.order.costumer;
-    products = widget.order.products;
     user = widget.user;
   }
 
@@ -57,57 +48,22 @@ class _OrdersCardState extends State<OrdersCard> {
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: ListTile(
-                dense: true,
-                leading: CircleAvatar(
-                    radius: 18,
-                    backgroundImage: NetworkImage(widget.user.userTypeId == 1
-                        ? costumer.photoUrl
-                        : publisher.photoUrl)),
-                title: Text(
-                  widget.user.userTypeId == 1 ? costumer.name : publisher.name,
-                  style: const TextStyle(
-                      color: linkColor,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.bold),
-                ),
-                trailing: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ChatBox(
-                                  receiver: widget.user.userTypeId == 1
-                                      ? costumer
-                                      : publisher,
-                                  author: user,
-                                )),
-                      );
-                    },
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          const WidgetSpan(
-                              child: FaIcon(FontAwesomeIcons.solidComment,
-                                  size: 18, color: linkColor)),
-                          const WidgetSpan(
-                            child: SizedBox(width: 5),
-                          ),
-                          TextSpan(
-                              text: widget.user.userTypeId == 1
-                                  ? 'Contact Consumer'
-                                  : 'Contact Farmer',
-                              style: const TextStyle(
-                                  color: linkColor,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
+                  dense: true,
+                  leading: CircleAvatar(
+                      radius: 18,
+                      backgroundImage: NetworkImage(widget.user.userTypeId == 1
+                          ? widget.order.costumer.photoUrl
+                          : widget.order.publisher.photoUrl)),
+                  title: Text(
+                    widget.user.userTypeId == 1
+                        ? widget.order.costumer.name
+                        : widget.order.publisher.name,
+                    style: const TextStyle(
+                        color: linkColor,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold),
                   ),
-                ),
-              ),
+                  trailing: buildTrailing()),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
@@ -125,9 +81,10 @@ class _OrdersCardState extends State<OrdersCard> {
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: products.length,
+                  itemCount: widget.order.products.length,
                   itemBuilder: (context, index) {
-                    return buildProduct(context, products[index], width, index);
+                    return buildProduct(
+                        context, widget.order.products[index], width, index);
                   }),
             ),
             Padding(
@@ -147,7 +104,7 @@ class _OrdersCardState extends State<OrdersCard> {
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold)),
                             TextSpan(
-                                text: '\u20B1${order.totalPrice}',
+                                text: '\u20B1${widget.order.totalPrice}',
                                 style: const TextStyle(
                                     color: linkColor,
                                     fontSize: 13,
@@ -158,7 +115,21 @@ class _OrdersCardState extends State<OrdersCard> {
                     ),
                   ),
                   widget.user.userTypeId == 1
-                      ? buildStatusFarmer()
+                      ? widget.order.status == 4
+                          ? Container(
+                              height: 26,
+                              width: 64,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                      color: linkColor.withOpacity(0.7))),
+                              child: const Center(
+                                  child: Text('Rated',
+                                      style: TextStyle(
+                                          color: linkColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold))))
+                          : buildStatusFarmer()
                       : buildStatusConsumer()
                 ],
               ),
@@ -170,17 +141,30 @@ class _OrdersCardState extends State<OrdersCard> {
   }
 
   Row buildStatusFarmer() {
-    if (order.status == 0) {
+    if (widget.order.status == 0) {
       return Row(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: GestureDetector(
               onTap: () {
-                ProductPost.updateOrderStatus(
-                    order: widget.order,
-                    orderStatus: 1,
-                    userTypeId: user.userTypeId);
+                ShoWInfo.showUpDialog(context,
+                    title: 'Accept Order',
+                    message: 'Are you sure you want to accept this order?',
+                    action1: 'Yes',
+                    btn1: () {
+                      ProductPost.updateOrderStatus(
+                              order: widget.order,
+                              orderStatus: 1,
+                              userTypeId: user.userTypeId)
+                          .whenComplete(() => ShoWInfo.showToast(
+                              'Order has been accepted.', 3));
+                      Navigator.of(context).pop();
+                    },
+                    action2: 'No',
+                    btn2: () {
+                      Navigator.of(context).pop();
+                    });
               },
               child: Container(
                   height: 26,
@@ -195,27 +179,55 @@ class _OrdersCardState extends State<OrdersCard> {
                               fontWeight: FontWeight.bold)))),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 2),
-            child: SizedBox(
-                height: 26,
-                width: 55,
-                child: Center(
-                    child: Text('Deny',
-                        style: TextStyle(
-                            color: linkColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: GestureDetector(
+              onTap: () {
+                ShoWInfo.showUpDialog(context,
+                    title: 'Accept Order',
+                    message: 'Are you sure you want to deny this order?',
+                    action1: 'Yes',
+                    btn1: () {
+                      ProductPost.updateOrderStatus(
+                              order: widget.order,
+                              orderStatus: 3,
+                              userTypeId: user.userTypeId)
+                          .whenComplete(() =>
+                              ShoWInfo.showToast('Order has been denied.', 3));
+                      Navigator.of(context).pop();
+                    },
+                    action2: 'No',
+                    btn2: () {
+                      Navigator.of(context).pop();
+                    });
+              },
+              child: const SizedBox(
+                  height: 26,
+                  width: 55,
+                  child: Center(
+                      child: Text('Deny',
+                          style: TextStyle(
+                              color: linkColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)))),
+            ),
           )
         ],
       );
-    } else {
+    } else if (widget.order.status == 1) {
       return Row(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                ProductPost.updateOrderStatus(
+                        orderStatus: 2,
+                        userTypeId: widget.user.userTypeId,
+                        order: widget.order)
+                    .whenComplete(
+                        () => ShoWInfo.showToast('Order has been sold.', 3));
+              },
               child: Container(
                   height: 26,
                   width: 64,
@@ -229,20 +241,43 @@ class _OrdersCardState extends State<OrdersCard> {
                               fontWeight: FontWeight.bold)))),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 2),
-            child: SizedBox(
-                height: 26,
-                width: 55,
-                child: Center(
-                    child: Text('Delete',
-                        style: TextStyle(
-                            color: linkColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: GestureDetector(
+              onTap: () {
+                ShoWInfo.showUpDialog(
+                  context,
+                  title: 'Delete Order',
+                  message: 'Are you sure you want to delete this order?',
+                  action1: 'Yes',
+                  btn1: () {
+                    ProductPost.deleteOrder(orderId: widget.order.orderId!)
+                        .whenComplete(() =>
+                            ShoWInfo.showToast('Order has been deleted.', 3));
+
+                    Navigator.of(context).pop();
+                  },
+                  action2: 'No',
+                  btn2: () {
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+              child: const SizedBox(
+                  height: 26,
+                  width: 55,
+                  child: Center(
+                      child: Text('Delete',
+                          style: TextStyle(
+                              color: linkColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold)))),
+            ),
           )
         ],
       );
+    } else {
+      return Row();
     }
   }
 
@@ -251,7 +286,7 @@ class _OrdersCardState extends State<OrdersCard> {
 
     if (widget.order.status == 1) {
       msg = 'Order is ready for pick up';
-    } else if (widget.order.status == 2) {
+    } else if (widget.order.status == 3) {
       msg = 'Your order was denied';
     } else {
       msg = 'Waiting for confirmation';
@@ -265,7 +300,7 @@ class _OrdersCardState extends State<OrdersCard> {
           child: Center(
               child: Text(msg,
                   style: TextStyle(
-                      color: widget.order.status == 2
+                      color: widget.order.status == 3
                           ? Colors.red
                           : widget.order.status == 0
                               ? linkColor.withOpacity(0.7)
@@ -343,7 +378,7 @@ class _OrdersCardState extends State<OrdersCard> {
                     border: Border.all(color: linkColor)),
                 child: Center(
                   child: Text(
-                    '${products[index].quantity}',
+                    '${widget.order.products[index].quantity}',
                     style: const TextStyle(
                         color: linkColor,
                         fontSize: 11,
@@ -356,7 +391,7 @@ class _OrdersCardState extends State<OrdersCard> {
           SizedBox(
             width: width * 0.20,
             child: Center(
-                child: Text('\u20B1${products[index].tPrice!}',
+                child: Text('\u20B1${widget.order.products[index].tPrice!}',
                     style: const TextStyle(
                         color: linkColor,
                         fontSize: 12,
@@ -365,5 +400,79 @@ class _OrdersCardState extends State<OrdersCard> {
         ],
       ),
     );
+  }
+
+  Widget buildTrailing() {
+    if (widget.order.status == 3) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: GestureDetector(
+            onTap: () {
+              ProductPost.deleteOrder(orderId: widget.order.orderId!)
+                  .whenComplete(
+                      () => ShoWInfo.showToast('Order has been deleted.', 3));
+            },
+            child: const Icon(
+              FontAwesomeIcons.xmark,
+              color: linkColor,
+              size: 18,
+            )),
+      );
+    } else if (widget.order.status == 4) {
+      return RatingBar.builder(
+        initialRating: widget.order.rating!,
+        ignoreGestures: true,
+        direction: Axis.horizontal,
+        itemCount: 5,
+        unratedColor: primaryColor.withOpacity(0.7),
+        itemPadding: const EdgeInsets.symmetric(horizontal: 1),
+        itemBuilder: (context, _) => const Icon(
+          Icons.star,
+          color: Colors.amber,
+        ),
+        itemSize: 16,
+        onRatingUpdate: (rating) {
+          null;
+        },
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChatBox(
+                        receiver: widget.user.userTypeId == 1
+                            ? widget.order.costumer
+                            : widget.order.publisher,
+                        author: user,
+                      )),
+            );
+          },
+          child: RichText(
+            text: TextSpan(
+              children: [
+                const WidgetSpan(
+                    child: FaIcon(FontAwesomeIcons.solidComment,
+                        size: 18, color: linkColor)),
+                const WidgetSpan(
+                  child: SizedBox(width: 5),
+                ),
+                TextSpan(
+                    text: widget.user.userTypeId == 1
+                        ? 'Contact Consumer'
+                        : 'Contact Farmer',
+                    style: const TextStyle(
+                        color: linkColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

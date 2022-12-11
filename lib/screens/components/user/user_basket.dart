@@ -6,7 +6,6 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/screens/components/basket_pages/active_orders.dart';
 import 'package:ani_capstone/screens/components/basket_pages/basket_screen.dart';
-import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -27,7 +26,7 @@ class UserBasket extends StatefulWidget {
 }
 
 class _UserBasketState extends State<UserBasket> {
-  int tabIndex = 1;
+  int tabIndex = 0;
 
   List<int> badgeCount = [0, 0, 0];
 
@@ -70,9 +69,9 @@ class _UserBasketState extends State<UserBasket> {
 
       if (orders.isNotEmpty) {
         for (var order in orders) {
-          if (order.status == 0 || order.status == 1 || order.status == 5) {
+          if (order.status == 0 || order.status == 1 || order.status == 3) {
             this.order[0].add(order);
-          } else if (order.status == 2) {
+          } else {
             this.order[1].add(order);
           }
         }
@@ -92,7 +91,19 @@ class _UserBasketState extends State<UserBasket> {
             }
           }
 
-          setBadgeCount(order[i].length, i + 1);
+          if (i == 1) {
+            int count = 0;
+
+            for (var o in order[i]) {
+              if (o.status != 4) {
+                count++;
+              }
+            }
+
+            setBadgeCount(count, i + 1);
+          } else {
+            setBadgeCount(order[i].length, i + 1);
+          }
         }
       } else {
         for (int i = 0; i < order.length; i++) {
@@ -266,7 +277,12 @@ class _UserBasketState extends State<UserBasket> {
             order: order[0],
             fetchState: fetchState[0],
           ),
-          ToRate(),
+          ActiveOrders(
+            user: widget.userData,
+            orderStatus: 2,
+            order: order[1],
+            fetchState: fetchState[1],
+          ),
         ],
       ),
     );

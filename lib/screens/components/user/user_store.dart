@@ -81,7 +81,7 @@ class _UserStoreState extends State<UserStore> {
             this.order[0].add(order);
           } else if (order.status == 1) {
             this.order[1].add(order);
-          } else {
+          } else if (order.status == 2 || order.status == 4) {
             this.order[2].add(order);
           }
         }
@@ -101,7 +101,19 @@ class _UserStoreState extends State<UserStore> {
             }
           }
 
-          setBadgeCount(order[i].length, i);
+          if (i == 2) {
+            int count = 0;
+
+            for (var o in order[i]) {
+              if (o.status != 4) {
+                count++;
+              }
+            }
+
+            setBadgeCount(count, i);
+          } else {
+            setBadgeCount(order[i].length, i);
+          }
         }
       } else {
         for (int i = 0; i < order.length; i++) {

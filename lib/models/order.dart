@@ -10,6 +10,7 @@ class Order {
   List<Product> products;
   int totalPrice;
   int status;
+  double? rating;
 
   Order(
       {required this.publisher,
@@ -17,7 +18,8 @@ class Order {
       required this.products,
       required this.totalPrice,
       required this.status,
-      this.orderId});
+      this.orderId,
+      this.rating});
 
   static Order fromJson(Map<String, dynamic> json, String orderId) => Order(
       orderId: orderId,
@@ -27,13 +29,15 @@ class Order {
           .map((product) => Product.fromJson(product))
           .toList()),
       totalPrice: json['totalPrice'],
-      status: json['status']);
+      status: json['status'],
+      rating: double.tryParse('${json['rating']}'));
 
   Map<String, dynamic> toJson() => {
         'publisher': publisher.toJson(),
         'costumer': costumer.toJson(),
         'products': products.map((product) => product.toJson()).toList(),
         'totalPrice': totalPrice,
-        'status': status
+        'status': status,
+        'rating': rating
       };
 }

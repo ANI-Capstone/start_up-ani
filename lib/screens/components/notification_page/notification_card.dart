@@ -81,10 +81,12 @@ class _NotificationCardState extends State<NotificationCard> {
     if (widget.notif.notifType == 2) {
       body = 'ordered your products.';
     } else if (widget.notif.notifType == 3) {
-      body = 'accepted your order. It is ready to be pickup.';
+      body = 'accepted your order. It is ready to be picked up.';
     } else if (widget.notif.notifType == 5) {
       body = 'denied your order.';
     } else if (widget.notif.notifType == 4) {
+      body = ": How's my products? Please give me a review.";
+    } else if (widget.notif.notifType == 6) {
       body = 'posted a review of your product.';
     } else {
       body = 'liked your post.';

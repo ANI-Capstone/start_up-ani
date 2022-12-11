@@ -7,7 +7,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:rxdart/streams.dart';
 
 import '../screens/auth/log_in.dart';
 
@@ -89,10 +88,6 @@ class GoogleProvider extends ChangeNotifier {
       return;
     } else {
       try {
-        // if (googleSignIn.currentUser != null) {
-        //   await googleSignIn.disconnect();
-        // }
-
         final googleUser =
             await GoogleSignIn(scopes: ['profile', 'email']).signIn();
 
@@ -120,9 +115,8 @@ class GoogleProvider extends ChangeNotifier {
       } on FirebaseAuthException catch (e) {
         Navigator.of(context, rootNavigator: true).pop(result);
         ShoWInfo.errorAlert(context, e.message.toString(), 5);
-      } on Exception catch (e) {
+      } on Exception catch (_) {
         Navigator.of(context, rootNavigator: true).pop(result);
-        print(e);
         ShoWInfo.errorAlert(context, 'Failed due to an error occurred.', 5);
       }
     }

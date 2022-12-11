@@ -32,8 +32,6 @@ class BasketCard extends StatefulWidget {
 }
 
 class _BasketCardState extends State<BasketCard> {
-  late User publisher;
-
   bool checkAll = false;
   Timer? timer;
 
@@ -42,8 +40,6 @@ class _BasketCardState extends State<BasketCard> {
   @override
   void initState() {
     super.initState();
-
-    publisher = widget.products[0].publisher;
   }
 
   void updateTotalPrice() {
@@ -64,6 +60,7 @@ class _BasketCardState extends State<BasketCard> {
 
   Future checkout() {
     List<Product> checkoutProducts = [];
+    final User publisher = widget.products[0].publisher;
 
     for (int i = 0; i < widget.products.length; i++) {
       if (widget.products[i].checkBox!) {

@@ -81,6 +81,24 @@ class FirebaseStorageDb {
     return await ref.getDownloadURL();
   }
 
+  static Future<List<String>> uploadReviewImages(
+      {required String userId, required List<File> images}) async {
+    var imageUrls =
+        await Future.wait(images.map((img) => _uploadReviewImage(img, userId)));
+    return imageUrls;
+  }
+
+  static Future<String> _uploadReviewImage(File img, String userId) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('$userId/reviews/${basename(img.path)}');
+
+    UploadTask uploadTask = ref.putFile(img);
+    await uploadTask;
+
+    return await ref.getDownloadURL();
+  }
+
   static Future<String> uploadMessageImage(File img, String userId) async {
     final ref = FirebaseStorage.instance
         .ref()

@@ -1,7 +1,6 @@
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
-import 'package:ani_capstone/screens/components/profile_page/edit_profile.dart';
 import 'package:ani_capstone/screens/components/profile_page/my_profile.dart';
 import 'package:ani_capstone/screens/components/profile_page/profile_management.dart';
 import 'package:ani_capstone/screens/components/profile_page/security_settings.dart';

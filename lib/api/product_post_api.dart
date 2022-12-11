@@ -1,8 +1,8 @@
 import 'package:ani_capstone/api/notification_api.dart';
-import 'package:ani_capstone/models/notification.dart';
 import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/product.dart';
+import 'package:ani_capstone/models/review.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -169,16 +169,24 @@ class ProductPost {
               .map((doc) => Post.fromJson(doc.data(), doc.id))
               .toList());
 
+  static Future deleteOrder({required String orderId}) =>
+      FirebaseFirestore.instance.collection('orders').doc(orderId).delete();
+
   static Future updateOrderStatus(
       {required int orderStatus,
       required int userTypeId,
-      required Order order}) async {
+      required Order order,
+      double? rating}) async {
     final orderRef =
         FirebaseFirestore.instance.collection('orders').doc(order.orderId!);
 
-    final List<int> notifStatus = [3, 4, 5];
+    final List<int> notifStatus = [3, 4, 5, 6];
 
-    await orderRef.update({'status': orderStatus}).whenComplete(() {
+    final update = orderStatus == 4
+        ? {'status': orderStatus, 'rating': rating!}
+        : {'status': orderStatus};
+
+    await orderRef.update(update).whenComplete(() {
       if (userTypeId == 1) {
         NotificationApi.addNotification(
             notifTo: order.costumer.userId!,
@@ -223,4 +231,33 @@ class ProductPost {
             payload: orderRef.id,
             notifType: 2));
   }
+
+  static Future addProductReview(
+      {required List<Review> reviews,
+      required List<String> productIds,
+      required String userId}) {
+    final batch = FirebaseFirestore.instance.batch();
+    final reviewRef = FirebaseFirestore.instance.collection('reviews');
+    final postRef = FirebaseFirestore.instance.collection('posts');
+
+    for (int i = 0; i < productIds.length; i++) {
+      batch.update(postRef.doc(productIds[i]), {
+        'reviews': FieldValue.arrayUnion([userId])
+      });
+
+      batch.set(reviewRef.doc(), reviews[i].toJson());
+    }
+
+    return batch.commit();
+  }
+
+  static Future<List<Review>> getProductReviews({required String productId}) =>
+      FirebaseFirestore.instance
+          .collection('reviews')
+          .where('productId', isEqualTo: productId)
+          .orderBy("rating", descending: true)
+          .get()
+          .then((snapshots) => snapshots.docs
+              .map((doc) => Review.fromJson(doc.data(), doc.id))
+              .toList());
 }

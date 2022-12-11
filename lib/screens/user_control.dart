@@ -78,7 +78,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 4;
+  int currentIndex = 0;
   int? userType;
   UserData? user;
 
@@ -94,7 +94,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
   FaIcon homeNav = const FaIcon(FontAwesomeIcons.house);
   FaIcon inboxNav = const FaIcon(FontAwesomeIcons.solidMessage);
   FaIcon postNav = const FaIcon(FontAwesomeIcons.circlePlus);
-  FaIcon reviewNav = const FaIcon(FontAwesomeIcons.solidStar);
+  FaIcon reviewNav = const FaIcon(FontAwesomeIcons.bagShopping);
   FaIcon notifNav = const FaIcon(FontAwesomeIcons.solidBell);
   FaIcon userNav = const FaIcon(FontAwesomeIcons.solidUser);
 
@@ -201,7 +201,16 @@ class _UserViewScreenState extends State<UserViewScreen> {
                 setMessageBadge(count);
               },
             ),
-            userType == 1 ? UserPost(user: user!) : const UserReviews(),
+            userType == 1
+                ? UserPost(user: user!)
+                : UserBasket(
+                    userData: user!,
+                    toggleBasket: (open) {
+                      toggleBasket(open);
+                    },
+                    setFeedBadge: (int count, int index) {
+                      setFeedBadge(count, index);
+                    }),
             UserNotificaiton(
               user: user!,
               setBadge: (int count) {

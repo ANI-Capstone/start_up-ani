@@ -5,6 +5,7 @@ import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/user.dart';
+import 'package:ani_capstone/screens/components/review_page/review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -317,59 +318,73 @@ class _PostCardState extends State<PostCard> {
                   width: double.infinity,
                   child: Stack(children: [
                     Positioned(
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            WidgetSpan(
-                                child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (liked) {
-                                    like = unLikeColor;
-                                    liked = false;
-                                  } else {
-                                    like = likeColor;
-                                    liked = true;
-                                  }
-                                });
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (liked) {
+                              like = unLikeColor;
+                              liked = false;
+                            } else {
+                              like = likeColor;
+                              liked = true;
+                            }
+                          });
 
-                                if (!_timer.isActive) saveLike();
-                              },
-                              child: FaIcon(FontAwesomeIcons.solidThumbsUp,
-                                  size: 18, color: like),
-                            )),
-                            const WidgetSpan(
-                              child: SizedBox(width: 5),
-                            ),
-                            TextSpan(
-                                text: widget.post.likes!.length == 1
-                                    ? '${widget.post.likes!.length} Like'
-                                    : '${widget.post.likes!.length} Likes',
-                                style: TextStyle(color: like, fontSize: 12)),
-                          ],
+                          if (!_timer.isActive) saveLike();
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              WidgetSpan(
+                                  child: FaIcon(FontAwesomeIcons.solidThumbsUp,
+                                      size: 18, color: like)),
+                              const WidgetSpan(
+                                child: SizedBox(width: 5),
+                              ),
+                              TextSpan(
+                                  text: widget.post.likes!.length == 1
+                                      ? '${widget.post.likes!.length} Like'
+                                      : '${widget.post.likes!.length} Likes',
+                                  style: TextStyle(color: like, fontSize: 12)),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     Positioned(
                       left: 75,
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            WidgetSpan(
-                                child: GestureDetector(
-                              child: const FaIcon(
-                                  FontAwesomeIcons.solidComments,
-                                  size: 18,
-                                  color: linkColor),
-                            )),
-                            const WidgetSpan(
-                              child: SizedBox(width: 5),
-                            ),
-                            const TextSpan(
-                                text: '0 Reviews',
-                                style:
-                                    TextStyle(color: linkColor, fontSize: 12)),
-                          ],
+                      child: GestureDetector(
+                        onTap: () {
+                          if (widget.post.reviews!.isNotEmpty) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReviewScreen(
+                                    productId: widget.post.postId!,
+                                  ),
+                                ));
+                          } else {
+                            ShoWInfo.showToast(
+                                'This product has no reviews.', 0);
+                          }
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              const WidgetSpan(
+                                  child: FaIcon(FontAwesomeIcons.solidComments,
+                                      size: 18, color: linkColor)),
+                              const WidgetSpan(
+                                child: SizedBox(width: 5),
+                              ),
+                              TextSpan(
+                                  text: widget.post.reviews!.length == 1
+                                      ? '${widget.post.reviews!.length} Review'
+                                      : '${widget.post.reviews!.length} Reviews',
+                                  style: const TextStyle(
+                                      color: linkColor, fontSize: 12)),
+                            ],
+                          ),
                         ),
                       ),
                     ),

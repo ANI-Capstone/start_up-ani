@@ -5,6 +5,7 @@ import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/basket_pages/orders_card.dart';
+import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:flutter/material.dart';
 import 'package:ani_capstone/models/user_data.dart';
 
@@ -76,10 +77,17 @@ class _ActiveOrdersState extends State<ActiveOrders> {
   Widget buildProduct(Order order) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
-      child: OrdersCard(
-        order: order,
-        user: widget.user,
-      ),
+      child: order.status == 2 || order.status == 4
+          ? widget.user.userTypeId == 2
+              ? ToRate(order: order, user: widget.user)
+              : OrdersCard(
+                  order: order,
+                  user: widget.user,
+                )
+          : OrdersCard(
+              order: order,
+              user: widget.user,
+            ),
     );
   }
 }
