@@ -28,6 +28,16 @@ class ProductPost {
           .map((doc) => Post.fromJson(doc.data(), doc.id))
           .toList());
 
+  static Future<List<Post>> getUserPosts({required String userId}) =>
+      FirebaseFirestore.instance
+          .collection('posts')
+          .where('publisher.id', isEqualTo: userId)
+          .orderBy('postedAt', descending: true)
+          .get()
+          .then((snapshot) => snapshot.docs
+              .map((doc) => Post.fromJson(doc.data(), doc.id))
+              .toList());
+
   static Future<bool> checkProductLike(
       {required String userId, required String productId}) async {
     final userLikesRef = FirebaseFirestore.instance
@@ -160,6 +170,17 @@ class ProductPost {
             .toList());
   }
 
+  static Future<List<Order>> getUserOrders({required String userId}) {
+    return FirebaseFirestore.instance
+        .collection('orders')
+        .where('costumer.id', isEqualTo: userId)
+        .where('status', isGreaterThanOrEqualTo: 3)
+        .get()
+        .then((snapshot) => snapshot.docs
+            .map((doc) => Order.fromJson(doc.data(), doc.id))
+            .toList());
+  }
+
   static Future<List<Post>> getProducts({required List<String> productList}) =>
       FirebaseFirestore.instance
           .collection('posts')
@@ -250,6 +271,16 @@ class ProductPost {
 
     return batch.commit();
   }
+
+  static Future<List<Review>> getUserReviews({required String userId}) =>
+      FirebaseFirestore.instance
+          .collection('reviews')
+          .where('reviewer.id', isEqualTo: userId)
+          .orderBy('postedAt', descending: true)
+          .get()
+          .then((snapshots) => snapshots.docs
+              .map((doc) => Review.fromJson(doc.data(), doc.id))
+              .toList());
 
   static Future<List<Review>> getProductReviews({required String productId}) =>
       FirebaseFirestore.instance

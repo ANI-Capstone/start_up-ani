@@ -89,7 +89,7 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Material(
         elevation: 1.5,
         color: backgroundColor,

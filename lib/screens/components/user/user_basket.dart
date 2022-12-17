@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ani_capstone/local_objects.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';

@@ -70,27 +70,30 @@ class _UserFeedState extends State<UserFeed> {
             backgroundColor: primaryColor,
             elevation: 0),
         backgroundColor: userBgColor,
-        body: StreamBuilder<List<Post>>(
-            stream: ProductPost.getPosts(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Center(child: Text('Something went wrong.'));
-              } else if (snapshot.hasData) {
-                final posts = snapshot.data!;
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: StreamBuilder<List<Post>>(
+              stream: ProductPost.getPosts(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return const Center(child: Text('Something went wrong.'));
+                } else if (snapshot.hasData) {
+                  final posts = snapshot.data!;
 
-                return posts.isEmpty
-                    ? const Center(child: Text('No posts.'))
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: ListView(
-                            scrollDirection: Axis.vertical,
-                            physics: const BouncingScrollPhysics(),
-                            children: posts.map(buildPost).toList()),
-                      );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            }));
+                  return posts.isEmpty
+                      ? const Center(child: Text('No posts.'))
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: ListView(
+                              scrollDirection: Axis.vertical,
+                              physics: const BouncingScrollPhysics(),
+                              children: posts.map(buildPost).toList()),
+                        );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              }),
+        ));
   }
 
   Widget buildPost(Post post) => PostCard(
