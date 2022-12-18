@@ -105,7 +105,8 @@ class _BasketCardState extends State<BasketCard> {
                 dense: true,
                 leading: CircleAvatar(
                     radius: 18,
-                    backgroundImage: NetworkImage(
+                    backgroundColor: primaryColor,
+                    backgroundImage: CachedNetworkImageProvider(
                         widget.products[0].post!.publisher.photoUrl)),
                 title: Text(
                   widget.products[0].post!.publisher.name,

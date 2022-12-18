@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ani_capstone/api/firebase_filehost.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,19 +16,17 @@ import '../../../constants.dart';
 import '../../../models/post.dart';
 import '../../../models/user.dart';
 
-class UserPost extends StatefulWidget {
-  UserData user;
-  UserPost({Key? key, required this.user}) : super(key: key);
+class EditPost extends StatefulWidget {
+  Post post;
+  VoidCallback? fetchData;
+  EditPost({Key? key, required this.post, this.fetchData}) : super(key: key);
 
   @override
-  State<UserPost> createState() => _UserPostState();
+  State<EditPost> createState() => _EditPostState();
 }
 
-class _UserPostState extends State<UserPost> {
-  UserData? user;
-  String? value1;
-  String? value2;
-
+class _EditPostState extends State<EditPost> {
+  late Post post;
   late GooglePlace googlePlace;
 
   final _formKey = GlobalKey<FormState>();
@@ -41,9 +40,7 @@ class _UserPostState extends State<UserPost> {
 
   final ImagePicker _picker = ImagePicker();
   List<AutocompletePrediction> predictions = [];
-  List<File>? pickedImages = [];
-
-  var _autoValidate = AutovalidateMode.disabled;
+  List<File> pickedImages = [];
 
   bool confirmPost = false;
 
@@ -51,7 +48,8 @@ class _UserPostState extends State<UserPost> {
   void initState() {
     super.initState();
 
-    user = widget.user;
+    post = widget.post;
+    productUnit = post.unit;
   }
 
   void autoCompleteSearch(String value) async {
@@ -64,6 +62,100 @@ class _UserPostState extends State<UserPost> {
     }
   }
 
+  bool checkChanges() {
+    return _productName.text.isNotEmpty ||
+        _productDescription.text.isNotEmpty ||
+        _productPrice.text.isNotEmpty ||
+        pickedImages.isNotEmpty ||
+        productUnit != post.unit;
+  }
+
+  void updatePost() async {
+    List<String> images = [];
+
+    if (pickedImages.isNotEmpty) {
+      try {
+        ShoWInfo.showToast('Please wait, uploading images.', 3);
+        await FirebaseStorageDb.uploadPostImages(
+                userId: widget.post.publisher.userId!, images: pickedImages)
+            .then((value) => {
+                  ShoWInfo.showToast('Uploaded successfully.', 3),
+                  images = value
+                });
+      } on FirebaseException catch (_) {
+        ShoWInfo.showToast('Upload failed, unable to upload images.', 3);
+        return null;
+      } on Exception catch (_) {
+        ShoWInfo.showToast('Upload failed, unable to upload images.', 3);
+        return null;
+      }
+    }
+
+    final updatedPost = Post(
+      postId: post.postId,
+      description: _productDescription.text.isNotEmpty
+          ? _productDescription.text.trim()
+          : post.description,
+      publisher: post.publisher,
+      name: _productName.text.isNotEmpty ? _productName.text.trim() : post.name,
+      price: _productPrice.text != '${post.price}'
+          ? double.parse(_productPrice.text.trim())
+          : post.price,
+      unit: productUnit != post.unit ? productUnit! : post.unit,
+      location: post.location,
+      images: images.isNotEmpty ? images : post.images,
+      postedAt: post.postedAt,
+      likes: post.likes,
+      reviews: post.reviews,
+    );
+
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Container(
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    // The loading indicator
+                    CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    // Some text
+                    Text(
+                      'Updating post, please wait...',
+                      style: TextStyle(fontFamily: 'Roboto'),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+
+    ProductPost.updatePost(post: updatedPost)
+        .whenComplete(() => {
+              ShoWInfo.showToast('Post updated successfully.', 3),
+              Navigator.of(context).pop(),
+              widget.fetchData!(),
+              Navigator.of(context).pop(),
+            })
+        .onError((error, stackTrace) => {
+              Navigator.of(context).pop(),
+              ShoWInfo.showToast('Failed, an error occured.', 3)
+            });
+  }
+
   @override
   Widget build(BuildContext context) {
     var items1 = ['Kilogram', 'Gram', 'Pound'];
@@ -73,14 +165,19 @@ class _UserPostState extends State<UserPost> {
         backgroundColor: Colors.white,
         appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: const Center(
-              child: Text('CREATE POST',
-                  style: TextStyle(
-                    color: linkColor,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto',
-                  )),
-            ),
+            leading: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(FontAwesomeIcons.arrowLeft,
+                    color: linkColor, size: 18)),
+            title: const Text('EDIT POST',
+                style: TextStyle(
+                  color: linkColor,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Roboto',
+                )),
+            centerTitle: true,
             backgroundColor: primaryColor,
             elevation: 0),
         body: SingleChildScrollView(
@@ -95,152 +192,51 @@ class _UserPostState extends State<UserPost> {
                       radius: 22,
                       backgroundColor: primaryColor,
                       backgroundImage:
-                          CachedNetworkImageProvider(user?.photoUrl as String)),
+                          CachedNetworkImageProvider(post.publisher.photoUrl)),
                   const SizedBox(width: 10),
                   Text(
-                    user?.name as String,
+                    post.publisher.name,
                     style: const TextStyle(
                         color: linkColor,
                         fontSize: 14,
                         fontWeight: FontWeight.bold),
                   ),
                   const Expanded(child: SizedBox(width: 1)),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: TextButton(
-                      onPressed: () {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        if (_formKey.currentState!.validate()) {
-                          if (productUnit == null) {
-                            ShoWInfo.errorAlert(context,
-                                "Please add a unit for your product post.", 5);
-                            return;
-                          } else if (location == null) {
-                            ShoWInfo.errorAlert(context,
-                                "Please specify your product location.", 5);
-                            return;
-                          } else if (pickedImages!.isEmpty) {
-                            ShoWInfo.errorAlert(
-                                context,
-                                "Please add atleast one photo of your product.",
-                                5);
-                            return;
-                          } else {
-                            _formKey.currentState!.save();
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return _confirmationDialog(context);
-                              },
-                            ).then((value) {
-                              if (confirmPost) {
-                                User newUser = User(
-                                    userId: user!.id,
-                                    name: user!.name,
-                                    photoUrl: user!.photoUrl!);
+                  TextButton(
+                    onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
 
-                                showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (_) {
-                                      return Dialog(
-                                        // The background color
-                                        backgroundColor: Colors.white,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 20),
-                                          child: Container(
-                                            decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(30))),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: const [
-                                                // The loading indicator
-                                                CircularProgressIndicator(
-                                                  color: primaryColor,
-                                                ),
-                                                SizedBox(
-                                                  height: 15,
-                                                ),
-                                                // Some text
-                                                Text(
-                                                  'Uploading your post, please wait...',
-                                                  style: TextStyle(
-                                                      fontFamily: 'Roboto'),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    });
-
-                                FirebaseStorageDb.uploadPostImages(
-                                        userId: user!.id!,
-                                        images: pickedImages!)
-                                    .then((imgUrls) =>
-                                        ProductPost.uploadPost(context,
-                                            post: Post(
-                                              publisher: newUser,
-                                              postedAt: DateTime.now(),
-                                              name: _productName.text.trim(),
-                                              description: _productDescription
-                                                  .text
-                                                  .trim(),
-                                              price: double.parse(
-                                                  _productPrice.text.trim()),
-                                              unit: productUnit!,
-                                              location:
-                                                  _newLocation.text.trim(),
-                                              images: imgUrls,
-                                            )).then((value) {
-                                          if (value) {
-                                            Navigator.of(context).pop();
-                                            ShoWInfo.successAlert(
-                                                context,
-                                                'Your product has been posted successfully.',
-                                                5);
-                                            setState(() {
-                                              _formKey.currentState!.reset();
-                                              _productName.text = '';
-                                              _productDescription.text = '';
-                                              _productPrice.text = '';
-                                              _newLocation.text = '';
-                                              pickedImages!.clear();
-                                              productUnit = null;
-                                              location = null;
-                                            });
-                                          } else {
-                                            Navigator.of(context).pop();
-                                            ShoWInfo.errorAlert(
-                                                context,
-                                                'Failed to upload your post, please try again later.',
-                                                5);
-                                          }
-                                        }));
-
-                                confirmPost = false;
-                              }
+                      if (!checkChanges()) {
+                        ShoWInfo.showUpDialog(context,
+                            title: 'Update Post',
+                            message:
+                                "Fields are empty, no changes will be made to your post.",
+                            action1: 'Okay', btn1: () {
+                          Navigator.of(context).pop();
+                        });
+                      } else {
+                        ShoWInfo.showUpDialog(context,
+                            title: 'Update Profile',
+                            message:
+                                "Are you sure you want to update your post?",
+                            action1: 'Save Changes',
+                            btn1: () {
+                              Navigator.of(context).pop();
+                              updatePost();
+                            },
+                            action2: 'Cancel',
+                            btn2: () {
+                              Navigator.of(context).pop();
                             });
-                          }
-                        } else {
-                          setState(() {
-                            _autoValidate = AutovalidateMode.onUserInteraction;
-                          });
-                          ShoWInfo.errorAlert(context,
-                              'Please fill all the required fields.', 5);
-                        }
-                      },
-                      child: const Text('POST',
-                          style: TextStyle(
-                              color: linkColor, fontWeight: FontWeight.bold)),
-                    ),
+                      }
+                    },
+                    child: const Text('UPDATE',
+                        style: TextStyle(
+                            color: linkColor, fontWeight: FontWeight.bold)),
                   ),
                 ]),
                 Form(
                   key: _formKey,
-                  autovalidateMode: _autoValidate,
                   child: Column(
                     children: [
                       const SizedBox(
@@ -248,14 +244,14 @@ class _UserPostState extends State<UserPost> {
                       ),
                       _cTextField(
                           controller: _productName,
-                          hint: 'Product name',
+                          hint: post.name,
                           validator: 'Product name'),
                       const SizedBox(
                         height: 20,
                       ),
                       _cTextField(
                           controller: _productDescription,
-                          hint: 'Type product details',
+                          hint: post.description,
                           lines: 5,
                           validator: 'Product details'),
                       const SizedBox(
@@ -271,25 +267,26 @@ class _UserPostState extends State<UserPost> {
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.digitsOnly
                                 ],
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                     isDense: true,
-                                    enabledBorder: UnderlineInputBorder(
+                                    enabledBorder: const UnderlineInputBorder(
                                         borderSide: BorderSide(
                                             color: primaryColor, width: 1.5)),
-                                    contentPadding: EdgeInsets.symmetric(
+                                    contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 0, vertical: 5),
-                                    hintText: 'Price',
-                                    hintStyle: TextStyle(color: primaryColor),
-                                    prefixIconConstraints: BoxConstraints(
+                                    hintText: '${post.price}',
+                                    hintStyle:
+                                        const TextStyle(color: primaryColor),
+                                    prefixIconConstraints: const BoxConstraints(
                                         minWidth: 23, maxHeight: 20),
-                                    suffixIconConstraints: BoxConstraints(
+                                    suffixIconConstraints: const BoxConstraints(
                                         minWidth: 23, maxHeight: 20),
-                                    prefixIcon: Padding(
+                                    prefixIcon: const Padding(
                                       padding: EdgeInsets.zero,
                                       child: FaIcon(FontAwesomeIcons.pesoSign,
                                           color: primaryColor, size: 16),
                                     ),
-                                    suffixIcon: Padding(
+                                    suffixIcon: const Padding(
                                       padding: EdgeInsets.zero,
                                       child: Text(
                                         '.00',
@@ -381,7 +378,7 @@ class _UserPostState extends State<UserPost> {
             hint: Text(hint,
                 style: const TextStyle(
                     color: Colors.white, fontWeight: FontWeight.bold)),
-            value: location,
+            value: 'Default Address',
             isExpanded: true,
             elevation: 0,
             dropdownColor: primaryColor,
@@ -417,15 +414,14 @@ class _UserPostState extends State<UserPost> {
               });
 
               if (newValue == 'Locate New Address') {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return _cInputDialog(context);
-                  },
-                );
+                // showDialog(
+                //   context: context,
+                //   builder: (BuildContext context) {
+                //     return _cInputDialog(context);
+                //   },
+                // );
               } else {
-                _newLocation.text =
-                    '${user?.street}, ${user?.barangay}, ${user?.city}, ${user?.province}, ${user?.zipcode}';
+                _newLocation.text = post.location;
               }
             },
           ),
@@ -600,11 +596,11 @@ class _UserPostState extends State<UserPost> {
   }
 
   Widget _photoPreview(BuildContext context) {
-    return pickedImages == null ? _emptyPhoto(context) : _postImages(context);
+    return pickedImages.isEmpty ? _emptyPhoto(context) : _postImages(context);
   }
 
   Widget _postImages(BuildContext context) {
-    if (pickedImages!.length == 1) {
+    if (pickedImages.length == 1) {
       return Container(
         height: 120,
         width: MediaQuery.of(context).size.width,
@@ -621,7 +617,7 @@ class _UserPostState extends State<UserPost> {
           ],
         ),
       );
-    } else if (pickedImages!.length >= 2) {
+    } else if (pickedImages.length >= 2) {
       return Container(
         height: 120,
         width: MediaQuery.of(context).size.width,
@@ -651,9 +647,9 @@ class _UserPostState extends State<UserPost> {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(5),
-                  child: pickedImages!.length < 3
+                  child: pickedImages.length < 3
                       ? Image.file(
-                          pickedImages![index],
+                          pickedImages[index],
                           height: 80,
                           width: 80,
                           fit: BoxFit.cover,
@@ -662,7 +658,7 @@ class _UserPostState extends State<UserPost> {
                           alignment: Alignment.center,
                           children: [
                             Image.file(
-                              pickedImages![index],
+                              pickedImages[index],
                               height: 80,
                               width: 80,
                               fit: BoxFit.cover,
@@ -674,7 +670,7 @@ class _UserPostState extends State<UserPost> {
                                   color: plusColor.withOpacity(0.75),
                                   shape: BoxShape.circle),
                               child: Center(
-                                  child: Text('+${pickedImages!.length - 2}',
+                                  child: Text('+${pickedImages.length - 2}',
                                       style: const TextStyle(
                                           fontSize: 13,
                                           color: linkColor,
@@ -688,7 +684,7 @@ class _UserPostState extends State<UserPost> {
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
-                      pickedImages!.removeAt(index);
+                      pickedImages.removeAt(index);
                     });
                   },
                   child: Container(
@@ -712,7 +708,7 @@ class _UserPostState extends State<UserPost> {
             ClipRRect(
                 borderRadius: BorderRadius.circular(5),
                 child: Image.file(
-                  pickedImages![index],
+                  pickedImages[index],
                   height: 80,
                   width: 80,
                   fit: BoxFit.cover,
@@ -723,7 +719,7 @@ class _UserPostState extends State<UserPost> {
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    pickedImages!.removeAt(index);
+                    pickedImages.removeAt(index);
                   });
                 },
                 child: Container(
@@ -821,18 +817,18 @@ class _UserPostState extends State<UserPost> {
 
         if (images != null) {
           setState(() {
-            pickedImages!.addAll(images.map((img) => File(img.path)).toList());
+            pickedImages.addAll(images.map((img) => File(img.path)).toList());
           });
         }
       } else {
         final XFile? image = await _picker.pickImage(source: source);
         setState(() {
-          pickedImages!.add(File(image!.path));
+          pickedImages.add(File(image!.path));
         });
       }
     } on Exception catch (e) {
       ShoWInfo.errorAlert(context, e.toString(), 5);
     }
-    if (pickedImages == null) return;
+    if (pickedImages.isEmpty) return;
   }
 }

@@ -51,9 +51,10 @@ class _OrdersCardState extends State<OrdersCard> {
                   dense: true,
                   leading: CircleAvatar(
                       radius: 18,
-                      backgroundImage: NetworkImage(widget.user.userTypeId == 1
-                          ? widget.order.costumer.photoUrl
-                          : widget.order.publisher.photoUrl)),
+                      backgroundImage: CachedNetworkImageProvider(
+                          widget.user.userTypeId == 1
+                              ? widget.order.costumer.photoUrl
+                              : widget.order.publisher.photoUrl)),
                   title: Text(
                     widget.user.userTypeId == 1
                         ? widget.order.costumer.name

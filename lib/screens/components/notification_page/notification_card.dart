@@ -1,5 +1,6 @@
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/notification.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -28,7 +29,9 @@ class _NotificationCardState extends State<NotificationCard> {
           dense: true,
           leading: CircleAvatar(
               radius: 22,
-              backgroundImage: NetworkImage(widget.notif.participant.photoUrl)),
+              backgroundColor: primaryColor,
+              backgroundImage: CachedNetworkImageProvider(
+                  widget.notif.participant.photoUrl)),
           title: RichText(
             text: TextSpan(
               children: [

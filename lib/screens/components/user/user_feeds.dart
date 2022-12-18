@@ -84,10 +84,13 @@ class _UserFeedState extends State<UserFeed> {
                       ? const Center(child: Text('No posts.'))
                       : Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: ListView(
+                          child: ListView.builder(
                               scrollDirection: Axis.vertical,
                               physics: const BouncingScrollPhysics(),
-                              children: posts.map(buildPost).toList()),
+                              shrinkWrap: true,
+                              itemCount: posts.length,
+                              itemBuilder: (context, index) =>
+                                  buildPost(posts[index])),
                         );
                 } else {
                   return const Center(child: CircularProgressIndicator());

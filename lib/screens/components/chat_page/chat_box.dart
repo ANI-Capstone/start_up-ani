@@ -9,13 +9,13 @@ import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/message_widget.dart';
 import 'package:ani_capstone/screens/components/chat_page/new_message.dart';
 import 'package:ani_capstone/screens/components/widgets/material_banner.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:swipe_to/swipe_to.dart';
 
 class ChatBox extends StatefulWidget {
   List<Message>? messages;
@@ -246,7 +246,9 @@ class _ChatBoxState extends State<ChatBox> {
             children: [
               CircleAvatar(
                   radius: 20,
-                  backgroundImage: NetworkImage(receiver!.photoUrl)),
+                  backgroundColor: primaryColor,
+                  backgroundImage:
+                      CachedNetworkImageProvider(receiver!.photoUrl)),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),

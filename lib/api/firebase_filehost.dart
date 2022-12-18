@@ -70,6 +70,17 @@ class FirebaseStorageDb {
     return imageUrls;
   }
 
+  static Future deleteImages(
+      {required String userId, required List<String> images}) async {
+    return Future.wait(images.map((img) => _deleteImage(img)));
+  }
+
+  static Future _deleteImage(String imageUrl) async {
+    final ref = FirebaseStorage.instance.refFromURL(imageUrl);
+
+    return ref.delete();
+  }
+
   static Future<String> _uploadPostImage(File img, String userId) async {
     final ref = FirebaseStorage.instance
         .ref()

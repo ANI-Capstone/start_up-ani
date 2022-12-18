@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
+import 'firebase_filehost.dart';
 
 class ProductPost {
   static Future uploadPost(BuildContext context, {required Post post}) async {
@@ -18,6 +19,30 @@ class ProductPost {
     } on Exception catch (_) {
       return false;
     }
+  }
+
+  static Future updatePost({required Post post}) => FirebaseFirestore.instance
+      .collection('posts')
+      .doc(post.postId!)
+      .update(post.toJson());
+
+  static Future updatePrice(
+          {required String postId, required double newPrice}) =>
+      FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .update({'price': newPrice});
+
+  static Future deletePost({
+    required Post post,
+  }) async {
+    await FirebaseStorageDb.deleteImages(
+        userId: post.publisher.userId!, images: post.images);
+
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .doc(post.postId)
+        .delete();
   }
 
   static Stream<List<Post>> getPosts() => FirebaseFirestore.instance

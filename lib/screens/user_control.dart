@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
@@ -10,7 +9,6 @@ import 'package:ani_capstone/screens/components/user/user_inbox.dart';
 import 'package:ani_capstone/screens/components/user/user_notification.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
-import 'package:ani_capstone/screens/components/user/user_reviews.dart';
 import 'package:ani_capstone/screens/components/user/user_store.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
 import 'package:badges/badges.dart';
@@ -78,7 +76,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 0;
+  int currentIndex = 4;
   int? userType;
   UserData? user;
 

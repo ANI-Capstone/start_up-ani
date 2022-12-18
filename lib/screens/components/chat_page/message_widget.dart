@@ -5,6 +5,7 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/reply_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -85,7 +86,9 @@ class _MessageWidgetState extends State<MessageWidget> {
             padding: const EdgeInsets.only(left: 8, bottom: 10),
             child: CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(widget.message.urlAvatar)),
+                backgroundColor: primaryColor,
+                backgroundImage:
+                    CachedNetworkImageProvider(widget.message.urlAvatar)),
           ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,

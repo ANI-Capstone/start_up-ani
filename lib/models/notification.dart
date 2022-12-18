@@ -12,6 +12,7 @@ class NotificationModel {
   DateTime timestamp;
   bool? read;
   bool? hide;
+  bool? notified;
 
   NotificationModel(
       {required this.participant,
@@ -22,7 +23,8 @@ class NotificationModel {
       required this.timestamp,
       this.read = false,
       this.hide = false,
-      this.notifId});
+      this.notifId,
+      this.notified = false});
 
   static NotificationModel fromJson(
           Map<String, dynamic> json, String notifId) =>
@@ -35,6 +37,7 @@ class NotificationModel {
           timestamp: Utils.toDateTime(json['timestamp']),
           read: json['read'],
           hide: json['hide'],
+          notified: json['notified'] ?? true,
           notifId: notifId);
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +48,7 @@ class NotificationModel {
         'payload': payload,
         'timestamp': Utils.fromDateTimeToJson(timestamp),
         'read': read,
-        'hide': hide
+        'hide': hide,
+        'notified': notified
       };
 }

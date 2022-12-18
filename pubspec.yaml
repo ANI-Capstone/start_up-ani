@@ -73,6 +73,7 @@ dependencies:
   grouped_list: ^5.1.2
   cached_network_image: ^3.2.1
   hidden_drawer_menu: ^3.0.1
+  visibility_detector: ^0.3.3
 
 flutter_native_splash:
   image: assets/images/ani_splash.png

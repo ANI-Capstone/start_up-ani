@@ -155,7 +155,7 @@ class _UserStoreState extends State<UserStore> {
               const SizedBox(
                 width: 15,
               ),
-              const Text('BASKET',
+              const Text('STORE',
                   style: TextStyle(
                     color: linkColor,
                     fontWeight: FontWeight.bold,

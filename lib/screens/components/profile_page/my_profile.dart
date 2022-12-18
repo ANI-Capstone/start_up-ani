@@ -5,6 +5,8 @@ import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';
+import 'package:ani_capstone/screens/components/widgets/pull_refresh.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -31,7 +33,7 @@ class _MyProfileState extends State<MyProfile> {
     fetchData();
   }
 
-  void fetchData() async {
+  Future fetchData() async {
     final userType = widget.user.userTypeId;
 
     try {
@@ -72,8 +74,8 @@ class _MyProfileState extends State<MyProfile> {
           });
         });
       }
-    } on Exception catch (e) {
-      print(e);
+    } on Exception catch (_) {
+      null;
     }
   }
 
@@ -96,99 +98,110 @@ class _MyProfileState extends State<MyProfile> {
           backgroundColor: primaryColor,
           elevation: 0),
       body: SingleChildScrollView(
-          child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: (defaultPadding - 20)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: (defaultPadding - 10)),
-              child: SizedBox(
-                  width: size.width,
-                  height: 70,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(children: [
-                          CircleAvatar(
-                            radius: 22,
-                            backgroundColor: Colors.white,
-                            backgroundImage:
-                                NetworkImage(widget.user.photoUrl!),
-                          ),
-                          const SizedBox(width: 20),
-                          Text(
-                            widget.user.name,
-                            style: const TextStyle(
-                                color: linkColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                          )
-                        ]),
-                        SizedBox(
-                            width: 24,
-                            child: IconButton(
-                                onPressed: () {
-                                  widget.toggleDrawer();
-                                },
-                                icon: const Icon(FontAwesomeIcons.bars,
-                                    size: 20, color: linkColor))),
-                      ])),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: (defaultPadding - 10)),
-              child: Text(
-                widget.user.userTypeId == 1 ? 'My Posts' : 'Complete Orders',
-                style: TextStyle(
-                    color: textColor.withOpacity(0.3),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: (defaultPadding - 20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: (defaultPadding - 10)),
+                child: SizedBox(
+                    width: size.width,
+                    height: 70,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(children: [
+                            CircleAvatar(
+                              radius: 22,
+                              backgroundColor: primaryColor,
+                              backgroundImage: CachedNetworkImageProvider(
+                                  widget.user.photoUrl!),
+                            ),
+                            const SizedBox(width: 20),
+                            Text(
+                              widget.user.name,
+                              style: const TextStyle(
+                                  color: linkColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          ]),
+                          SizedBox(
+                              width: 24,
+                              child: IconButton(
+                                  onPressed: () {
+                                    widget.toggleDrawer();
+                                  },
+                                  icon: const Icon(FontAwesomeIcons.bars,
+                                      size: 20, color: linkColor))),
+                        ])),
               ),
-            ),
-            const SizedBox(height: 10),
-            fetchState == 1
-                ? widget.user.userTypeId == 1
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            physics: const BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: posts.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                child: PostCard(
-                                  post: posts[index],
-                                  user: widget.user,
-                                ),
-                              );
-                            }),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            physics: const BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: orders.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                child: ToRate(
-                                    order: orders[index], user: widget.user),
-                              );
-                            }),
-                      )
-                : statusBuilder()
-          ],
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: (defaultPadding - 10)),
+                child: Text(
+                  widget.user.userTypeId == 1 ? 'My Posts' : 'Complete Orders',
+                  style: TextStyle(
+                      color: textColor.withOpacity(0.3),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 10),
+              fetchState == 1
+                  ? widget.user.userTypeId == 1
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: SizedBox(
+                            height: size.height * 0.65,
+                            width: double.infinity,
+                            child: RefreshWidget(
+                              onRefresh: fetchData,
+                              child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  physics: const BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: posts.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      child: PostCard(
+                                        post: posts[index],
+                                        user: widget.user,
+                                        fetchData: () {
+                                          fetchData();
+                                        },
+                                      ),
+                                    );
+                                  }),
+                            ),
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              physics: const BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: orders.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  child: ToRate(
+                                      order: orders[index], user: widget.user),
+                                );
+                              }),
+                        )
+                  : statusBuilder()
+            ],
+          ),
         ),
-      )),
+      ),
     );
   }
 

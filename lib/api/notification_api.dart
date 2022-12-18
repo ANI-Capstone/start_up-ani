@@ -142,6 +142,7 @@ class NotificationApi {
             body: body,
             notifType: notifType,
             payload: payload,
+            notified: false,
             timestamp: DateTime.now())
         .toJson();
 
@@ -162,6 +163,15 @@ class NotificationApi {
     }
 
     return await batch.commit();
+  }
+
+  static void notified({required String userId, required String notifId}) {
+    FirebaseFirestore.instance
+        .collection('notifications')
+        .doc(userId)
+        .collection('user_notif')
+        .doc(notifId)
+        .update({'notified': true});
   }
 
   static removeNotification(
