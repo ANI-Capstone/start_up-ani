@@ -183,19 +183,23 @@ class _MyProfileState extends State<MyProfile> {
                         )
                       : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              physics: const BouncingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: orders.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 5),
-                                  child: ToRate(
-                                      order: orders[index], user: widget.user),
-                                );
-                              }),
+                          child: SizedBox(
+                            height: size.height * 0.65,
+                            child: ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                physics: const BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: orders.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 5),
+                                    child: ToRate(
+                                        order: orders[index],
+                                        user: widget.user),
+                                  );
+                                }),
+                          ),
                         )
                   : statusBuilder()
             ],

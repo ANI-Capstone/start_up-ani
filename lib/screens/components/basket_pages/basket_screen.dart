@@ -260,14 +260,18 @@ class _BasketScreenState extends State<BasketScreen> {
 
   Widget statusBuilder() {
     if (fetchState == 2) {
-      return const Center(child: Text('Basket is empty.'));
+      return SizedBox(
+          height: (MediaQuery.of(context).size.height) * 0.6,
+          child: const Center(child: Text('Basket is empty.')));
     } else if (fetchState == -1) {
-      return const Center(child: Text('An error occured, please try again.'));
+      return SizedBox(
+          height: (MediaQuery.of(context).size.height) * 0.6,
+          child:
+              const Center(child: Text('An error occured, please try again.')));
     } else {
-      return const Padding(
-        padding: EdgeInsets.only(top: 30),
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return SizedBox(
+          height: (MediaQuery.of(context).size.height) * 0.6,
+          child: const Center(child: CircularProgressIndicator()));
     }
   }
 

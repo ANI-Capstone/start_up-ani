@@ -7,6 +7,7 @@ import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/models/review.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/models/user_data.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -161,7 +162,8 @@ class _UserPostReviewState extends State<UserPostReview> {
                         CircleAvatar(
                             radius: 22,
                             backgroundColor: Colors.white,
-                            backgroundImage: NetworkImage(user.photoUrl)),
+                            backgroundImage:
+                                CachedNetworkImageProvider(user.photoUrl)),
                         const SizedBox(width: 10),
                         Text(
                           user.name,

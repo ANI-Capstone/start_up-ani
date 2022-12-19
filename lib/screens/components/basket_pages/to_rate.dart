@@ -1,3 +1,4 @@
+import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/order.dart';
 import 'package:ani_capstone/models/product.dart';
@@ -176,7 +177,25 @@ class _ToRateState extends State<ToRate> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        ShoWInfo.showUpDialog(context,
+                            title: 'Buy Again',
+                            message:
+                                'Are you sure you want to buy again? Products will be added to your basket.',
+                            action1: 'Yes',
+                            btn1: () {
+                              Future.wait(widget.order.products.map((product) =>
+                                  ProductPost.addToBasket(
+                                      userId: widget.user.id!,
+                                      post: product.post!))).whenComplete(() =>
+                                  ShoWInfo.showToast('Added to basket.', 3));
+                              Navigator.of(context).pop();
+                            },
+                            action2: 'Cancel',
+                            btn2: () {
+                              Navigator.of(context).pop();
+                            });
+                      },
                       child: const SizedBox(
                           height: 26,
                           width: 55,

@@ -34,11 +34,13 @@ class FirebaseMessageApi {
       .collection('messages')
       .snapshots();
 
-  static Stream<List<User>> getUsers() => FirebaseFirestore.instance
-      .collection('users')
-      .snapshots()
-      .map((snapshot) =>
-          snapshot.docs.map((doc) => User.fromJson(doc.data())).toList());
+  static Stream<List<User>> getUsers({required String userId}) =>
+      FirebaseFirestore.instance
+          .collection('users')
+          .where('id', isNotEqualTo: userId)
+          .snapshots()
+          .map((snapshot) =>
+              snapshot.docs.map((doc) => User.fromJson(doc.data())).toList());
 
   static generateChatId(String ids) => const Uuid().v5(Uuid.NAMESPACE_OID, ids);
 

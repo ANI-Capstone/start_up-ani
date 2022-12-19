@@ -70,28 +70,6 @@ class _ChatBoxState extends State<ChatBox> {
     listener.cancel();
   }
 
-  void openBag() async {
-    FirebaseMessageApi.getUserBag(chatPathId: chatPathId!).then((value) {
-      if (mounted) {
-        setState(() {
-          userBag = value;
-        });
-      }
-
-      setOrderStatus();
-    });
-  }
-
-  void setOrderStatus() {
-    FirebaseMessageApi.getStatus(chatPathId: chatPathId!).then((value) {
-      if (mounted) {
-        setState(() {
-          orderStatus = value['status'];
-        });
-      }
-    });
-  }
-
   void getChatPath() async {
     prefs = await SharedPreferences.getInstance();
 

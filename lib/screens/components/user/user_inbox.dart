@@ -11,6 +11,7 @@ import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:search_page/search_page.dart';
 
 import '../../../constants.dart';
 import '../widgets/pull_refresh.dart';
@@ -32,6 +33,8 @@ class _UserInboxState extends State<UserInbox> {
   List<Chat> chats = [];
   late final NotificationApi notificationService;
   late StreamSubscription listener;
+
+  List<User> users = [];
 
   @override
   void initState() {
@@ -71,16 +74,20 @@ class _UserInboxState extends State<UserInbox> {
                 chat.message.createdAt.isAtSameMomentAs(DateTime.now())) {
               newChatNotifier(chat);
             }
-
-            if (mounted) {
-              setState(() => chats = data);
-            }
           }
+        }
+
+        if (mounted) {
+          setState(() {
+            chats = data;
+          });
         }
 
         setState(() {
           widget.setBadge(unreadCount);
         });
+      }).onError((error, stackTrace) {
+        debugPrint(error.toString());
       });
     } else {
       timer?.cancel();
@@ -91,7 +98,7 @@ class _UserInboxState extends State<UserInbox> {
     await notificationService.showLocalNotification(
         id: 0,
         title: chat.contact.name,
-        body: chat.message.message,
+        body: chat.message.typeId == 1 ? 'Sent a photo.' : chat.message.message,
         payload: chat.chatPathId);
   }
 
@@ -111,15 +118,71 @@ class _UserInboxState extends State<UserInbox> {
       backgroundColor: userBgColor,
       appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('INBOX',
-                  style:
-                      TextStyle(color: linkColor, fontWeight: FontWeight.bold)),
-              Icon(FontAwesomeIcons.magnifyingGlass, size: 20, color: linkColor)
-            ],
-          ),
+          title: const Text('INBOX',
+              style: TextStyle(color: linkColor, fontWeight: FontWeight.bold)),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: GestureDetector(
+                onTap: () {
+                  showSearch(
+                    context: context,
+                    delegate: SearchPage<User>(
+                      barTheme: ThemeData(
+                          primarySwatch: Colors.green,
+                          primaryColor: primaryColor,
+                          fontFamily: 'Roboto',
+                          appBarTheme: const AppBarTheme(
+                              backgroundColor: primaryColor,
+                              elevation: 0,
+                              iconTheme: IconThemeData(color: linkColor))),
+                      items: users,
+                      searchLabel: 'Search user',
+                      suggestion: const Center(
+                        child: Text('Filter user by name'),
+                      ),
+                      failure: const Center(
+                        child: Text('No user found.'),
+                      ),
+                      filter: (user) => [user.name],
+                      builder: (user) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 5),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ChatBox(
+                                        receiver: user,
+                                        author: widget.user,
+                                      )),
+                            );
+                          },
+                          child: ListTile(
+                            leading: CircleAvatar(
+                                backgroundColor: primaryColor,
+                                backgroundImage:
+                                    CachedNetworkImageProvider(user.photoUrl),
+                                radius: 24),
+                            title: Text(
+                              user.name,
+                              style: const TextStyle(
+                                  color: linkColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: const Icon(FontAwesomeIcons.magnifyingGlass,
+                    size: 20, color: linkColor),
+              ),
+            )
+          ],
           backgroundColor: primaryColor,
           elevation: 0),
       body: SafeArea(
@@ -131,12 +194,13 @@ class _UserInboxState extends State<UserInbox> {
               Container(
                 padding: const EdgeInsets.only(top: 15),
                 child: StreamBuilder<List<User>>(
-                    stream: FirebaseMessageApi.getUsers(),
+                    stream:
+                        FirebaseMessageApi.getUsers(userId: widget.user.id!),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return const Text('Something went wrong.');
                       } else if (snapshot.hasData) {
-                        final users = snapshot.data!;
+                        users = snapshot.data!;
                         return SizedBox(
                           height: 90,
                           child: ListView(
@@ -179,8 +243,8 @@ class _UserInboxState extends State<UserInbox> {
 
   Widget buildChat(Chat chat) => GestureDetector(
       onTap: () {
-        // FirebaseMessageApi.readMessage(
-        //     AccountControl.getUserId(), chat.contact.userId!, chat.message);
+        FirebaseMessageApi.readMessage(
+            AccountControl.getUserId(), chat.contact.userId!, chat.message);
 
         Navigator.push(
           context,

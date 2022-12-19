@@ -1,6 +1,8 @@
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/components/profile_page/edit_profile.dart';
+import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -108,15 +110,25 @@ class ProfileManagement extends StatelessWidget {
                     Center(
                       child: Column(
                         children: [
-                          InkWell(
-                            child: CircleAvatar(
-                              backgroundColor: linkColor,
-                              radius: 60,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ImagePreview(image: user.photoUrl!),
+                                  ));
+                            },
+                            child: InkWell(
                               child: CircleAvatar(
-                                  radius: 58,
-                                  backgroundColor: Colors.white,
-                                  backgroundImage:
-                                      NetworkImage(user.photoUrl!)),
+                                backgroundColor: linkColor,
+                                radius: 60,
+                                child: CircleAvatar(
+                                    radius: 58,
+                                    backgroundColor: primaryColor,
+                                    backgroundImage: CachedNetworkImageProvider(
+                                        user.photoUrl!)),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),

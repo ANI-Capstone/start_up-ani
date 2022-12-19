@@ -1,5 +1,6 @@
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/review.dart';
+import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -27,8 +28,9 @@ class _ReviewCardState extends State<ReviewCard> {
                 dense: true,
                 leading: CircleAvatar(
                     radius: 20,
-                    backgroundImage:
-                        NetworkImage(widget.review.reviewer.photoUrl)),
+                    backgroundColor: primaryColor,
+                    backgroundImage: CachedNetworkImageProvider(
+                        widget.review.reviewer.photoUrl)),
                 title: Text(
                   widget.review.reviewer.name,
                   style: const TextStyle(
@@ -75,21 +77,31 @@ class _ReviewCardState extends State<ReviewCard> {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 5),
-                      child: ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(5)),
-                        child: CachedNetworkImage(
-                          width: 80,
-                          fit: BoxFit.cover,
-                          imageUrl: widget.review.photos![index],
-                          placeholder: (context, url) => Container(
-                            decoration:
-                                const BoxDecoration(color: primaryColor),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ImagePreview(
+                                    image: widget.review.photos![index]),
+                              ));
+                        },
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5)),
+                          child: CachedNetworkImage(
+                            width: 80,
+                            fit: BoxFit.cover,
+                            imageUrl: widget.review.photos![index],
+                            placeholder: (context, url) => Container(
+                              decoration:
+                                  const BoxDecoration(color: primaryColor),
+                            ),
+                            errorWidget: (context, url, error) => const Icon(
+                                Icons.error,
+                                size: 12,
+                                color: linkColor),
                           ),
-                          errorWidget: (context, url, error) => const Icon(
-                              Icons.error,
-                              size: 12,
-                              color: linkColor),
                         ),
                       ),
                     );
@@ -107,3 +119,5 @@ class _ReviewCardState extends State<ReviewCard> {
         ]));
   }
 }
+
+class CachedNetworkImageProvided {}

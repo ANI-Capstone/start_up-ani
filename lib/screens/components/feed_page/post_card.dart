@@ -7,6 +7,7 @@ import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/feed_page/edit_post.dart';
 import 'package:ani_capstone/screens/components/review_page/review_screen.dart';
+import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -155,11 +156,21 @@ class _PostCardState extends State<PostCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                  leading: CircleAvatar(
-                      backgroundColor: primaryColor,
-                      radius: 22,
-                      backgroundImage: CachedNetworkImageProvider(
-                          widget.post.publisher.photoUrl)),
+                  leading: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImagePreview(
+                                image: widget.post.publisher.photoUrl),
+                          ));
+                    },
+                    child: CircleAvatar(
+                        backgroundColor: primaryColor,
+                        radius: 22,
+                        backgroundImage: CachedNetworkImageProvider(
+                            widget.post.publisher.photoUrl)),
+                  ),
                   title: Text(
                     widget.post.publisher.name,
                     style: const TextStyle(
@@ -294,11 +305,21 @@ class _PostCardState extends State<PostCard> {
                               }
                             }),
                         items: widget.post.images
-                            .map((item) => Image(
-                                image: CachedNetworkImageProvider(item),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 150))
+                            .map((item) => GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ImagePreview(image: item),
+                                        ));
+                                  },
+                                  child: Image(
+                                      image: CachedNetworkImageProvider(item),
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: 150),
+                                ))
                             .toList(),
                       ),
                       if (widget.post.images.length > 1)

@@ -5,6 +5,7 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/reply_widget.dart';
+import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -153,16 +154,39 @@ class _MessageWidgetState extends State<MessageWidget> {
             ClipRRect(
                 borderRadius: BorderRadius.circular(5),
                 child: widget.message.message.contains('https://')
-                    ? Image.network(
-                        widget.message.message,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
+                    ? GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ImagePreview(image: widget.message.message),
+                              ));
+                        },
+                        child: Image(
+                          image: CachedNetworkImageProvider(
+                              widget.message.message),
+                          width: double.infinity,
+                          height: 500,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
+                        ),
                       )
-                    : Image.file(File(widget.message.message),
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover)),
+                    : GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ImagePreview(image: widget.message.message),
+                              ));
+                        },
+                        child: Image.file(File(widget.message.message),
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            height: 500,
+                            alignment: Alignment.topCenter),
+                      )),
             if (widget.showButton && widget.message.status == 0)
               GestureDetector(
                 onTap: () {

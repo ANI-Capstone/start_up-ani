@@ -96,6 +96,9 @@ class _UserViewScreenState extends State<UserViewScreen> {
   FaIcon notifNav = const FaIcon(FontAwesomeIcons.solidBell);
   FaIcon userNav = const FaIcon(FontAwesomeIcons.solidUser);
 
+  int exitApp = 0;
+  late Timer _timer;
+
   @override
   void initState() {
     super.initState();
@@ -113,12 +116,16 @@ class _UserViewScreenState extends State<UserViewScreen> {
         });
       }
     });
+
+    _timer = Timer(const Duration(seconds: 0), () {});
   }
 
   @override
   void dispose() {
     keyboardSubscription.cancel();
     super.dispose();
+
+    _timer.cancel();
   }
 
   void getUserData() async {
@@ -181,106 +188,120 @@ class _UserViewScreenState extends State<UserViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
-          color: Colors.white,
-          child: IndexedStack(index: currentIndex, children: [
-            UserFeed(
-              user: user!,
-              openBasket: (open) {
-                toggleBasket(open);
-              },
-              badgeCount: badgeCount[0],
-            ),
-            UserInbox(
-              user: user!,
-              setBadge: (int count) {
-                setMessageBadge(count);
-              },
-            ),
-            userType == 1
-                ? UserPost(user: user!)
-                : UserBasket(
-                    userData: user!,
-                    toggleBasket: (open) {
-                      toggleBasket(open);
-                    },
-                    setFeedBadge: (int count, int index) {
-                      setFeedBadge(count, index);
-                    }),
-            UserNotificaiton(
-              user: user!,
-              setBadge: (int count) {
-                setNotifBadge(count);
-              },
-            ),
-            UserProfile(
-              user: user!,
-              getUserData: () {
-                getUserData();
-              },
-            ),
-            user!.userTypeId == 1
-                ? UserStore(
-                    userData: user!,
-                    toggleBasket: (open) {
-                      toggleBasket(open);
-                    },
-                    setFeedBadge: (int count, int index) {
-                      setFeedBadge(count, index);
-                    },
-                  )
-                : UserBasket(
-                    userData: user!,
-                    toggleBasket: (open) {
-                      toggleBasket(open);
-                    },
-                    setFeedBadge: (int count, int index) {
-                      setFeedBadge(count, index);
-                    })
-          ])),
-      bottomNavigationBar: !showBottomNavigation
-          ? null
-          : Theme(
-              data: Theme.of(context)
-                  .copyWith(iconTheme: const IconThemeData(color: linkColor)),
-              child: CurvedNavigationBar(
-                color: primaryColor,
-                backgroundColor: Colors.transparent,
-                buttonBackgroundColor: Colors.transparent,
-                height: 55,
-                index: currentIndex > 4 ? 0 : currentIndex,
-                onTap: (index) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  setState(() => currentIndex = index);
+    return WillPopScope(
+      onWillPop: () async {
+        if (exitApp == 0) ShoWInfo.showToast('Try again to exit the app.', 3);
+
+        exitApp++;
+
+        if (!_timer.isActive) {
+          _timer = Timer(const Duration(seconds: 5), () async {
+            exitApp = 0;
+          });
+        }
+        return exitApp == 2;
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Container(
+            color: Colors.white,
+            child: IndexedStack(index: currentIndex, children: [
+              UserFeed(
+                user: user!,
+                openBasket: (open) {
+                  toggleBasket(open);
                 },
-                items: [
-                  homeNav,
-                  Badge(
-                    badgeContent: Text(
-                      '${badgeCount[1]}',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    showBadge: badgeCount[1] > 0,
-                    elevation: 3,
-                    position: BadgePosition.topEnd(top: -14, end: -12),
-                    child: inboxNav,
-                  ),
-                  userType == 1 ? postNav : reviewNav,
-                  Badge(
+                badgeCount: badgeCount[0],
+              ),
+              UserInbox(
+                user: user!,
+                setBadge: (int count) {
+                  setMessageBadge(count);
+                },
+              ),
+              userType == 1
+                  ? UserPost(user: user!)
+                  : UserBasket(
+                      userData: user!,
+                      toggleBasket: (open) {
+                        toggleBasket(open);
+                      },
+                      setFeedBadge: (int count, int index) {
+                        setFeedBadge(count, index);
+                      }),
+              UserNotificaiton(
+                user: user!,
+                setBadge: (int count) {
+                  setNotifBadge(count);
+                },
+              ),
+              UserProfile(
+                user: user!,
+                getUserData: () {
+                  getUserData();
+                },
+              ),
+              user!.userTypeId == 1
+                  ? UserStore(
+                      userData: user!,
+                      toggleBasket: (open) {
+                        toggleBasket(open);
+                      },
+                      setFeedBadge: (int count, int index) {
+                        setFeedBadge(count, index);
+                      },
+                    )
+                  : UserBasket(
+                      userData: user!,
+                      toggleBasket: (open) {
+                        toggleBasket(open);
+                      },
+                      setFeedBadge: (int count, int index) {
+                        setFeedBadge(count, index);
+                      })
+            ])),
+        bottomNavigationBar: !showBottomNavigation
+            ? null
+            : Theme(
+                data: Theme.of(context)
+                    .copyWith(iconTheme: const IconThemeData(color: linkColor)),
+                child: CurvedNavigationBar(
+                  color: primaryColor,
+                  backgroundColor: Colors.transparent,
+                  buttonBackgroundColor: Colors.transparent,
+                  height: 55,
+                  index: currentIndex > 4 ? 0 : currentIndex,
+                  onTap: (index) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() => currentIndex = index);
+                  },
+                  items: [
+                    homeNav,
+                    Badge(
                       badgeContent: Text(
-                        '${badgeCount[2]}',
+                        '${badgeCount[1]}',
                         style: const TextStyle(color: Colors.white),
                       ),
-                      showBadge: badgeCount[2] > 0,
+                      showBadge: badgeCount[1] > 0,
                       elevation: 3,
                       position: BadgePosition.topEnd(top: -14, end: -12),
-                      child: notifNav),
-                  userNav
-                ],
+                      child: inboxNav,
+                    ),
+                    userType == 1 ? postNav : reviewNav,
+                    Badge(
+                        badgeContent: Text(
+                          '${badgeCount[2]}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        showBadge: badgeCount[2] > 0,
+                        elevation: 3,
+                        position: BadgePosition.topEnd(top: -14, end: -12),
+                        child: notifNav),
+                    userNav
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }

@@ -63,14 +63,18 @@ class _ActiveOrdersState extends State<ActiveOrders> {
 
   Widget statusBuilder() {
     if (widget.fetchState == 2) {
-      return const Center(child: Text('Order is empty.'));
+      return SizedBox(
+          height: (MediaQuery.of(context).size.height) * 0.6,
+          child: const Center(child: Text('This tab is empty.')));
     } else if (widget.fetchState == -1) {
-      return const Center(child: Text('An error occured, please try again.'));
+      return SizedBox(
+          height: (MediaQuery.of(context).size.height) * 0.6,
+          child:
+              const Center(child: Text('An error occured, please try again.')));
     } else {
-      return const Padding(
-        padding: EdgeInsets.only(top: 30),
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return SizedBox(
+          height: (MediaQuery.of(context).size.height) * 0.6,
+          child: const Center(child: CircularProgressIndicator()));
     }
   }
 

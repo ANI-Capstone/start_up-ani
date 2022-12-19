@@ -75,6 +75,10 @@ class FirebaseStorageDb {
     return Future.wait(images.map((img) => _deleteImage(img)));
   }
 
+  static Future<String> getImageRef({required String imageUrl}) async {
+    return FirebaseStorage.instance.refFromURL(imageUrl).name;
+  }
+
   static Future _deleteImage(String imageUrl) async {
     final ref = FirebaseStorage.instance.refFromURL(imageUrl);
 
