@@ -1,6 +1,7 @@
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/api/notification_api.dart';
+import 'package:ani_capstone/screens/components/widgets/placeholders.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +26,8 @@ class _TestScreenState extends State<TestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-            child: ElevatedButton(
-      onPressed: () async {},
-      child: const Text("Test"),
-    )));
+        body: Placeholders(
+      type: 3,
+    ));
   }
 }
