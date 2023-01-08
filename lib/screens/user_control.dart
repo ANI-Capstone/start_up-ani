@@ -76,7 +76,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 4;
+  int currentIndex = 0;
   int? userType;
   UserData? user;
 

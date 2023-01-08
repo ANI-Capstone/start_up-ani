@@ -37,7 +37,6 @@ class _PostCardState extends State<PostCard> {
 
   late SharedPreferences prefs;
   Color? like = unLikeColor;
-  late String description;
 
   final selectedColor = Colors.white;
   final unSelectedColor = const Color(0xFFB5B5B5);
@@ -54,10 +53,6 @@ class _PostCardState extends State<PostCard> {
         name: widget.user.name,
         userId: widget.user.id,
         photoUrl: widget.user.photoUrl!);
-
-    description = widget.post.description.length > 85
-        ? '${widget.post.description.characters.take(85)}...'
-        : widget.post.description;
 
     setLiked();
     _timer = Timer(Duration(seconds: duration), () {});
@@ -157,20 +152,23 @@ class _PostCardState extends State<PostCard> {
             children: [
               ListTile(
                   leading: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ImagePreview(
-                                image: widget.post.publisher.photoUrl),
-                          ));
-                    },
-                    child: CircleAvatar(
-                        backgroundColor: primaryColor,
-                        radius: 22,
-                        backgroundImage: CachedNetworkImageProvider(
-                            widget.post.publisher.photoUrl)),
-                  ),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ImagePreview(
+                                  image: widget.post.publisher.photoUrl),
+                            ));
+                      },
+                      child: CircleAvatar(
+                          backgroundColor: primaryColor,
+                          radius: 22,
+                          backgroundImage: CachedNetworkImageProvider(
+                              widget.post.publisher.photoUrl,
+                              cacheKey: widget.post.publisher.userId,
+                              errorListener: () {
+                            return;
+                          }))),
                   title: Text(
                     widget.post.publisher.name,
                     style: const TextStyle(
@@ -251,7 +249,10 @@ class _PostCardState extends State<PostCard> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                            text: description,
+                            text: textButton == 'See more' &&
+                                    widget.post.description.length > 85
+                                ? '${widget.post.description.characters.take(85)}...'
+                                : widget.post.description,
                             style: const TextStyle(
                                 color: linkColor, fontSize: 13)),
                         const WidgetSpan(
@@ -266,11 +267,8 @@ class _PostCardState extends State<PostCard> {
                             onTap: () {
                               setState(() {
                                 if (textButton == 'See more') {
-                                  description = widget.post.description;
                                   textButton = 'Close';
                                 } else {
-                                  description =
-                                      '${widget.post.description.characters.take(85)}...';
                                   textButton = 'See more';
                                 }
                               });

@@ -45,13 +45,18 @@ class ProductPost {
         .delete();
   }
 
-  static Stream<List<Post>> getPosts() => FirebaseFirestore.instance
+  static Future<List<Post>> getPosts() => FirebaseFirestore.instance
       .collection('posts')
       .orderBy("postedAt", descending: true)
-      .snapshots()
-      .map((snapshot) => snapshot.docs
+      .get()
+      .then((snapshot) => snapshot.docs
           .map((doc) => Post.fromJson(doc.data(), doc.id))
           .toList());
+
+  static postStream() => FirebaseFirestore.instance
+      .collection('posts')
+      .orderBy("postedAt", descending: true)
+      .snapshots(includeMetadataChanges: false);
 
   static Future<List<Post>> getUserPosts({required String userId}) =>
       FirebaseFirestore.instance
