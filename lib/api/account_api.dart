@@ -19,4 +19,11 @@ class AccountApi {
 
     return await userRef.update({'email': newEmail});
   }
+
+  static Future<UserData> getUserData(String userId) =>
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get()
+          .then((value) => UserData.fromJson(value.data()!));
 }

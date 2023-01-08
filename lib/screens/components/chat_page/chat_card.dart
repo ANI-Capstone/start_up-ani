@@ -28,8 +28,9 @@ class ChatCard extends StatelessWidget {
             children: [
               CircleAvatar(
                   backgroundColor: primaryColor,
-                  backgroundImage:
-                      CachedNetworkImageProvider(chat.contact.photoUrl),
+                  backgroundImage: CachedNetworkImageProvider(
+                      chat.contact.photoUrl,
+                      cacheKey: chat.contact.userId),
                   radius: 28),
               Expanded(
                 child: Padding(

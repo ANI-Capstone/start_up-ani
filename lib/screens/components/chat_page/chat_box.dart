@@ -1,20 +1,20 @@
 import 'dart:async';
 
+import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/firebase_message.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/message.dart';
-import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/message_widget.dart';
 import 'package:ani_capstone/screens/components/chat_page/new_message.dart';
-import 'package:ani_capstone/screens/components/widgets/material_banner.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
 class ChatBox extends StatefulWidget {
@@ -22,9 +22,12 @@ class ChatBox extends StatefulWidget {
   UserData author;
   User receiver;
 
-  ChatBox(
-      {Key? key, required this.author, required this.receiver, this.messages})
-      : super(key: key);
+  ChatBox({
+    Key? key,
+    required this.author,
+    required this.receiver,
+    this.messages,
+  }) : super(key: key);
 
   @override
   _ChatBoxState createState() => _ChatBoxState();
@@ -44,11 +47,8 @@ class _ChatBoxState extends State<ChatBox> {
   late StreamSubscription listener;
 
   List<Message> messages = [];
-  List<Product> userBag = [];
 
   final focusNode = FocusNode();
-
-  int orderStatus = 0;
 
   @override
   void initState() {
@@ -68,6 +68,10 @@ class _ChatBoxState extends State<ChatBox> {
   void dispose() {
     super.dispose();
     listener.cancel();
+  }
+
+  void readMessage() {
+    FirebaseMessageApi.readMessage(authorId!, receiverId!, messages.last);
   }
 
   void getChatPath() async {
@@ -106,6 +110,7 @@ class _ChatBoxState extends State<ChatBox> {
           messages = data;
         });
       }
+      readMessage();
     });
   }
 
@@ -124,7 +129,6 @@ class _ChatBoxState extends State<ChatBox> {
             });
           }
         }
-        // print(change);
       }
     });
   }
@@ -204,6 +208,14 @@ class _ChatBoxState extends State<ChatBox> {
     }
   }
 
+  Future<void> _dialCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,10 +252,30 @@ class _ChatBoxState extends State<ChatBox> {
                   ),
                 ),
               ),
-              const FaIcon(
-                FontAwesomeIcons.phone,
-                color: linkColor,
-                size: 18,
+              GestureDetector(
+                onTap: () {
+                  ShoWInfo.showLoadingDialog(context,
+                      message: 'Getting contact info...');
+                  AccountApi.getUserData(widget.receiver.userId!).then((value) {
+                    Navigator.of(context).pop();
+
+                    ShoWInfo.showUpDialog(context,
+                        title: 'Dial Phone',
+                        message: "Dial this contact number ${value.phone}?",
+                        action1: "Yes",
+                        action2: "No", btn1: () {
+                      Navigator.of(context).pop();
+                      _dialCall(value.phone);
+                    }, btn2: () {
+                      Navigator.of(context).pop();
+                    });
+                  });
+                },
+                child: const FaIcon(
+                  FontAwesomeIcons.phone,
+                  color: linkColor,
+                  size: 18,
+                ),
               ),
               Transform.translate(
                 offset: const Offset(20, 0),
@@ -261,7 +293,6 @@ class _ChatBoxState extends State<ChatBox> {
       body: !isGetChatPathId
           ? const Center(child: CircularProgressIndicator())
           : Column(children: [
-              if (userBag.isNotEmpty) buildBanner(),
               Expanded(
                   child: messages.isEmpty
                       ? const SizedBox()
@@ -301,25 +332,6 @@ class _ChatBoxState extends State<ChatBox> {
               )
             ]),
     );
-  }
-
-  Widget buildBanner() {
-    if (widget.author.userTypeId == 1 && orderStatus > 0) {
-      return ConsumerBag(
-        chatPathId: chatPathId!,
-        user: widget.author,
-        userBag: userBag,
-        orderStatus: orderStatus,
-      );
-    } else if (widget.author.userTypeId != 1) {
-      return ConsumerBag(
-          chatPathId: chatPathId!,
-          user: widget.author,
-          userBag: userBag,
-          orderStatus: orderStatus);
-    } else {
-      return const SizedBox();
-    }
   }
 
   String buildDate(Message message) {

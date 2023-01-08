@@ -12,6 +12,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:search_page/search_page.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../constants.dart';
 import '../widgets/pull_refresh.dart';
@@ -114,115 +115,126 @@ class _UserInboxState extends State<UserInbox> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: userBgColor,
-      appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text('INBOX',
-              style: TextStyle(color: linkColor, fontWeight: FontWeight.bold)),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: GestureDetector(
-                onTap: () {
-                  showSearch(
-                    context: context,
-                    delegate: SearchPage<User>(
-                      barTheme: ThemeData(
-                          primarySwatch: Colors.green,
-                          primaryColor: primaryColor,
-                          fontFamily: 'Roboto',
-                          appBarTheme: const AppBarTheme(
-                              backgroundColor: primaryColor,
-                              elevation: 0,
-                              iconTheme: IconThemeData(color: linkColor))),
-                      items: users,
-                      searchLabel: 'Search user',
-                      suggestion: const Center(
-                        child: Text('Filter user by name'),
-                      ),
-                      failure: const Center(
-                        child: Text('No user found.'),
-                      ),
-                      filter: (user) => [user.name],
-                      builder: (user) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 5),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ChatBox(
-                                        receiver: user,
-                                        author: widget.user,
-                                      )),
-                            );
-                          },
-                          child: ListTile(
-                            leading: CircleAvatar(
+    return VisibilityDetector(
+      key: const Key('inbox-screen'),
+      onVisibilityChanged: (info) {
+        if ((info.visibleFraction * 100) == 100) {
+          loadChats();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: userBgColor,
+        appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: const Text('INBOX',
+                style:
+                    TextStyle(color: linkColor, fontWeight: FontWeight.bold)),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: GestureDetector(
+                  onTap: () {
+                    showSearch(
+                      context: context,
+                      delegate: SearchPage<User>(
+                        barTheme: ThemeData(
+                            primarySwatch: Colors.green,
+                            primaryColor: primaryColor,
+                            fontFamily: 'Roboto',
+                            appBarTheme: const AppBarTheme(
                                 backgroundColor: primaryColor,
-                                backgroundImage:
-                                    CachedNetworkImageProvider(user.photoUrl),
-                                radius: 24),
-                            title: Text(
-                              user.name,
-                              style: const TextStyle(
-                                  color: linkColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold),
+                                elevation: 0,
+                                iconTheme: IconThemeData(color: linkColor))),
+                        items: users,
+                        searchLabel: 'Search user',
+                        suggestion: const Center(
+                          child: Text('Filter user by name'),
+                        ),
+                        failure: const Center(
+                          child: Text('No user found.'),
+                        ),
+                        filter: (user) => [user.name],
+                        builder: (user) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 5),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ChatBox(
+                                          receiver: user,
+                                          author: widget.user,
+                                        )),
+                              );
+                            },
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                  backgroundColor: primaryColor,
+                                  backgroundImage:
+                                      CachedNetworkImageProvider(user.photoUrl),
+                                  radius: 24),
+                              title: Text(
+                                user.name,
+                                style: const TextStyle(
+                                    color: linkColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
-                child: const Icon(FontAwesomeIcons.magnifyingGlass,
-                    size: 20, color: linkColor),
-              ),
-            )
-          ],
-          backgroundColor: primaryColor,
-          elevation: 0),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                padding: const EdgeInsets.only(top: 15),
-                child: StreamBuilder<List<User>>(
-                    stream:
-                        FirebaseMessageApi.getUsers(userId: widget.user.id!),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return const Text('Something went wrong.');
-                      } else if (snapshot.hasData) {
-                        users = snapshot.data!;
-                        return SizedBox(
-                          height: 90,
-                          child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: users.map(buildUser).toList()),
-                        );
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    }),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 15, bottom: 15),
-                child: SizedBox(
-                  child: Text(
-                    'Messages',
-                    style: TextStyle(color: primaryColor),
-                  ),
+                    );
+                  },
+                  child: const Icon(FontAwesomeIcons.magnifyingGlass,
+                      size: 20, color: linkColor),
                 ),
-              ),
-              SizedBox(height: height * 0.6, child: buildList())
-            ]),
+              )
+            ],
+            backgroundColor: primaryColor,
+            elevation: 0),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: StreamBuilder<List<User>>(
+                          stream: FirebaseMessageApi.getUsers(
+                              userId: widget.user.id!),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return const Text('Something went wrong.');
+                            } else if (snapshot.hasData) {
+                              users = snapshot.data!;
+                              return SizedBox(
+                                height: 90,
+                                child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: users.map(buildUser).toList()),
+                              );
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
+                          }),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 15, bottom: 15),
+                      child: SizedBox(
+                        child: Text(
+                          'Messages',
+                          style: TextStyle(color: primaryColor),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: height * 0.6, child: buildList())
+                  ]),
+            ),
           ),
         ),
       ),

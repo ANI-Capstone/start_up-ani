@@ -35,4 +35,17 @@ class UserData {
         },
         'createdAt': Utils.fromDateTimeToJson(DateTime.now())
       };
+
+  static UserData fromJson(Map<String, dynamic> json) => UserData(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      phone: json['phone'],
+      street: json['address']['street'],
+      barangay: json['address']['barangay'],
+      city: json['address']['city'],
+      province: json['address']['province'],
+      zipcode: json['address']['zipcode'],
+      userTypeId: json['userType']['userTypeId'],
+      typeName: json['userType']['typeName']);
 }

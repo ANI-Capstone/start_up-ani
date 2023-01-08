@@ -98,7 +98,7 @@ class _EditPostState extends State<EditPost> {
           : post.description,
       publisher: post.publisher,
       name: _productName.text.isNotEmpty ? _productName.text.trim() : post.name,
-      price: _productPrice.text != '${post.price}'
+      price: _productPrice.text.isNotEmpty
           ? double.parse(_productPrice.text.trim())
           : post.price,
       unit: productUnit != post.unit ? productUnit! : post.unit,
