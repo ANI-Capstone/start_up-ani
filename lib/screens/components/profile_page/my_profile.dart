@@ -215,7 +215,7 @@ class _MyProfileState extends State<MyProfile> {
           child: Text(
               'No ${widget.user.userTypeId == 1 ? 'Posts' : 'Complete Orders'}'));
     } else if (fetchState == -1) {
-      return const Center(child: Text('An error occured, please try again.'));
+      return const Center(child: Text('An error occurred, please try again.'));
     } else {
       return const Padding(
         padding: EdgeInsets.only(top: 30),

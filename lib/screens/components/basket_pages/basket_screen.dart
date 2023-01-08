@@ -266,8 +266,8 @@ class _BasketScreenState extends State<BasketScreen> {
     } else if (fetchState == -1) {
       return SizedBox(
           height: (MediaQuery.of(context).size.height) * 0.6,
-          child:
-              const Center(child: Text('An error occured, please try again.')));
+          child: const Center(
+              child: Text('An error occurred, please try again.')));
     } else {
       return SizedBox(
           height: (MediaQuery.of(context).size.height) * 0.6,
