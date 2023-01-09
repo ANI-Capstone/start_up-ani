@@ -130,7 +130,7 @@ class UserSelect extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                    'A person who advertises and sells his/her produced goods.',
                     style: TextStyle(
                         fontSize: 12, color: textColor.withOpacity(0.5)),
                   ),
@@ -144,7 +144,7 @@ class UserSelect extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                    'A person who buys and uses up goods.',
                     style: TextStyle(
                         fontSize: 12, color: textColor.withOpacity(0.5)),
                   )

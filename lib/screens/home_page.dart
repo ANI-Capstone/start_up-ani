@@ -105,7 +105,7 @@ class OnBoardPage extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         Text(
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                            "A system which creates a direct connection between farmers and consumers, eradicating the existence of intermediary entities. This application is intended for farmers who are about to sell their produced goods and for consumers who are about to buy a farmer's produced goods, creating a vital link between both target users.",
                             style: TextStyle(
                                 color: textColor.withOpacity(0.5),
                                 fontSize: 12,
