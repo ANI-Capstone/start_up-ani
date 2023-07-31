@@ -1,6 +1,6 @@
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/screens/components/user/user_post_review.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ToRate extends StatefulWidget {
-  Order order;
+  Orders order;
   UserData user;
   ToRate({Key? key, required this.order, required this.user}) : super(key: key);
 
@@ -138,7 +138,7 @@ class _ToRateState extends State<ToRate> {
                               MaterialPageRoute(
                                 builder: (context) => UserPostReview(
                                   user: user,
-                                  order: widget.order,
+                                  orders: widget.order,
                                 ),
                               ));
                         }

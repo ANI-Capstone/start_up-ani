@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:464340532379:android:6263ee3f89c67b9c64da3e',
     messagingSenderId: '464340532379',
     projectId: 'capstone-ani',
+    databaseURL: 'https://capstone-ani-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'capstone-ani.appspot.com',
   );
 
@@ -62,7 +63,9 @@ class DefaultFirebaseOptions {
     appId: '1:464340532379:ios:f4d1de4aabc6dee164da3e',
     messagingSenderId: '464340532379',
     projectId: 'capstone-ani',
+    databaseURL: 'https://capstone-ani-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'capstone-ani.appspot.com',
+    androidClientId: '464340532379-80ss5nkh1dt7gqjr5brm41ovpl3ai9op.apps.googleusercontent.com',
     iosClientId: '464340532379-tsju9p6e93cojqdrjvg9vc2jckuhnkkj.apps.googleusercontent.com',
     iosBundleId: 'com.example.aniCapstone',
   );

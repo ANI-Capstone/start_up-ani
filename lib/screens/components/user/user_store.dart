@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/screens/components/basket_pages/active_orders.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -29,7 +29,7 @@ class _UserStoreState extends State<UserStore> {
 
   List<int> badgeCount = [0, 0, 0];
 
-  List<List<Order>> order = [[], [], []];
+  List<List<Orders>> order = [[], [], []];
 
   List<int> fetchState = [0, 0, 0];
   late StreamSubscription listener;
@@ -223,15 +223,14 @@ class _UserStoreState extends State<UserStore> {
             child: Center(
                 child: Column(
               children: [
-                Badge(
+                badges.Badge(
                     // badgeColor: badgeColor,
                     badgeContent: Text(
                       '$count',
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     showBadge: count > 0,
-                    elevation: 3,
-                    position: BadgePosition.topEnd(top: -14, end: -12),
+                    position: badges.BadgePosition.topEnd(top: -14, end: -12),
                     child: FaIcon(
                       icon,
                       size: 22,

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>464340532379-tsju9p6e93cojqdrjvg9vc2jckuhnkkj.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.464340532379-tsju9p6e93cojqdrjvg9vc2jckuhnkkj</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>464340532379-80ss5nkh1dt7gqjr5brm41ovpl3ai9op.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAjmyeuFT6_AsO07czsuzJsw-6q05DiKzc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>464340532379</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.aniCapstone</string>
+	<key>PROJECT_ID</key>
+	<string>capstone-ani</string>
+	<key>STORAGE_BUCKET</key>
+	<string>capstone-ani.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:464340532379:ios:f4d1de4aabc6dee164da3e</string>
+	<key>DATABASE_URL</key>
+	<string>https://capstone-ani-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+</dict>
+</plist>

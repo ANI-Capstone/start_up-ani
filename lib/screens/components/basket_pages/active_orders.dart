@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/basket_pages/orders_card.dart';
 import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
@@ -12,7 +12,7 @@ import 'package:ani_capstone/models/user_data.dart';
 class ActiveOrders extends StatefulWidget {
   UserData user;
   int orderStatus;
-  List<Order> order;
+  List<Orders> order;
   int fetchState;
   ActiveOrders(
       {Key? key,
@@ -78,7 +78,7 @@ class _ActiveOrdersState extends State<ActiveOrders> {
     }
   }
 
-  Widget buildProduct(Order order) {
+  Widget buildProduct(Orders order) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: order.status == 2 || order.status == 4

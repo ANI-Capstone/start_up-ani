@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:ani_capstone/api/firebase_filehost.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/review.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/models/user_data.dart';
@@ -16,8 +16,8 @@ import 'package:image_picker/image_picker.dart';
 
 class UserPostReview extends StatefulWidget {
   UserData user;
-  Order order;
-  UserPostReview({Key? key, required this.user, required this.order})
+  Orders orders;
+  UserPostReview({Key? key, required this.user, required this.orders})
       : super(key: key);
 
   @override
@@ -96,7 +96,7 @@ class _UserPostReviewState extends State<UserPostReview> {
       }
     }
 
-    for (var product in widget.order.products) {
+    for (var product in widget.orders.products) {
       final review = Review(
           reviewer: user,
           productId: product.productId,
@@ -110,13 +110,13 @@ class _UserPostReviewState extends State<UserPostReview> {
 
     ProductPost.addProductReview(
             reviews: reviews,
-            productIds: widget.order.products.map((e) => e.productId).toList(),
+            productIds: widget.orders.products.map((e) => e.productId).toList(),
             userId: user.userId!)
         .whenComplete(() {
       ProductPost.updateOrderStatus(
               orderStatus: 4,
               userTypeId: widget.user.userTypeId,
-              order: widget.order,
+              orders: widget.orders,
               rating: rating)
           .whenComplete(() {
         Navigator.of(context).pop();

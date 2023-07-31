@@ -6,7 +6,7 @@ import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';
 import 'package:ani_capstone/screens/components/widgets/pull_refresh.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -180,14 +180,14 @@ class _UserFeedState extends State<UserFeed> {
                   onTap: () {
                     widget.openBasket(true);
                   },
-                  child: Badge(
+                  child: badges.Badge(
                     badgeContent: Text(
                       '${widget.badgeCount}',
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     showBadge: widget.badgeCount > 0,
-                    elevation: 3,
-                    position: BadgePosition.topEnd(top: -13, end: -11),
+          
+                    position: badges.BadgePosition.topEnd(top: -13, end: -11),
                     child: user.userTypeId == 1
                         ? const Icon(FontAwesomeIcons.store,
                             size: 22, color: linkColor)

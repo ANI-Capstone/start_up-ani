@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 
-class Order {
+class Orders {
   String? orderId;
   User publisher;
   User costumer;
@@ -12,7 +10,7 @@ class Order {
   int status;
   double? rating;
 
-  Order(
+  Orders(
       {required this.publisher,
       required this.costumer,
       required this.products,
@@ -21,7 +19,7 @@ class Order {
       this.orderId,
       this.rating});
 
-  static Order fromJson(Map<String, dynamic> json, String orderId) => Order(
+  static Orders fromJson(Map<String, dynamic> json, String orderId) => Orders(
       orderId: orderId,
       publisher: User.fromJson(json['publisher']),
       costumer: User.fromJson(json['costumer']),

@@ -11,7 +11,7 @@ import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/components/user/user_store.dart';
 import 'package:ani_capstone/screens/user_type_select.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -277,25 +277,25 @@ class _UserViewScreenState extends State<UserViewScreen> {
                   },
                   items: [
                     homeNav,
-                    Badge(
+                    badges.Badge(
                       badgeContent: Text(
                         '${badgeCount[1]}',
                         style: const TextStyle(color: Colors.white),
                       ),
                       showBadge: badgeCount[1] > 0,
-                      elevation: 3,
-                      position: BadgePosition.topEnd(top: -14, end: -12),
+       
+                      position: badges.BadgePosition.topEnd(top: -14, end: -12),
                       child: inboxNav,
                     ),
                     userType == 1 ? postNav : reviewNav,
-                    Badge(
+                    badges.Badge(
                         badgeContent: Text(
                           '${badgeCount[2]}',
                           style: const TextStyle(color: Colors.white),
                         ),
                         showBadge: badgeCount[2] > 0,
-                        elevation: 3,
-                        position: BadgePosition.topEnd(top: -14, end: -12),
+               
+                        position: badges.BadgePosition.topEnd(top: -14, end: -12),
                         child: notifNav),
                     userNav
                   ],

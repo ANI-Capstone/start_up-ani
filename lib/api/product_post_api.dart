@@ -1,5 +1,5 @@
 import 'package:ani_capstone/api/notification_api.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/review.dart';
@@ -187,7 +187,7 @@ class ProductPost {
         .snapshots(includeMetadataChanges: false);
   }
 
-  static Future<List<Order>> getOrders(
+  static Future<List<Orders>> getOrders(
       {required String userId, required int userType}) {
     final id = userType == 1 ? 'publisher.id' : 'costumer.id';
 
@@ -196,18 +196,18 @@ class ProductPost {
         .where(id, isEqualTo: userId)
         .get()
         .then((snapshot) => snapshot.docs
-            .map((doc) => Order.fromJson(doc.data(), doc.id))
+            .map((doc) => Orders.fromJson(doc.data(), doc.id))
             .toList());
   }
 
-  static Future<List<Order>> getUserOrders({required String userId}) {
+  static Future<List<Orders>> getUserOrders({required String userId}) {
     return FirebaseFirestore.instance
         .collection('orders')
         .where('costumer.id', isEqualTo: userId)
         .where('status', isGreaterThanOrEqualTo: 3)
         .get()
         .then((snapshot) => snapshot.docs
-            .map((doc) => Order.fromJson(doc.data(), doc.id))
+            .map((doc) => Orders.fromJson(doc.data(), doc.id))
             .toList());
   }
 
@@ -226,10 +226,10 @@ class ProductPost {
   static Future updateOrderStatus(
       {required int orderStatus,
       required int userTypeId,
-      required Order order,
+      required Orders orders,
       double? rating}) async {
     final orderRef =
-        FirebaseFirestore.instance.collection('orders').doc(order.orderId!);
+        FirebaseFirestore.instance.collection('orders').doc(orders.orderId!);
 
     final List<int> notifStatus = [3, 4, 5, 6];
 
@@ -240,17 +240,17 @@ class ProductPost {
     await orderRef.update(update).whenComplete(() {
       if (userTypeId == 1) {
         NotificationApi.addNotification(
-            notifTo: order.costumer.userId!,
-            notifFrom: order.publisher,
-            title: order.publisher.name,
+            notifTo: orders.costumer.userId!,
+            notifFrom: orders.publisher,
+            title: orders.publisher.name,
             body: '',
             payload: orderRef.id,
             notifType: notifStatus[orderStatus - 1]);
       } else {
         NotificationApi.addNotification(
-            notifTo: order.publisher.userId!,
-            notifFrom: order.costumer,
-            title: order.publisher.name,
+            notifTo: orders.publisher.userId!,
+            notifFrom: orders.costumer,
+            title: orders.publisher.name,
             body: '',
             payload: orderRef.id,
             notifType: notifStatus[orderStatus - 1]);
@@ -265,7 +265,7 @@ class ProductPost {
       required int totalPrice}) async {
     final orderRef = FirebaseFirestore.instance.collection('orders').doc();
 
-    final order = Order(
+    final orders = Orders(
             publisher: publisher,
             costumer: costumer,
             products: products,
@@ -273,7 +273,7 @@ class ProductPost {
             status: 0)
         .toJson();
 
-    return await orderRef.set(order).whenComplete(() =>
+    return await orderRef.set(orders).whenComplete(() =>
         NotificationApi.addNotification(
             notifTo: publisher.userId!,
             notifFrom: costumer,

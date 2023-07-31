@@ -1,5 +1,5 @@
 import 'package:ani_capstone/api/product_post_api.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
@@ -23,7 +23,7 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   int fetchState = 0;
 
-  List<Order> orders = [];
+  List<Orders> orders = [];
   List<Post> posts = [];
 
   @override

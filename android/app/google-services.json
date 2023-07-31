@@ -1,0 +1,79 @@
+{
+  "project_info": {
+    "project_number": "464340532379",
+    "firebase_url": "https://capstone-ani-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "capstone-ani",
+    "storage_bucket": "capstone-ani.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464340532379:android:6263ee3f89c67b9c64da3e",
+        "android_client_info": {
+          "package_name": "com.capstone.ani_capstone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464340532379-80ss5nkh1dt7gqjr5brm41ovpl3ai9op.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.ani_capstone",
+            "certificate_hash": "bafc7cf8452d6cc49c0ac9310662deaf8c2b474a"
+          }
+        },
+        {
+          "client_id": "464340532379-9fb4c94tm6hljvg04cesduif26aihoeq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.ani_capstone",
+            "certificate_hash": "6860e516057c78a51cc44969e7483cca2327bb4a"
+          }
+        },
+        {
+          "client_id": "464340532379-f56505k4cgkrbn3rdflg4dreir9658k2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.ani_capstone",
+            "certificate_hash": "a923ab31ef92d3dee626548db5d92c04af4cceb5"
+          }
+        },
+        {
+          "client_id": "464340532379-g67nftu0haij5ng1f99piiqt1igij5im.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.ani_capstone",
+            "certificate_hash": "11aa6604b9741eb5931e2af34392a2bdb408191b"
+          }
+        },
+        {
+          "client_id": "464340532379-5kjhkvjrr9gmnoghpjmjqb3u2d8leia6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDkIWAWj1HqLCkwIUogSUHn0BCnS4OXDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464340532379-5kjhkvjrr9gmnoghpjmjqb3u2d8leia6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "464340532379-tsju9p6e93cojqdrjvg9vc2jckuhnkkj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.aniCapstone"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

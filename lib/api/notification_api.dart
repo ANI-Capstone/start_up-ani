@@ -17,21 +17,14 @@ class NotificationApi {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('ic_launcher');
 
-    final IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings(
-            requestSoundPermission: true,
-            requestBadgePermission: true,
-            requestAlertPermission: true,
-            onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+   
 
     final InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
     );
 
-    await _localNotifications.initialize(initializationSettings,
-        onSelectNotification: selectNotification);
+    await _localNotifications.initialize(initializationSettings);
   }
 
   void onDidReceiveLocalNotification(
@@ -51,11 +44,6 @@ class NotificationApi {
             playSound: true,
             styleInformation: DefaultStyleInformation(true, true));
 
-    IOSNotificationDetails iosNotificationDetails =
-        const IOSNotificationDetails(
-      threadIdentifier: "thread1",
-    );
-
     // final details = await _localNotifications.getNotificationAppLaunchDetails();
     // if (details != null && details.didNotificationLaunchApp) {
     //   try {
@@ -65,7 +53,7 @@ class NotificationApi {
     //   }
     // }
     NotificationDetails platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics, iOS: iosNotificationDetails);
+        android: androidPlatformChannelSpecifics);
 
     return platformChannelSpecifics;
   }

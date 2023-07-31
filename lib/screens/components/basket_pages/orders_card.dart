@@ -2,7 +2,7 @@ import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/notification_api.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_box.dart';
@@ -12,7 +12,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class OrdersCard extends StatefulWidget {
-  Order order;
+  Orders order;
   UserData user;
   OrdersCard({Key? key, required this.order, required this.user})
       : super(key: key);
@@ -155,7 +155,7 @@ class _OrdersCardState extends State<OrdersCard> {
                     action1: 'Yes',
                     btn1: () {
                       ProductPost.updateOrderStatus(
-                              order: widget.order,
+                              orders: widget.order,
                               orderStatus: 1,
                               userTypeId: user.userTypeId)
                           .whenComplete(() => ShoWInfo.showToast(
@@ -190,7 +190,7 @@ class _OrdersCardState extends State<OrdersCard> {
                     action1: 'Yes',
                     btn1: () {
                       ProductPost.updateOrderStatus(
-                              order: widget.order,
+                              orders: widget.order,
                               orderStatus: 3,
                               userTypeId: user.userTypeId)
                           .whenComplete(() =>
@@ -225,7 +225,7 @@ class _OrdersCardState extends State<OrdersCard> {
                 ProductPost.updateOrderStatus(
                         orderStatus: 2,
                         userTypeId: widget.user.userTypeId,
-                        order: widget.order)
+                        orders: widget.order)
                     .whenComplete(
                         () => ShoWInfo.showToast('Order has been sold.', 3));
               },

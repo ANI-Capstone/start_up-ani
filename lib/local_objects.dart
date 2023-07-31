@@ -1,17 +1,17 @@
-import 'package:ani_capstone/models/order.dart';
+import 'package:ani_capstone/models/orders.dart';
 
 class Local {
-  static List<Order> _orders = [];
+  static List<Orders> _orders = [];
 
-  static setOrders(List<Order> orders) {
+  static setOrders(List<Orders> orders) {
     _orders = orders;
   }
 
-  static addOrder(Order order) {
+  static addOrder(Orders order) {
     _orders.add(order);
   }
 
-  static List<Order> getOders() {
+  static List<Orders> getOders() {
     return _orders;
   }
 }
