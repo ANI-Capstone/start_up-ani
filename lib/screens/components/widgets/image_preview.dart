@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:ani_capstone/api/firebase_filehost.dart';
-import 'package:ani_capstone/constants.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:ani_capstone/api/firebase_filehost.dart';
+// import 'package:ani_capstone/constants.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:photo_view/photo_view.dart';
@@ -35,8 +35,8 @@ class ImagePreview extends StatelessWidget {
           height: MediaQuery.of(context).size.height - 120,
           child: PhotoView(
             imageProvider: image.contains('https://')
-                ? Image(
-                    image: CachedNetworkImageProvider(image),
+                ? Image.network(
+                    image,
                     fit: BoxFit.cover,
                     filterQuality: FilterQuality.high,
                   ).image

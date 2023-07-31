@@ -30,8 +30,8 @@ class _NotificationCardState extends State<NotificationCard> {
           leading: CircleAvatar(
               radius: 22,
               backgroundColor: primaryColor,
-              backgroundImage: CachedNetworkImageProvider(
-                  widget.notif.participant.photoUrl)),
+              backgroundImage: Image.network(
+                  widget.notif.participant.photoUrl).image),
           title: RichText(
             text: TextSpan(
               children: [

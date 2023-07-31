@@ -163,7 +163,7 @@ class _UserPostReviewState extends State<UserPostReview> {
                             radius: 22,
                             backgroundColor: Colors.white,
                             backgroundImage:
-                                CachedNetworkImageProvider(user.photoUrl)),
+                                Image.network(user.photoUrl).image),
                         const SizedBox(width: 10),
                         Text(
                           user.name,

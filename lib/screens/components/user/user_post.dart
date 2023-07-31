@@ -95,7 +95,7 @@ class _UserPostState extends State<UserPost> {
                       radius: 22,
                       backgroundColor: primaryColor,
                       backgroundImage:
-                          CachedNetworkImageProvider(user?.photoUrl as String)),
+                          Image.network(user?.photoUrl as String).image),
                   const SizedBox(width: 10),
                   Text(
                     user?.name as String,

@@ -289,7 +289,7 @@ class _UserInboxState extends State<UserInbox> {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: primaryColor,
-                backgroundImage: CachedNetworkImageProvider(user.photoUrl),
+                backgroundImage:Image.network(user.photoUrl).image,
               ),
               const SizedBox(height: 5),
               Text(
