@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "464340532379-810bs856assq6ei00gsi22kgbb1hu8sc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capstone.ani_capstone",
+            "certificate_hash": "d5efb329cd7f614f2b3b46ad4da3f7fa4b6d98bc"
+          }
+        },
+        {
           "client_id": "464340532379-9fb4c94tm6hljvg04cesduif26aihoeq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

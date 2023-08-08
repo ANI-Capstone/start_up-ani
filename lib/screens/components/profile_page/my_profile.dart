@@ -116,8 +116,8 @@ class _MyProfileState extends State<MyProfile> {
                             CircleAvatar(
                               radius: 22,
                               backgroundColor: primaryColor,
-                              backgroundImage: CachedNetworkImageProvider(
-                                  widget.user.photoUrl!),
+                              backgroundImage: Image.network(
+                                  widget.user.photoUrl!).image,
                             ),
                             const SizedBox(width: 20),
                             Text(

@@ -163,12 +163,9 @@ class _PostCardState extends State<PostCard> {
                       child: CircleAvatar(
                           backgroundColor: primaryColor,
                           radius: 22,
-                          backgroundImage: CachedNetworkImageProvider(
-                              widget.post.publisher.photoUrl,
-                              cacheKey: widget.post.publisher.userId,
-                              errorListener: () {
-                            return;
-                          }))),
+                          backgroundImage: Image.network(
+                              widget.post.publisher.photoUrl
+                             ).image)),
                   title: Text(
                     widget.post.publisher.name,
                     style: const TextStyle(
@@ -313,7 +310,7 @@ class _PostCardState extends State<PostCard> {
                                         ));
                                   },
                                   child: Image(
-                                      image: CachedNetworkImageProvider(item),
+                                      image: Image.network(item).image,
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: 150),

@@ -102,9 +102,9 @@ class ProfileManagement extends StatelessWidget {
       ),
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          child: Column(children: [
-            SingleChildScrollView(
-              child: Column(
+          child: SingleChildScrollView(
+            child: Column(children: [
+              Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
@@ -126,8 +126,8 @@ class ProfileManagement extends StatelessWidget {
                                 child: CircleAvatar(
                                     radius: 58,
                                     backgroundColor: primaryColor,
-                                    backgroundImage: CachedNetworkImageProvider(
-                                        user.photoUrl!)),
+                                    backgroundImage: Image.network(
+                                        user.photoUrl!).image),
                               ),
                             ),
                           ),
@@ -205,14 +205,14 @@ class ProfileManagement extends StatelessWidget {
                       ),
                     )
                   ]),
-            ),
-            const SizedBox(height: 5),
-            buildAdress(label: 'Street', value: user.street),
-            buildAdress(label: 'Barangay', value: user.barangay),
-            buildAdress(label: 'Municipality/City', value: user.city),
-            buildAdress(label: 'Province', value: user.province),
-            buildAdress(label: 'Zip Code', value: '${user.zipcode}'),
-          ])),
+              const SizedBox(height: 5),
+              buildAdress(label: 'Street', value: user.street),
+              buildAdress(label: 'Barangay', value: user.barangay),
+              buildAdress(label: 'Municipality/City', value: user.city),
+              buildAdress(label: 'Province', value: user.province),
+              buildAdress(label: 'Zip Code', value: '${user.zipcode}'),
+            ]),
+          )),
     );
   }
 
