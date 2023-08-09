@@ -5,7 +5,9 @@ import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';
+import 'package:ani_capstone/screens/components/widgets/image_handler.dart';
 import 'package:ani_capstone/screens/components/widgets/pull_refresh.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -82,6 +84,9 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
+    final double itemHeight = 210;
+    final double itemWidth = size.width / 2;
+
     return Scaffold(
       backgroundColor: userBgColor,
       appBar: AppBar(
@@ -115,8 +120,8 @@ class _MyProfileState extends State<MyProfile> {
                             CircleAvatar(
                               radius: 22,
                               backgroundColor: primaryColor,
-                              backgroundImage: Image.network(
-                                  widget.user.photoUrl!).image,
+                              backgroundImage:
+                                  Image.network(widget.user.photoUrl!).image,
                             ),
                             const SizedBox(width: 20),
                             Text(
@@ -138,17 +143,44 @@ class _MyProfileState extends State<MyProfile> {
                         ])),
               ),
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: (defaultPadding - 10)),
-                child: Text(
-                  widget.user.userTypeId == 1 ? 'My Posts' : 'Complete Orders',
-                  style: TextStyle(
-                      color: textColor.withOpacity(0.3),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
+              widget.user.userTypeId == 1
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: (defaultPadding - 10)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'My Posts',
+                            style: TextStyle(
+                                color: textColor.withOpacity(0.3),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Text(
+                              'Edit Products',
+                              style: TextStyle(
+                                color: linkColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: (defaultPadding - 10)),
+                      child: Text(
+                        'Complete Orders',
+                        style: TextStyle(
+                            color: textColor.withOpacity(0.3),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
               const SizedBox(height: 10),
               fetchState == 1
                   ? widget.user.userTypeId == 1
@@ -159,24 +191,17 @@ class _MyProfileState extends State<MyProfile> {
                             width: double.infinity,
                             child: RefreshWidget(
                               onRefresh: fetchData,
-                              child: ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  physics: const BouncingScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: posts.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5),
-                                      child: PostCard(
-                                        post: posts[index],
-                                        user: widget.user,
-                                        fetchData: () {
-                                          fetchData();
-                                        },
-                                      ),
-                                    );
-                                  }),
+                              child: GridView.count(
+                                primary: false,
+                                padding: const EdgeInsets.all(10),
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                crossAxisCount: 2,
+                                childAspectRatio: (itemWidth / itemHeight),
+                                children: posts
+                                    .map((post) => buildProduct(post))
+                                    .toList(),
+                              ),
                             ),
                           ),
                         )
@@ -201,6 +226,57 @@ class _MyProfileState extends State<MyProfile> {
                           ),
                         )
                   : statusBuilder()
+              // fetchState == 1
+              //     ? widget.user.userTypeId == 1
+              //         ? Padding(
+              //             padding: const EdgeInsets.symmetric(horizontal: 10),
+              //             child: SizedBox(
+              //               height: size.height * 0.65,
+              //               width: double.infinity,
+              //               child: RefreshWidget(
+              //                 onRefresh: fetchData,
+              //                 child: ListView.builder(
+              //                     scrollDirection: Axis.vertical,
+              //                     physics: const BouncingScrollPhysics(),
+              //                     shrinkWrap: true,
+              //                     itemCount: posts.length,
+              //                     itemBuilder: (context, index) {
+              //                       return Padding(
+              //                         padding: const EdgeInsets.symmetric(
+              //                             vertical: 5),
+              //                         child: PostCard(
+              //                           post: posts[index],
+              //                           user: widget.user,
+              //                           fetchData: () {
+              //                             fetchData();
+              //                           },
+              //                         ),
+              //                       );
+              //                     }),
+              //               ),
+              //             ),
+              //           )
+              //         : Padding(
+              //             padding: const EdgeInsets.symmetric(horizontal: 10),
+              //             child: SizedBox(
+              //               height: size.height * 0.65,
+              //               child: ListView.builder(
+              //                   scrollDirection: Axis.vertical,
+              //                   physics: const BouncingScrollPhysics(),
+              //                   shrinkWrap: true,
+              //                   itemCount: orders.length,
+              //                   itemBuilder: (context, index) {
+              //                     return Padding(
+              //                       padding:
+              //                           const EdgeInsets.symmetric(vertical: 5),
+              //                       child: ToRate(
+              //                           order: orders[index],
+              //                           user: widget.user),
+              //                     );
+              //                   }),
+              //             ),
+              //           )
+              //     : statusBuilder()
             ],
           ),
         ),
@@ -221,5 +297,66 @@ class _MyProfileState extends State<MyProfile> {
         child: Center(child: CircularProgressIndicator()),
       );
     }
+  }
+
+  Widget buildProduct(Post post) {
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(5),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(5)),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+                child: SizedBox(
+                  height: 120,
+                  child: ImageHandler(
+                    image: post.images[0],
+                    imageType: ImageHandler.postImage,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                  text: TextSpan(
+                    children: [
+                      const WidgetSpan(
+                        child: FaIcon(
+                          FontAwesomeIcons.tags,
+                          color: linkColor,
+                          size: 16,
+                        ),
+                      ),
+                      const WidgetSpan(
+                        child: SizedBox(width: 5),
+                      ),
+                      TextSpan(
+                          text: post.name,
+                          style: const TextStyle(
+                              color: linkColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 5),
+                    Text('P${post.price} / Kilogram', style: const TextStyle(fontSize: 13, color: linkColor),)
+                  ],
+                ),
+              )
+            ]),
+      ),
+    );
   }
 }

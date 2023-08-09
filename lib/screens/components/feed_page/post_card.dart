@@ -7,6 +7,7 @@ import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/feed_page/edit_post.dart';
 import 'package:ani_capstone/screens/components/review_page/review_screen.dart';
+import 'package:ani_capstone/screens/components/widgets/image_handler.dart';
 import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -159,12 +160,7 @@ class _PostCardState extends State<PostCard> {
                                   image: widget.post.publisher.photoUrl),
                             ));
                       },
-                      child: CircleAvatar(
-                          backgroundColor: primaryColor,
-                          radius: 22,
-                          backgroundImage: Image.network(
-                              widget.post.publisher.photoUrl
-                             ).image)),
+                      child: ImageHandler(image: widget.post.publisher.photoUrl, imageType: ImageHandler.userProfile)),
                   title: Text(
                     widget.post.publisher.name,
                     style: const TextStyle(
@@ -308,11 +304,7 @@ class _PostCardState extends State<PostCard> {
                                               ImagePreview(image: item),
                                         ));
                                   },
-                                  child: Image(
-                                      image: Image.network(item).image,
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: 150),
+                                  child: ImageHandler(image: item, imageType: ImageHandler.postImage),
                                 ))
                             .toList(),
                       ),
