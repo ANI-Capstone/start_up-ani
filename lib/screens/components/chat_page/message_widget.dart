@@ -6,7 +6,6 @@ import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/reply_widget.dart';
 import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -89,7 +88,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                 radius: 20,
                 backgroundColor: primaryColor,
                 backgroundImage:
-                    CachedNetworkImageProvider(widget.message.urlAvatar)),
+                   NetworkImage(widget.message.urlAvatar)),
           ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -164,7 +163,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                               ));
                         },
                         child: Image(
-                          image: CachedNetworkImageProvider(
+                          image: NetworkImage(
                               widget.message.message),
                           width: double.infinity,
                           height: 500,

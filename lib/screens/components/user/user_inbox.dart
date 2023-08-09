@@ -8,7 +8,6 @@ import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_box.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_card.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:search_page/search_page.dart';
@@ -172,7 +171,7 @@ class _UserInboxState extends State<UserInbox> {
                               leading: CircleAvatar(
                                   backgroundColor: primaryColor,
                                   backgroundImage:
-                                      CachedNetworkImageProvider(user.photoUrl),
+                                      NetworkImage(user.photoUrl),
                                   radius: 24),
                               title: Text(
                                 user.name,

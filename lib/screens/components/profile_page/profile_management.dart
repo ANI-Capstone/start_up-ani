@@ -2,7 +2,6 @@ import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/components/profile_page/edit_profile.dart';
 import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

@@ -6,7 +6,6 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -106,8 +105,8 @@ class _BasketCardState extends State<BasketCard> {
                 leading: CircleAvatar(
                     radius: 18,
                     backgroundColor: primaryColor,
-                    backgroundImage: CachedNetworkImageProvider(
-                        widget.products[0].post!.publisher.photoUrl)),
+                    backgroundImage: Image.network(
+                        widget.products[0].post!.publisher.photoUrl).image),
                 title: Text(
                   widget.products[0].post!.publisher.name,
                   style: const TextStyle(
@@ -278,15 +277,12 @@ class _BasketCardState extends State<BasketCard> {
         ),
         ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(5)),
-          child: CachedNetworkImage(
+          child: Image.network(
+            product.post!.images[0],
             width: 32,
             height: 32,
             fit: BoxFit.cover,
-            imageUrl: product.post!.images[0],
-            placeholder: (context, url) => Container(
-              decoration: const BoxDecoration(color: primaryColor),
-            ),
-            errorWidget: (context, url, error) =>
+            errorBuilder: (context, url, error) =>
                 const Icon(Icons.error, size: 12, color: linkColor),
           ),
         ),

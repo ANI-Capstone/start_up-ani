@@ -6,7 +6,6 @@ import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/chat_box.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -51,7 +50,7 @@ class _OrdersCardState extends State<OrdersCard> {
                   dense: true,
                   leading: CircleAvatar(
                       radius: 18,
-                      backgroundImage: CachedNetworkImageProvider(
+                      backgroundImage:NetworkImage(
                           widget.user.userTypeId == 1
                               ? widget.order.costumer.photoUrl
                               : widget.order.publisher.photoUrl)),
@@ -342,15 +341,13 @@ class _OrdersCardState extends State<OrdersCard> {
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.all(Radius.circular(5)),
-            child: CachedNetworkImage(
+            child: Image.network(
+              product.post!.images[0],
               width: 32,
               height: 32,
               fit: BoxFit.cover,
-              imageUrl: product.post!.images[0],
-              placeholder: (context, url) => Container(
-                decoration: const BoxDecoration(color: primaryColor),
-              ),
-              errorWidget: (context, url, error) =>
+             
+              errorBuilder: (context, url, error) =>
                   const Icon(Icons.error, size: 12, color: linkColor),
             ),
           ),

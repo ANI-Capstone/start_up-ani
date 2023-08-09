@@ -8,7 +8,6 @@ import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/chat_page/message_widget.dart';
 import 'package:ani_capstone/screens/components/chat_page/new_message.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -238,7 +237,7 @@ class _ChatBoxState extends State<ChatBox> {
                   radius: 20,
                   backgroundColor: primaryColor,
                   backgroundImage:
-                      CachedNetworkImageProvider(receiver!.photoUrl)),
+                      NetworkImage(receiver!.photoUrl)),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),

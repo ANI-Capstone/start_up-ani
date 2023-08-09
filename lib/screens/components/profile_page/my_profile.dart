@@ -6,7 +6,6 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';
 import 'package:ani_capstone/screens/components/widgets/pull_refresh.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

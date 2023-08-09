@@ -71,7 +71,6 @@ dependencies:
   permission_handler: ^10.1.0
   carousel_slider: ^4.1.1
   grouped_list: ^5.1.2
-  cached_network_image: ^3.2.1
   hidden_drawer_menu: ^3.0.1
   visibility_detector: ^0.4.0+2
   photo_view: ^0.14.0

@@ -2,7 +2,6 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/chat.dart';
 import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -28,9 +27,9 @@ class ChatCard extends StatelessWidget {
             children: [
               CircleAvatar(
                   backgroundColor: primaryColor,
-                  backgroundImage: CachedNetworkImageProvider(
+                  backgroundImage: NetworkImage(
                       chat.contact.photoUrl,
-                      cacheKey: chat.contact.userId),
+                     ),
                   radius: 28),
               Expanded(
                 child: Padding(

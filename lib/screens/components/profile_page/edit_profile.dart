@@ -4,7 +4,6 @@ import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/api/firebase_filehost.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -278,7 +277,7 @@ class _EditProfileState extends State<EditProfile> {
                           backgroundColor: primaryColor,
                           backgroundImage: updatePic
                               ? Image.file(pickedImage!).image
-                              : CachedNetworkImageProvider(
+                              : NetworkImage(
                                   widget.user.photoUrl!)),
                     ),
                   ),

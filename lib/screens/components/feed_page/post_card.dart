@@ -8,7 +8,6 @@ import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/feed_page/edit_post.dart';
 import 'package:ani_capstone/screens/components/review_page/review_screen.dart';
 import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

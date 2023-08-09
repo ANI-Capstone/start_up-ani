@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:ani_capstone/api/firebase_filehost.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -192,7 +191,7 @@ class _EditPostState extends State<EditPost> {
                       radius: 22,
                       backgroundColor: primaryColor,
                       backgroundImage:
-                          CachedNetworkImageProvider(post.publisher.photoUrl)),
+                          NetworkImage(post.publisher.photoUrl)),
                   const SizedBox(width: 10),
                   Text(
                     post.publisher.name,

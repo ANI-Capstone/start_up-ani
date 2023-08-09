@@ -1,7 +1,6 @@
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/review.dart';
 import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
@@ -29,7 +28,7 @@ class _ReviewCardState extends State<ReviewCard> {
                 leading: CircleAvatar(
                     radius: 20,
                     backgroundColor: primaryColor,
-                    backgroundImage: CachedNetworkImageProvider(
+                    backgroundImage: NetworkImage(
                         widget.review.reviewer.photoUrl)),
                 title: Text(
                   widget.review.reviewer.name,
@@ -89,15 +88,12 @@ class _ReviewCardState extends State<ReviewCard> {
                         child: ClipRRect(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(5)),
-                          child: CachedNetworkImage(
+                          child: Image.network(
+                            widget.review.photos![index],
                             width: 80,
                             fit: BoxFit.cover,
-                            imageUrl: widget.review.photos![index],
-                            placeholder: (context, url) => Container(
-                              decoration:
-                                  const BoxDecoration(color: primaryColor),
-                            ),
-                            errorWidget: (context, url, error) => const Icon(
+                         
+                            errorBuilder: (context, url, error) => const Icon(
                                 Icons.error,
                                 size: 12,
                                 color: linkColor),
