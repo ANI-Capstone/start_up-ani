@@ -125,6 +125,7 @@ class _UserStoreState extends State<UserStore> {
         }
       }
     }).onError((error, stackTrace) {
+      print(stackTrace);
       for (int i = 0; i < order.length; i++) {
         if (mounted) {
           setState(() {

@@ -76,7 +76,7 @@ class UserViewScreen extends StatefulWidget {
 }
 
 class _UserViewScreenState extends State<UserViewScreen> {
-  int currentIndex = 4;
+  int currentIndex = 0;
   int? userType;
   UserData? user;
 
@@ -283,7 +283,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
                         style: const TextStyle(color: Colors.white),
                       ),
                       showBadge: badgeCount[1] > 0,
-       
                       position: badges.BadgePosition.topEnd(top: -14, end: -12),
                       child: inboxNav,
                     ),
@@ -294,8 +293,8 @@ class _UserViewScreenState extends State<UserViewScreen> {
                           style: const TextStyle(color: Colors.white),
                         ),
                         showBadge: badgeCount[2] > 0,
-               
-                        position: badges.BadgePosition.topEnd(top: -14, end: -12),
+                        position:
+                            badges.BadgePosition.topEnd(top: -14, end: -12),
                         child: notifNav),
                     userNav
                   ],

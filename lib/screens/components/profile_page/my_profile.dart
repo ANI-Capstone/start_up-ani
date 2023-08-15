@@ -7,9 +7,13 @@ import 'package:ani_capstone/screens/components/basket_pages/to_rate.dart';
 import 'package:ani_capstone/screens/components/feed_page/post_card.dart';
 import 'package:ani_capstone/screens/components/widgets/image_handler.dart';
 import 'package:ani_capstone/screens/components/widgets/pull_refresh.dart';
+import 'package:ani_capstone/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../widgets/image_preview.dart';
 
 class MyProfile extends StatefulWidget {
   UserData user;
@@ -108,39 +112,67 @@ class _MyProfileState extends State<MyProfile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: (defaultPadding - 10)),
-                child: SizedBox(
-                    width: size.width,
-                    height: 70,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(children: [
-                            CircleAvatar(
-                              radius: 22,
-                              backgroundColor: primaryColor,
-                              backgroundImage:
-                                  Image.network(widget.user.photoUrl!).image,
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                child: ListTile(
+                    titleAlignment: ListTileTitleAlignment.center,
+                    leading: SizedBox(
+                      height: double.infinity,
+                      child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ImagePreview(
+                                      image: widget.user.photoUrl!),
+                                ));
+                          },
+                          child: CircleAvatar(
+                            radius: 24,
+                            backgroundColor: primaryColor,
+                            backgroundImage:
+                                Image.network(widget.user.photoUrl!).image,
+                          )),
+                    ),
+                    title: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.user.name,
+                          style: const TextStyle(
+                              color: linkColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        if (widget.user.userTypeId == 1 && fetchState == 1)
+                          RatingBar.builder(
+                            initialRating: Utils.computeRating(posts),
+                            allowHalfRating: true,
+                            ignoreGestures: true,
+                            direction: Axis.horizontal,
+                            itemCount: 5,
+                            unratedColor: primaryColor.withOpacity(0.7),
+                            itemPadding:
+                                const EdgeInsets.symmetric(vertical: 2),
+                            itemBuilder: (context, _) => const Icon(
+                              Icons.star,
+                              color: Colors.amber,
                             ),
-                            const SizedBox(width: 20),
-                            Text(
-                              widget.user.name,
-                              style: const TextStyle(
-                                  color: linkColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          ]),
-                          SizedBox(
-                              width: 24,
-                              child: IconButton(
-                                  onPressed: () {
-                                    widget.toggleDrawer();
-                                  },
-                                  icon: const Icon(FontAwesomeIcons.bars,
-                                      size: 20, color: linkColor))),
-                        ])),
+                            itemSize: 16,
+                            onRatingUpdate: (rating) {
+                              null;
+                            },
+                          )
+                      ],
+                    ),
+                    trailing: SizedBox(
+                        width: 24,
+                        child: IconButton(
+                            onPressed: () {
+                              widget.toggleDrawer();
+                            },
+                            icon: const Icon(FontAwesomeIcons.bars,
+                                size: 20, color: linkColor)))),
               ),
               const SizedBox(height: 10),
               widget.user.userTypeId == 1
@@ -329,29 +361,32 @@ class _MyProfileState extends State<MyProfile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     RichText(
-                  text: TextSpan(
-                    children: [
-                      const WidgetSpan(
-                        child: FaIcon(
-                          FontAwesomeIcons.tags,
-                          color: linkColor,
-                          size: 16,
-                        ),
-                      ),
-                      const WidgetSpan(
-                        child: SizedBox(width: 5),
-                      ),
-                      TextSpan(
-                          text: post.name,
-                          style: const TextStyle(
+                      text: TextSpan(
+                        children: [
+                          const WidgetSpan(
+                            child: FaIcon(
+                              FontAwesomeIcons.tags,
                               color: linkColor,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                    Text('P${post.price} / Kilogram', style: const TextStyle(fontSize: 13, color: linkColor),)
+                              size: 16,
+                            ),
+                          ),
+                          const WidgetSpan(
+                            child: SizedBox(width: 5),
+                          ),
+                          TextSpan(
+                              text: post.name,
+                              style: const TextStyle(
+                                  color: linkColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'P${post.price} / Kilogram',
+                      style: const TextStyle(fontSize: 13, color: linkColor),
+                    )
                   ],
                 ),
               )

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:ani_capstone/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'models/post.dart';
+
 class Utils {
   static StreamTransformer transformer<T>(
           T Function(Map<String, dynamic> json) fromJson) =>
@@ -25,6 +27,30 @@ class Utils {
 
   static dynamic fromDateTimeToJson(DateTime date) {
     return date.toUtc();
+  }
+
+  static double productRating(double rate, int rateCount, double rating) {
+    final sum = (rating * rateCount) + rate;
+
+    return sum / (rateCount + 1);
+  }
+
+  static double computeRating(List<Post> posts) {
+    final ratings = [];
+
+    for (var post in posts) {
+      if (post.rateCount! > 0) {
+        ratings.add(post.rating);
+      }
+    }
+
+    if (ratings.isEmpty) {
+      return 0;
+    }
+
+    final sum = ratings.reduce((a, b) => a + b);
+
+    return sum / ratings.length;
   }
 }
 

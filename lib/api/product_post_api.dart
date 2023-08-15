@@ -3,6 +3,7 @@ import 'package:ani_capstone/models/orders.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/review.dart';
+import 'package:ani_capstone/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -285,14 +286,19 @@ class ProductPost {
 
   static Future addProductReview(
       {required List<Review> reviews,
-      required List<String> productIds,
+      required Orders orders,
       required String userId}) {
     final batch = FirebaseFirestore.instance.batch();
     final reviewRef = FirebaseFirestore.instance.collection('reviews');
     final postRef = FirebaseFirestore.instance.collection('posts');
 
-    for (int i = 0; i < productIds.length; i++) {
-      batch.update(postRef.doc(productIds[i]), {
+    for (int i = 0; i < orders.products.length; i++) {
+      final post = orders.products[i].post;
+
+      batch.update(postRef.doc(post!.postId), {
+        'rateCount': post.rateCount! + 1,
+        'rating': Utils.productRating(
+            reviews[i].rating, post.rateCount!, post.rating!),
         'reviews': FieldValue.arrayUnion([userId])
       });
 

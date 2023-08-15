@@ -48,6 +48,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
@@ -74,19 +76,22 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 : MainAxisAlignment.start,
             children: [
               fetchState == 1
-                  ? ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      physics: const BouncingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: reviews.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: ReviewCard(
-                            review: reviews[index],
-                          ),
-                        );
-                      })
+                  ? SizedBox(
+                      height: size.height - 120,
+                      child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          physics: const BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: reviews.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: ReviewCard(
+                                review: reviews[index],
+                              ),
+                            );
+                          }),
+                    )
                   : statusBuilder()
             ]),
       ),

@@ -6,6 +6,7 @@ import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/feed_page/edit_post.dart';
+import 'package:ani_capstone/screens/components/profile_page/visit_profile.dart';
 import 'package:ani_capstone/screens/components/review_page/review_screen.dart';
 import 'package:ani_capstone/screens/components/widgets/image_handler.dart';
 import 'package:ani_capstone/screens/components/widgets/image_preview.dart';
@@ -160,13 +161,25 @@ class _PostCardState extends State<PostCard> {
                                   image: widget.post.publisher.photoUrl),
                             ));
                       },
-                      child: ImageHandler(image: widget.post.publisher.photoUrl, imageType: ImageHandler.userProfile)),
-                  title: Text(
-                    widget.post.publisher.name,
-                    style: const TextStyle(
-                        color: linkColor,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold),
+                      child: ImageHandler(
+                          image: widget.post.publisher.photoUrl,
+                          imageType: ImageHandler.userProfile)),
+                  title: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                VisitProfile(user: widget.post.publisher),
+                          ));
+                    },
+                    child: Text(
+                      widget.post.publisher.name,
+                      style: const TextStyle(
+                          color: linkColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   subtitle: Text(
                     DateFormat('MMMM dd, yyyy').format(widget.post.postedAt),
@@ -304,7 +317,9 @@ class _PostCardState extends State<PostCard> {
                                               ImagePreview(image: item),
                                         ));
                                   },
-                                  child: ImageHandler(image: item, imageType: ImageHandler.postImage),
+                                  child: ImageHandler(
+                                      image: item,
+                                      imageType: ImageHandler.postImage),
                                 ))
                             .toList(),
                       ),

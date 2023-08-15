@@ -108,9 +108,7 @@ class _UserPostReviewState extends State<UserPostReview> {
     }
 
     ProductPost.addProductReview(
-            reviews: reviews,
-            productIds: widget.orders.products.map((e) => e.productId).toList(),
-            userId: user.userId!)
+            reviews: reviews, orders: widget.orders, userId: user.userId!)
         .whenComplete(() {
       ProductPost.updateOrderStatus(
               orderStatus: 4,

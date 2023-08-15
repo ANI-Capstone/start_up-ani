@@ -26,6 +26,7 @@ class Post {
       required this.unit,
       required this.location,
       required this.images,
+      this.rating = 0,
       this.rateCount = 0,
       this.likes,
       this.reviews,
@@ -40,7 +41,8 @@ class Post {
       unit: json['unit'],
       location: json['location'],
       images: List.from(json['images']),
-      rateCount: json['rateCount'],
+      rating: json['rating'] == null ? 0 : double.parse('${json['rating']}'),
+      rateCount: json['rateCount'] ?? 0,
       likes: List.from(json['likes'] ?? []),
       reviews: List.from(json['reviews'] ?? []),
       postId: postId);
