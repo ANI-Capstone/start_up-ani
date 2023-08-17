@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
-import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:flutter/material.dart';
@@ -106,7 +104,8 @@ class _BasketCardState extends State<BasketCard> {
                     radius: 18,
                     backgroundColor: primaryColor,
                     backgroundImage: Image.network(
-                        widget.products[0].post!.publisher.photoUrl).image),
+                            widget.products[0].post!.publisher.photoUrl)
+                        .image),
                 title: Text(
                   widget.products[0].post!.publisher.name,
                   style: const TextStyle(

@@ -1,10 +1,3 @@
-import 'package:meta/meta.dart';
-
-import '../utils.dart';
-
-class UserField {
-  static final String lastMessageTime = 'lastMessageTime';
-}
 
 class User {
   String? userId;
@@ -17,16 +10,16 @@ class User {
       // required this.lastMessageTime,
       });
 
-  User copyWith({
-    String? userId,
-    String? name,
-    String? photoUrl,
-    String? fcmToken,
-    // DateTime? lastMessageTime,
-  }) =>
-      User(userId: userId, name: name!, photoUrl: photoUrl!, fcmToken: fcmToken!
-          // lastMessageTime: lastMessageTime!,
-          );
+  // User copyWith({
+  //   String? userId,
+  //   String? name,
+  //   String? photoUrl,
+  //   String? fcmToken,
+  //   // DateTime? lastMessageTime,
+  // }) =>
+  //     User(userId: userId, name: name!, photoUrl: photoUrl!, fcmToken: fcmToken!
+  //         // lastMessageTime: lastMessageTime!,
+  //         );
 
   static User fromJson(Map<String, dynamic> json) => User(
       userId: json['id'],

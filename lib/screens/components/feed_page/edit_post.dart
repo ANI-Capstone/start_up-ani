@@ -9,11 +9,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:google_place/google_place.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'package:ani_capstone/models/user_data.dart';
 import '../../../constants.dart';
 import '../../../models/post.dart';
-import '../../../models/user.dart';
 
 class EditPost extends StatefulWidget {
   Post post;
@@ -190,8 +187,7 @@ class _EditPostState extends State<EditPost> {
                   CircleAvatar(
                       radius: 22,
                       backgroundColor: primaryColor,
-                      backgroundImage:
-                          NetworkImage(post.publisher.photoUrl)),
+                      backgroundImage: NetworkImage(post.publisher.photoUrl)),
                   const SizedBox(width: 10),
                   Text(
                     post.publisher.name,

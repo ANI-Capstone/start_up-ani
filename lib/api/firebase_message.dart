@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:ani_capstone/models/chat.dart';
-import 'package:ani_capstone/models/post.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

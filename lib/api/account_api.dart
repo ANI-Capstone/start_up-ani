@@ -1,7 +1,5 @@
 import 'package:ani_capstone/models/user_data.dart';
-import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AccountApi {
   static Future updateUserData(

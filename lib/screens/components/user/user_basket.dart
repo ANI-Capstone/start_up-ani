@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:ani_capstone/local_objects.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
@@ -230,7 +229,6 @@ class _UserBasketState extends State<UserBasket> {
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     showBadge: count > 0,
-             
                     position: badges.BadgePosition.topEnd(top: -14, end: -12),
                     child: FaIcon(
                       icon,
