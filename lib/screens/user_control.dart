@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
@@ -16,6 +17,8 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+
+import '../api/fcm_notif_api.dart';
 
 class UserControl extends StatefulWidget {
   const UserControl({Key? key}) : super(key: key);
@@ -117,23 +120,42 @@ class _UserViewScreenState extends State<UserViewScreen> {
       }
     });
 
+    notifInit();
     _timer = Timer(const Duration(seconds: 0), () {});
+  }
+
+  Future<void> notifInit() async {
+    await NotifAPI.initNotification();
+
+    if (widget.user!.fcmToken == null) {
+      final fcmToken = await NotifAPI.firebaseMessaging.getToken();
+
+      AccountApi.setFcmToken(userId: user!.id!, fcmToken: fcmToken!)
+          .then((value) {
+        setState(() {
+          widget.user!.fcmToken = fcmToken;
+        });
+      });
+    }
   }
 
   @override
   void dispose() {
     keyboardSubscription.cancel();
     super.dispose();
+    NotifAPI.notifListener.cancel();
 
     _timer.cancel();
   }
 
   void getUserData() async {
-    AccountControl.accountCheck(context).then((value) {
+    AccountControl.accountCheck(context).then((value) async {
       if (mounted) {
-        setState(() {
-          user = value;
-        });
+        if (value) {
+          setState(() {
+            user = value;
+          });
+        }
       }
     });
   }
@@ -229,12 +251,13 @@ class _UserViewScreenState extends State<UserViewScreen> {
                       setFeedBadge: (int count, int index) {
                         setFeedBadge(count, index);
                       }),
-              UserNotificaiton(
-                user: user!,
-                setBadge: (int count) {
-                  setNotifBadge(count);
-                },
-              ),
+              // UserNotificaiton(
+              //   user: user!,
+              //   setBadge: (int count) {
+              //     setNotifBadge(count);
+              //   },
+              // ),
+              Container(),
               UserProfile(
                 user: user!,
                 getUserData: () {

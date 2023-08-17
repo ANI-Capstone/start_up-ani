@@ -182,6 +182,7 @@ class FirebaseMessageApi {
         userId: author.userId!,
         urlAvatar: author.photoUrl,
         username: author.name,
+        fcmToken: receiver.fcmToken,
         createdAt: DateTime.now(),
         replyMessage: replyMessage,
         typeId: typeId,

@@ -1,5 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:js_util';
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../models/notification.dart';
@@ -17,10 +25,8 @@ class NotificationApi {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('ic_launcher');
 
-   
-
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
+    InitializationSettings initializationSettings =
+        const InitializationSettings(
       android: initializationSettingsAndroid,
     );
 
@@ -36,13 +42,37 @@ class NotificationApi {
     }
   }
 
-  Future<NotificationDetails> _notificationDetails() async {
-    AndroidNotificationDetails androidPlatformChannelSpecifics =
-        const AndroidNotificationDetails('channel id', 'channel name',
-            channelDescription: 'channel description',
+  Future<String> _downloadAndSaveFile(String url, String fileName) async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final String filePath = '${directory.path}/$fileName';
+
+    File(filePath).exists().then((value) async {
+      if (value) {
+        return null;
+      } else {
+        final http.Response response = await http.get(Uri.parse(url));
+        final File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+      }
+    });
+
+    return filePath;
+  }
+
+  Future<NotificationDetails> _notificationDetails(
+      String imageUrl, String imageName) async {
+    String largeIconPath = await _downloadAndSaveFile(imageUrl, imageName);
+
+    final AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+            'high_importance_channel', // id
+            'High Importance Notifications', // title
+            channelDescription:
+                'This channel is used for important notifications.',
             importance: Importance.max,
             playSound: true,
-            styleInformation: DefaultStyleInformation(true, true));
+            largeIcon: FilePathAndroidBitmap(largeIconPath),
+            styleInformation: const DefaultStyleInformation(true, true));
 
     // final details = await _localNotifications.getNotificationAppLaunchDetails();
     // if (details != null && details.didNotificationLaunchApp) {
@@ -52,26 +82,52 @@ class NotificationApi {
     //     null;
     //   }
     // }
-    NotificationDetails platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics);
+    NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
 
     return platformChannelSpecifics;
   }
 
-  Future<void> showLocalNotification({
-    required int id,
-    required String title,
-    required String body,
-    required String payload,
-  }) async {
-    final platformChannelSpecifics = await _notificationDetails();
-    await _localNotifications.show(
-      id,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: payload,
-    );
+  // Future<void> showLocalNotification({
+  //   required int id,
+  //   required String title,
+  //   required String body,
+  //   required String payload,
+  // }) async {
+  //   final platformChannelSpecifics = await _notificationDetails();
+  //   await _localNotifications.show(
+  //     id,
+  //     title,
+  //     body,
+  //     platformChannelSpecifics,
+  //     payload: payload,
+  //   );
+  // }
+
+  Future<AndroidBitmap> getImageBytes(String imageUrl) async {
+    http.Response response = await http.get(Uri.parse(imageUrl));
+
+    AndroidBitmap androidBitmap = ByteArrayAndroidBitmap.fromBase64String(
+        base64.encode(response.bodyBytes)); //Uint8List
+
+    return androidBitmap;
+  }
+
+  Future<void> showMessageNotification(
+      {required RemoteNotification notification}) async {
+    if (notification.body == null) return;
+
+    print(notification.body);
+
+    // final platformChannelSpecifics =
+    //     await _notificationDetails(notification.body, body['iconName']);
+
+    // await _localNotifications.show(
+    //   notification.hashCode,
+    //   notification.title,
+    //   body['description'],
+    //   platformChannelSpecifics,
+    // );
   }
 
   static Future<List<NotificationModel>> getNotification(
@@ -86,11 +142,11 @@ class NotificationApi {
               .map((doc) => NotificationModel.fromJson(doc.data(), doc.id))
               .toList());
 
-  static notifStream(String userId) => FirebaseFirestore.instance
-      .collection('notifications')
-      .doc(userId)
-      .collection('user_notif')
-      .snapshots(includeMetadataChanges: true);
+  // static notifStream(String userId) => FirebaseFirestore.instance
+  //     .collection('notifications')
+  //     .doc(userId)
+  //     .collection('user_notif')
+  //     .snapshots(includeMetadataChanges: true);
 
   static Future addNotification(
       {required String notifTo,

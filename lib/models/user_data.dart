@@ -3,12 +3,13 @@ import 'package:ani_capstone/utils.dart';
 class UserData {
   String name, email, phone, street, barangay, city, province, typeName;
 
-  String? id, photoUrl;
+  String? id, photoUrl, fcmToken;
   int zipcode, userTypeId;
 
   UserData(
       {this.id,
       this.photoUrl,
+      this.fcmToken,
       required this.name,
       required this.email,
       required this.phone,
@@ -38,6 +39,7 @@ class UserData {
 
   static UserData fromJson(Map<String, dynamic> json) => UserData(
       id: json['id'],
+      fcmToken: json['fcmToken'],
       name: json['name'],
       email: json['email'],
       phone: json['phone'],

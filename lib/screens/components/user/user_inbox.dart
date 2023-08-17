@@ -31,7 +31,7 @@ class _UserInboxState extends State<UserInbox> {
   User? author;
   Timer? timer;
   List<Chat> chats = [];
-  late final NotificationApi notificationService;
+  // late final NotificationApi notificationService;
   late StreamSubscription listener;
 
   List<User> users = [];
@@ -40,8 +40,8 @@ class _UserInboxState extends State<UserInbox> {
   void initState() {
     super.initState();
 
-    notificationService = NotificationApi();
-    notificationService.initializePlatformNotifications();
+    // notificationService = NotificationApi();
+    // notificationService.initializePlatformNotifications();
 
     author = User(
         name: widget.user.name,
@@ -95,11 +95,11 @@ class _UserInboxState extends State<UserInbox> {
   }
 
   void newChatNotifier(Chat chat) async {
-    await notificationService.showLocalNotification(
-        id: 0,
-        title: chat.contact.name,
-        body: chat.message.typeId == 1 ? 'Sent a photo.' : chat.message.message,
-        payload: chat.chatPathId);
+    // await notificationService.showLocalNotification(
+    //     id: 0,
+    //     title: chat.contact.name,
+    //     body: chat.message.typeId == 1 ? 'Sent a photo.' : chat.message.message,
+    //     payload: chat.chatPathId);
   }
 
   void chatListener() async {
@@ -170,8 +170,7 @@ class _UserInboxState extends State<UserInbox> {
                             child: ListTile(
                               leading: CircleAvatar(
                                   backgroundColor: primaryColor,
-                                  backgroundImage:
-                                      NetworkImage(user.photoUrl),
+                                  backgroundImage: NetworkImage(user.photoUrl),
                                   radius: 24),
                               title: Text(
                                 user.name,
@@ -288,7 +287,7 @@ class _UserInboxState extends State<UserInbox> {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: primaryColor,
-                backgroundImage:Image.network(user.photoUrl).image,
+                backgroundImage: Image.network(user.photoUrl).image,
               ),
               const SizedBox(height: 5),
               Text(

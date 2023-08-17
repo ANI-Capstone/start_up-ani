@@ -5,6 +5,7 @@ class Message {
   String urlAvatar;
   String username;
   String message;
+  String? fcmToken;
   DateTime createdAt;
   Message? replyMessage;
   String? type;
@@ -19,6 +20,7 @@ class Message {
       required this.username,
       required this.message,
       required this.createdAt,
+      this.fcmToken,
       this.type,
       required this.seen,
       this.replyMessage,
@@ -31,6 +33,7 @@ class Message {
       urlAvatar: json['urlAvatar'],
       username: json['username'],
       message: json['message'],
+      fcmToken: json['fcmToken'],
       createdAt: Utils.toDateTime(json['createdAt']),
       replyMessage: json['replyMessage'] == null
           ? null
@@ -45,6 +48,7 @@ class Message {
         'urlAvatar': urlAvatar,
         'username': username,
         'message': message,
+        'fcmToken': fcmToken,
         'createdAt': Utils.fromDateTimeToJson(createdAt),
         'replyMessage': replyMessage != null ? replyMessage!.toJson() : null,
         'type': type,

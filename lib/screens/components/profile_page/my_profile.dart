@@ -88,7 +88,7 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    final double itemHeight = 210;
+    const double itemHeight = 210;
     final double itemWidth = size.width / 2;
 
     return Scaffold(

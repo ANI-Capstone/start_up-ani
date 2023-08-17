@@ -236,8 +236,7 @@ class _ChatBoxState extends State<ChatBox> {
               CircleAvatar(
                   radius: 20,
                   backgroundColor: primaryColor,
-                  backgroundImage:
-                      NetworkImage(receiver!.photoUrl)),
+                  backgroundImage: NetworkImage(receiver!.photoUrl)),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),

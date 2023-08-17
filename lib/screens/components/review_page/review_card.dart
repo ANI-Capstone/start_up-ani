@@ -28,8 +28,8 @@ class _ReviewCardState extends State<ReviewCard> {
                 leading: CircleAvatar(
                     radius: 20,
                     backgroundColor: primaryColor,
-                    backgroundImage: NetworkImage(
-                        widget.review.reviewer.photoUrl)),
+                    backgroundImage:
+                        NetworkImage(widget.review.reviewer.photoUrl)),
                 title: Text(
                   widget.review.reviewer.name,
                   style: const TextStyle(
@@ -92,7 +92,6 @@ class _ReviewCardState extends State<ReviewCard> {
                             widget.review.photos![index],
                             width: 80,
                             fit: BoxFit.cover,
-                         
                             errorBuilder: (context, url, error) => const Icon(
                                 Icons.error,
                                 size: 12,
@@ -115,5 +114,3 @@ class _ReviewCardState extends State<ReviewCard> {
         ]));
   }
 }
-
-class CachedNetworkImageProvided {}

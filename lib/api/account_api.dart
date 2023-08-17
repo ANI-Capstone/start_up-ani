@@ -20,6 +20,13 @@ class AccountApi {
     return await userRef.update({'email': newEmail});
   }
 
+  static Future setFcmToken(
+      {required String userId, required String fcmToken}) async {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+
+    return await userRef.update({'fcmToken': fcmToken});
+  }
+
   static Future<UserData> getUserData(String userId) =>
       FirebaseFirestore.instance
           .collection('users')
