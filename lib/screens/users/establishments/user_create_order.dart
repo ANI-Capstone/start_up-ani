@@ -1,7 +1,9 @@
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/product_order.dart';
 import 'package:ani_capstone/models/user_data.dart';
+import 'package:ani_capstone/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -30,6 +32,12 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
   String? location;
   String locChoice = 'Location';
   var items = ['Default Address', 'Locate New Address'];
+
+  late Future<DateTime?> selectedDate;
+  String date = "";
+
+  late Future<TimeOfDay?> selectedTime;
+  String time = "";
 
   void addProduct(String productName, int quantity, int unit) {
     final newProduct =
@@ -335,20 +343,136 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Text(
+                    const Text(
                       'Date and Time',
-                      style: TextStyle(color: linkColor, fontSize: 13),
+                      style: TextStyle(color: linkColor, fontSize: 14),
                     ),
-                    Text(
-                      '(Input what date and time you want your products to be delivered.)',
+                    const SizedBox(
+                      height: 2,
+                    ),
+                    const Text(
+                      'Input what date and time you want your order to be delivered.',
                       style: TextStyle(color: linkColor, fontSize: 11),
                     ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: DottedBorder(
+                        color: linkColor.withOpacity(0.7),
+                        borderType: BorderType.RRect,
+                        radius: const Radius.circular(5),
+                        dashPattern: const [2, 2],
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5)),
+                          child: Container(
+                            height: 75,
+                            width: double.infinity,
+                            alignment: Alignment.centerLeft,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            color: Colors.white,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialogPicker(context);
+                                  },
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: date.isEmpty
+                                        ? const Text(
+                                            'MM/DD/YYYY',
+                                            style: TextStyle(
+                                                color: primaryColor,
+                                                fontSize: 15),
+                                          )
+                                        : Text(
+                                            date,
+                                            style: const TextStyle(
+                                                color: linkColor, fontSize: 15),
+                                          ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: FDottedLine(
+                                    width: double.infinity,
+                                    height: 1,
+                                    dottedLength: 2,
+                                    space: 3,
+                                    color: linkColor.withOpacity(0.7),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialogTimePicker(context);
+                                  },
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: time.isEmpty
+                                        ? Text('00:00 AM',
+                                            style: TextStyle(
+                                                color: primaryColor,
+                                                fontSize: 15))
+                                        : Text(time,
+                                            style: TextStyle(
+                                                color: linkColor,
+                                                fontSize: 15)),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 ))
           ]),
         ),
       ),
     );
+  }
+
+  void showDialogPicker(BuildContext context) {
+    selectedDate = showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2050),
+    );
+    selectedDate.then((value) {
+      setState(() {
+        if (value == null) return;
+        date = Utils.getFormattedDateSimple(value.millisecondsSinceEpoch);
+      });
+    }, onError: (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    });
+  }
+
+  void showDialogTimePicker(BuildContext context) {
+    selectedTime = showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    selectedTime.then((value) {
+      setState(() {
+        if (value == null) return;
+        time = value.format(context);
+      });
+    }, onError: (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    });
   }
 
   Widget _locationDropdown({

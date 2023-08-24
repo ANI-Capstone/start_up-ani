@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ani_capstone/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 import 'models/post.dart';
 
@@ -51,6 +52,11 @@ class Utils {
     final sum = ratings.reduce((a, b) => a + b);
 
     return sum / ratings.length;
+  }
+
+  static String getFormattedDateSimple(int time) {
+    DateFormat newFormat = DateFormat("MM/dd/yyyy");
+    return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
   }
 }
 
