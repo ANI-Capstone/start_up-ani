@@ -51,6 +51,13 @@ class _UserPostState extends State<UserPost> {
     super.initState();
 
     user = widget.user;
+
+    // Prediction prediction = await PlacesAutocomplete.show(
+    //         context: context,
+    //         apiKey: API_KEY,
+    //         mode: Mode.fullscreen, // Mode.overlay
+    //         language: "en",
+    //         components: [Component(Component.country, "pk")]);
   }
 
   void autoCompleteSearch(String value) async {
@@ -449,7 +456,7 @@ class _UserPostState extends State<UserPost> {
           suffixIcon: Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: IconButton(
-              onPressed: (() => {}),
+              onPressed: (() {}),
               icon: const FaIcon(
                 FontAwesomeIcons.magnifyingGlass,
                 size: 18,

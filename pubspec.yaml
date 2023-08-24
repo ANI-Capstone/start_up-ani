@@ -79,6 +79,10 @@ dependencies:
   cached_network_image: ^3.2.3
   firebase_messaging: ^14.6.5
   firebase_analytics: ^10.4.4
+  google_maps_flutter: ^2.4.0
+  geolocator: ^10.0.0
+  dotted_border: ^2.0.0+3
+  fdottedline_nullsafety: ^2.0.1
 
 flutter_native_splash:
   image: assets/images/ani_splash.png
@@ -87,7 +91,6 @@ flutter_native_splash:
 
   android_12:
     image: assets/images/ani_splash.png
-    background_image: assets/images/ani_background.png
     branding: assets/images/ani_branding.png
 
   web: false
