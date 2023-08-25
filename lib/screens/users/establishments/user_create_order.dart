@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/product_order.dart';
 import 'package:ani_capstone/models/user_data.dart';
@@ -5,9 +7,11 @@ import 'package:ani_capstone/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class UserCreateOrder extends StatefulWidget {
   const UserCreateOrder({Key? key, required this.user}) : super(key: key);
@@ -28,10 +32,12 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
   bool selectLocation = false;
 
   List<ProductOrder> product = [];
+  List<String> vegetables = [];
 
   String? location;
   String locChoice = 'Location';
-  var items = ['Default Address', 'Locate New Address'];
+  final items = ['Default Address', 'Locate New Address'];
+  final units = ['kg', 'g', 'pcs'];
 
   late Future<DateTime?> selectedDate;
   String date = "";
@@ -39,12 +45,19 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
   late Future<TimeOfDay?> selectedTime;
   String time = "";
 
-  void addProduct(String productName, int quantity, int unit) {
-    final newProduct =
-        ProductOrder(productName: productName, quantity: quantity, unit: unit);
+  int selectedUnit = 0;
+
+  void addProduct(String productName, int quantity, String unit, int unitId) {
+    final newProduct = ProductOrder(
+        productName: productName,
+        quantity: quantity,
+        unit: unit,
+        unitId: unitId);
 
     setState(() {
       product.add(newProduct);
+      _productName.text = '';
+      _productQnt.text = '';
     });
   }
 
@@ -52,6 +65,24 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
     setState(() {
       product.removeAt(index);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    readJson();
+  }
+
+  Future<void> readJson() async {
+    final String response =
+        await rootBundle.loadString('assets/tags/veges.json');
+    final data = await json.decode(response) as Map;
+
+    vegetables =
+        List.from(data['vegetables']).map((e) => e['name'].toString()).toList();
+
+    print(vegetables);
   }
 
   @override
@@ -113,40 +144,78 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: TextFormField(
-                                controller: _productName,
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'Roboto',
-                                    color: linkColor),
-                                keyboardType: TextInputType.text,
-                                validator: MultiValidator(
-                                  [
-                                    RequiredValidator(errorText: 'Required'),
-                                  ],
-                                ),
-                                onSaved: (value) {
-                                  _productName.text = value!;
-                                },
-                                decoration: const InputDecoration(
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(10, 13, 10, 13),
-                                  hintText: 'Add product name',
-                                  hintStyle: TextStyle(
-                                      fontSize: 14, color: primaryColor),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(5),
-                                          bottomLeft: Radius.circular(5)),
-                                      borderSide: BorderSide.none),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  isDense: true,
-                                )),
+                            child: TypeAheadField(
+                              textFieldConfiguration: TextFieldConfiguration(
+                                  controller: _productName,
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Roboto',
+                                      color: linkColor),
+                                  keyboardType: TextInputType.text,
+                                  decoration: const InputDecoration(
+                                    errorText: 'Product must be on the list.',
+                                    suffix: FaIcon(
+                                      FontAwesomeIcons.xmark,
+                                      color: redColor,
+                                      size: 14,
+                                    ),
+                                    contentPadding:
+                                        EdgeInsets.fromLTRB(10, 13, 10, 13),
+                                    hintText: 'Add product name',
+                                    hintStyle: TextStyle(
+                                        fontSize: 14, color: primaryColor),
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(5),
+                                            bottomLeft: Radius.circular(5)),
+                                        borderSide: BorderSide.none),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    isDense: true,
+                                  )),
+                              suggestionsCallback: (pattern) async {
+                                List<String> matches = <String>[];
+                                matches.addAll(vegetables);
+
+                                matches.retainWhere((s) {
+                                  return s
+                                      .toLowerCase()
+                                      .contains(pattern.toLowerCase());
+                                });
+                                return matches;
+                              },
+                              noItemsFoundBuilder: (context) {
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  child: Text(
+                                    'No items found!',
+                                    style: TextStyle(
+                                        color: linkColor, fontSize: 14),
+                                  ),
+                                );
+                              },
+                              itemBuilder: (context, suggestion) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  child: Text(
+                                    suggestion.toString(),
+                                    style: const TextStyle(
+                                        color: primaryColor, fontSize: 14),
+                                  ),
+                                );
+                              },
+                              onSuggestionSelected: (suggestion) {
+                                setState(() {
+                                  _productName.text = suggestion.toString();
+                                });
+                              },
+                            ),
                           ),
                         ),
                         SizedBox(
-                          width: 100,
+                          width: 80,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             child: TextFormField(
@@ -155,7 +224,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                   fontSize: 14,
                                   fontFamily: 'Roboto',
                                   color: linkColor),
-                              keyboardType: TextInputType.text,
+                              keyboardType: TextInputType.number,
                               validator: MultiValidator(
                                 [
                                   RequiredValidator(errorText: 'Required'),
@@ -164,23 +233,59 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                               onSaved: (value) {
                                 _productName.text = value!;
                               },
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                   contentPadding:
-                                      EdgeInsets.fromLTRB(10, 13, 10, 13),
-                                  hintText: 'Quantity',
-                                  hintStyle: TextStyle(
+                                      const EdgeInsets.fromLTRB(10, 13, 10, 13),
+                                  hintText: 'Qty.',
+                                  hintStyle: const TextStyle(
                                       fontSize: 14, color: primaryColor),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(5),
-                                          bottomRight: Radius.circular(5)),
+                                  border: const OutlineInputBorder(
                                       borderSide: BorderSide.none),
                                   filled: true,
                                   fillColor: Colors.white,
                                   isDense: true,
-                                  suffixText: 'kg',
-                                  suffixStyle: TextStyle(
-                                      fontSize: 14, color: primaryColor)),
+                                  suffixText: units[selectedUnit],
+                                  suffixStyle: const TextStyle(
+                                      fontSize: 14, color: linkColor)),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          child: Container(
+                            height: 42,
+                            padding: const EdgeInsets.only(right: 14, left: 2),
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(5),
+                                    bottomRight: Radius.circular(5))),
+                            alignment: Alignment.center,
+                            child: SizedBox(
+                              width: 20,
+                              height: 50,
+                              child: PopupMenuButton(
+                                  constraints: BoxConstraints.tight(
+                                      const Size(120, 120)),
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5),
+                                    ),
+                                  ),
+                                  onSelected: (value) {},
+                                  position: PopupMenuPosition.under,
+                                  padding: EdgeInsets.zero,
+                                  itemBuilder: (context) => [
+                                        _buildMenuItems(
+                                            label: 'Kilograms', value: 0),
+                                        _buildMenuItems(
+                                            label: 'Grams', value: 1),
+                                        _buildMenuItems(label: 'Pcs.', value: 2)
+                                      ],
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: linkColor,
+                                  )),
                             ),
                           ),
                         )
@@ -213,10 +318,13 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                             final formState = _formKey.currentState!;
 
                             if (formState.validate()) {
-                              addProduct(_productName.text,
-                                  int.parse(_productQnt.text), 0);
+                              addProduct(
+                                  _productName.text,
+                                  int.parse(_productQnt.text),
+                                  units[selectedUnit],
+                                  selectedUnit);
+
                               FocusManager.instance.primaryFocus?.unfocus();
-                              formState.reset();
                             }
                           },
                           child: const SizedBox(
@@ -402,7 +510,6 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                       const EdgeInsets.symmetric(vertical: 10),
                                   child: FDottedLine(
                                     width: double.infinity,
-                                    height: 1,
                                     dottedLength: 2,
                                     space: 3,
                                     color: linkColor.withOpacity(0.7),
@@ -437,6 +544,30 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
         ),
       ),
     );
+  }
+
+  PopupMenuItem _buildMenuItems({required String label, required int value}) {
+    return PopupMenuItem(
+        value: value,
+        height: 0,
+        onTap: () {
+          setState(() {
+            selectedUnit = value;
+          });
+        },
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          width: double.infinity,
+          decoration: BoxDecoration(
+              color: value == selectedUnit ? primaryColor : null,
+              borderRadius: BorderRadius.circular(3)),
+          child: Text(
+            label,
+            style: const TextStyle(
+                color: linkColor, fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+        ));
   }
 
   void showDialogPicker(BuildContext context) {
@@ -561,9 +692,9 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              width: 100,
+              width: 80,
               child: Text(
-                '${product.quantity} ${product.unit == 0 ? 'kg.' : 'pcs.'}',
+                '${product.quantity} ${product.unit}',
                 style: const TextStyle(
                     color: linkColor, overflow: TextOverflow.ellipsis),
               ),

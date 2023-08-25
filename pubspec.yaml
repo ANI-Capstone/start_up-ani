@@ -83,6 +83,7 @@ dependencies:
   geolocator: ^10.0.0
   dotted_border: ^2.0.0+3
   fdottedline_nullsafety: ^2.0.1
+  flutter_typeahead: ^4.6.2
 
 flutter_native_splash:
   image: assets/images/ani_splash.png
@@ -127,6 +128,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/tags/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
