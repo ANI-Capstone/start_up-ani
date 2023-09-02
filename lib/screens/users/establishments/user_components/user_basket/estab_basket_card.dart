@@ -69,7 +69,7 @@ class _EstabBasketCardState extends State<EstabBasketCard> {
                     child: Container(
                         width: double.infinity,
                         height: 50,
-                        decoration: BoxDecoration(color: Colors.white),
+                        decoration: const BoxDecoration(color: Colors.white),
                         child: Row(
                           children: [
                             Checkbox(
@@ -116,7 +116,7 @@ class _EstabBasketCardState extends State<EstabBasketCard> {
                                   style: const TextStyle(
                                       color: linkColor,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 12),
+                                      fontSize: 13),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),

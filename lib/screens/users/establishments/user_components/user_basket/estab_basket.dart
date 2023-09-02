@@ -61,6 +61,26 @@ class _EstabBasketState extends State<EstabBasket> {
     if (listener != null) listener!.cancel();
   }
 
+  void selectAllItems(bool value) {
+    setState(() {
+      checkAll = value;
+
+      int itemsCount = 0;
+
+      for (int i = 0; i < basket.length; i++) {
+        for (int j = 0; j < basket[i].products.length; j++) {
+          checkAll
+              ? basket[i].products[j].checkBox = true
+              : basket[i].products[j].checkBox = false;
+
+          itemsCount += 1;
+        }
+      }
+
+      checkAll ? selectedItems = itemsCount : selectedItems = 0;
+    });
+  }
+
   void selectedItemsCount() {
     int items = 0;
 
@@ -68,6 +88,12 @@ class _EstabBasketState extends State<EstabBasket> {
       for (int j = 0; j < basket[i].products.length; j++) {
         if (basket[i].products[j].checkBox!) {
           items += 1;
+        } else {
+          if (checkAll) {
+            setState(() {
+              checkAll = false;
+            });
+          }
         }
       }
     }
@@ -157,67 +183,6 @@ class _EstabBasketState extends State<EstabBasket> {
           fetchBasket();
         }
       }
-      // fetchBasket();
-      // for (var change in event.docChanges) {
-      //   if (change.type == DocumentChangeType.added) {
-      //     final latest = change.doc.data() as Map<String, dynamic>;
-
-      //     final newProduct = Product.fromJson(latest);
-
-      //     bool contain = false;
-
-      //     if (basket.isNotEmpty) {
-      //       for (var baskt in basket) {
-      //         if (baskt.products.any(
-      //             (product) => newProduct.productId == product.productId)) {
-      //           contain = true;
-      //           break;
-      //         }
-      //       }
-      //     }
-
-      //     if (contain) return;
-
-      //     addNewProduct(newProduct).then((product) {
-      //       bool added = false;
-      //       int sum = 0;
-      //       if (basket.isNotEmpty) {
-      //         for (int i = 0; i < basket.length; i++) {
-      //           if (basket[i].publisherId == product.publisher.userId) {
-      //             if (mounted) {
-      //               setState(() {
-      //                 basket[i].products.add(product);
-      //               });
-      //             }
-      //             added = true;
-      //           }
-      //           sum += basket[i].products.length;
-      //         }
-      //       }
-
-      //       if (mounted && !added) {
-      //         setState(() {
-      //           basket.add(Basket(
-      //               publisherId: product.publisher.userId!,
-      //               products: [product],
-      //               basketIndex: 0));
-
-      //           sum += basket[basket.length - 1].products.length;
-
-      //           if (fetchState != 1) {
-      //             fetchState = 1;
-      //           }
-      //         });
-      //       }
-
-      //       if (mounted) {
-      //         setState(() {
-      //           // widget.setBadgeCount(sum, 0);
-      //         });
-      //       }
-      //     });
-      //   }
-      // }
     });
   }
 
@@ -334,7 +299,9 @@ class _EstabBasketState extends State<EstabBasket> {
                             value: checkAll,
                             checkColor: Colors.white,
                             activeColor: linkColor,
-                            onChanged: (value) {},
+                            onChanged: (value) {
+                              selectAllItems(value!);
+                            },
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                             side: const BorderSide(width: 1, color: linkColor),
