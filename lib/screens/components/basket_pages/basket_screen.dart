@@ -11,10 +11,15 @@ import 'package:flutter/material.dart';
 import "package:collection/collection.dart";
 
 class BasketScreen extends StatefulWidget {
-  UserData user;
-  Function(int count, int index) setBadgeCount;
+  final UserData user;
+  final Function(int count, int index) setBadgeCount;
+  final Function(List<Product> products) updateAddedProducts;
 
-  BasketScreen({Key? key, required this.user, required this.setBadgeCount})
+  const BasketScreen(
+      {Key? key,
+      required this.user,
+      required this.setBadgeCount,
+      required this.updateAddedProducts})
       : super(key: key);
 
   @override
@@ -30,7 +35,7 @@ class _BasketScreenState extends State<BasketScreen> {
 
   int fetchState = 0;
 
-  late StreamSubscription listener;
+  StreamSubscription? listener;
 
   @override
   void initState() {
@@ -45,7 +50,7 @@ class _BasketScreenState extends State<BasketScreen> {
   @override
   void dispose() {
     super.dispose();
-    listener.cancel();
+    if (listener != null) listener!.cancel();
   }
 
   Future removeProduct(
@@ -111,62 +116,63 @@ class _BasketScreenState extends State<BasketScreen> {
     listener = basketRef.listen((event) async {
       for (var change in event.docChanges) {
         if (change.type == DocumentChangeType.added) {
-          final latest = change.doc.data() as Map<String, dynamic>;
+          fetchBasket();
+          // final latest = change.doc.data() as Map<String, dynamic>;
 
-          final newProduct = Product.fromJson(latest);
+          // final newProduct = Product.fromJson(latest);
 
-          bool contain = false;
+          // bool contain = false;
 
-          if (basket.isNotEmpty) {
-            for (var baskt in basket) {
-              if (baskt.products.any(
-                  (product) => newProduct.productId == product.productId)) {
-                contain = true;
-                break;
-              }
-            }
-          }
+          // if (basket.isNotEmpty) {
+          //   for (var baskt in basket) {
+          //     if (baskt.products.any(
+          //         (product) => newProduct.productId == product.productId)) {
+          //       contain = true;
+          //       break;
+          //     }
+          //   }
+          // }
 
-          if (contain) return;
+          // if (contain) return;
 
-          addNewProduct(newProduct).then((product) {
-            bool added = false;
-            int sum = 0;
-            if (basket.isNotEmpty) {
-              for (int i = 0; i < basket.length; i++) {
-                if (basket[i].publisherId == product.publisher.userId) {
-                  if (mounted) {
-                    setState(() {
-                      basket[i].products.add(product);
-                    });
-                  }
-                  added = true;
-                }
-                sum += basket[i].products.length;
-              }
-            }
+          // addNewProduct(newProduct).then((product) {
+          //   bool added = false;
+          //   int sum = 0;
+          //   if (basket.isNotEmpty) {
+          //     for (int i = 0; i < basket.length; i++) {
+          //       if (basket[i].publisherId == product.publisher.userId) {
+          //         if (mounted) {
+          //           setState(() {
+          //             basket[i].products.add(product);
+          //           });
+          //         }
+          //         added = true;
+          //       }
+          //       sum += basket[i].products.length;
+          //     }
+          //   }
 
-            if (mounted && !added) {
-              setState(() {
-                basket.add(Basket(
-                    publisherId: product.publisher.userId!,
-                    products: [product],
-                    basketIndex: 0));
+          //   if (mounted && !added) {
+          //     setState(() {
+          //       basket.add(Basket(
+          //           publisherId: product.publisher.userId!,
+          //           products: [product],
+          //           basketIndex: 0));
 
-                sum += basket[basket.length - 1].products.length;
+          //       sum += basket[basket.length - 1].products.length;
 
-                if (fetchState != 1) {
-                  fetchState = 1;
-                }
-              });
-            }
+          //       if (fetchState != 1) {
+          //         fetchState = 1;
+          //       }
+          //     });
+          //   }
 
-            if (mounted) {
-              setState(() {
-                widget.setBadgeCount(sum, 0);
-              });
-            }
-          });
+          //   if (mounted) {
+          //     setState(() {
+          //       widget.setBadgeCount(sum, 0);
+          //     });
+          //   }
+          // });
         }
       }
     });
@@ -202,6 +208,7 @@ class _BasketScreenState extends State<BasketScreen> {
   }
 
   void fetchBasket() async {
+    if (listener == null) productListener();
     ProductPost.getUserBasket(userId: userId).then((value) {
       if (value.isNotEmpty) {
         fetchProducts(value).then((products) {
@@ -222,13 +229,13 @@ class _BasketScreenState extends State<BasketScreen> {
             widget.setBadgeCount(value.length, 0);
           });
         });
+
+        widget.updateAddedProducts(value);
       } else {
         setState(() {
           fetchState = 2;
         });
       }
-
-      productListener();
     }).onError((error, stackTrace) {
       setState(() {
         fetchState = -1;

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ani_capstone/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -28,7 +29,7 @@ class _UserMapState extends State<UserMap> {
   void initState() {
     super.initState();
 
-    getCurrentLocation();
+    // getCurrentLocation();
   }
 
   Future<void> getCurrentLocation() async {
@@ -51,14 +52,19 @@ class _UserMapState extends State<UserMap> {
     }
 
     final loc = await Geolocator.getCurrentPosition();
-    print(loc);
-    final GoogleMapController controller = await _controller.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
-            bearing: 192.8334901395799,
-            target: LatLng(loc.latitude, loc.longitude),
-            tilt: 59.440717697143555,
-            zoom: 19.151926040649414)));
+
+    // List<Placemark> placemarks =
+    //     await placemarkFromCoordinates(loc.latitude, loc.longitude);
+
+    // print(placemarks);
+
+    // final GoogleMapController controller = await _controller.future;
+    // await controller.animateCamera(CameraUpdate.newCameraPosition(
+    //     CameraPosition(
+    //         bearing: 0,
+    //         target: LatLng(loc.latitude, loc.longitude),
+    //         tilt: 0,
+    //         zoom: 18)));
   }
 
   @override
@@ -82,7 +88,7 @@ class _UserMapState extends State<UserMap> {
           zoomControlsEnabled: false,
           mapToolbarEnabled: false,
           compassEnabled: false,
-          mapType: MapType.normal,
+          mapType: MapType.terrain,
           initialCameraPosition: _kGooglePlex,
           onMapCreated: (GoogleMapController controller) {
             _controller.complete(controller);

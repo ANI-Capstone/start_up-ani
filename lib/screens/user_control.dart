@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/user/user_basket.dart';
@@ -98,6 +99,8 @@ class _UserViewScreenState extends State<UserViewScreen> {
   List<int> badgeCount = [0, 0, 0];
   List<int> eachCount = [0, 0, 0];
 
+  List<Product> addedProducts = [];
+
   String messageBadge = "3";
   late StreamSubscription<bool> keyboardSubscription;
 
@@ -131,6 +134,12 @@ class _UserViewScreenState extends State<UserViewScreen> {
 
     notifInit();
     _timer = Timer(const Duration(seconds: 0), () {});
+  }
+
+  void updateAddedProducts(List<Product> products) {
+    setState(() {
+      addedProducts = products;
+    });
   }
 
   Future<void> notifInit() async {
@@ -217,6 +226,21 @@ class _UserViewScreenState extends State<UserViewScreen> {
     }
   }
 
+  Widget _userBasket() {
+    return UserBasket(
+      userData: user!,
+      toggleBasket: (open) {
+        toggleBasket(open);
+      },
+      setFeedBadge: (int count, int index) {
+        setFeedBadge(count, index);
+      },
+      updateAddedProducts: (products) {
+        updateAddedProducts(products);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -236,37 +260,27 @@ class _UserViewScreenState extends State<UserViewScreen> {
         resizeToAvoidBottomInset: false,
         body: Container(
             child: IndexedStack(index: currentIndex, children: [
-          UserMap(),
-          // UserFeed(
-          //   user: user!,
-          //   openBasket: (open) {
-          //     toggleBasket(open);
-          //   },
-          //   badgeCount: badgeCount[0],
-          // ),
+          UserFeed(
+            user: user!,
+            openBasket: (open) {
+              toggleBasket(open);
+            },
+            badgeCount: badgeCount[0],
+            addedProducts: addedProducts,
+          ),
           UserInbox(
             user: user!,
             setBadge: (int count) {
               setMessageBadge(count);
             },
           ),
-          userType == 1
-              ? UserPost(user: user!)
-              : UserBasket(
-                  userData: user!,
-                  toggleBasket: (open) {
-                    toggleBasket(open);
-                  },
-                  setFeedBadge: (int count, int index) {
-                    setFeedBadge(count, index);
-                  }),
-          // UserNotificaiton(
-          //   user: user!,
-          //   setBadge: (int count) {
-          //     setNotifBadge(count);
-          //   },
-          // ),
-          Container(),
+          userType == 1 ? UserPost(user: user!) : _userBasket(),
+          UserNotificaiton(
+            user: user!,
+            setBadge: (int count) {
+              setNotifBadge(count);
+            },
+          ),
           UserProfile(
             user: user!,
             getUserData: () {
@@ -283,14 +297,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
                     setFeedBadge(count, index);
                   },
                 )
-              : UserBasket(
-                  userData: user!,
-                  toggleBasket: (open) {
-                    toggleBasket(open);
-                  },
-                  setFeedBadge: (int count, int index) {
-                    setFeedBadge(count, index);
-                  })
+              : _userBasket()
         ])),
         bottomNavigationBar: !showBottomNavigation
             ? null

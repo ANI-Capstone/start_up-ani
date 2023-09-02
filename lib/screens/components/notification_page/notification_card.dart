@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationCard extends StatefulWidget {
-  NotificationModel notif;
+  final NotificationModel notif;
 
-  NotificationCard({Key? key, required this.notif}) : super(key: key);
+  const NotificationCard({Key? key, required this.notif}) : super(key: key);
 
   @override
   State<NotificationCard> createState() => _NotificationCardState();
@@ -29,8 +29,8 @@ class _NotificationCardState extends State<NotificationCard> {
           leading: CircleAvatar(
               radius: 22,
               backgroundColor: primaryColor,
-              backgroundImage: Image.network(
-                  widget.notif.participant.photoUrl).image),
+              backgroundImage:
+                  Image.network(widget.notif.participant.photoUrl).image),
           title: RichText(
             text: TextSpan(
               children: [

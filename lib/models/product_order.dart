@@ -10,6 +10,16 @@ class ProductOrder {
       required this.unit,
       required this.unitId});
 
-  Map<String, dynamic> toJson() =>
-      {'productName': productName, 'quantity': quantity, 'unit': unit};
+  static ProductOrder fromJson(Map<String, dynamic> json) => ProductOrder(
+      productName: json['productName'],
+      quantity: json['quantity'],
+      unit: json['unit'],
+      unitId: json['unitId']);
+
+  Map<String, dynamic> toJson() => {
+        'productName': productName,
+        'quantity': quantity,
+        'unit': unit,
+        'unitId': unitId
+      };
 }

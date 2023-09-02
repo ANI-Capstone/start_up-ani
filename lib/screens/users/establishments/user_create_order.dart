@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/address.dart';
 import 'package:ani_capstone/models/product_order.dart';
 import 'package:ani_capstone/models/user_data.dart';
+import 'package:ani_capstone/screens/components/user/user_locate_address.dart';
 import 'package:ani_capstone/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +14,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:fdottedline_nullsafety/fdottedline__nullsafety.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_place/google_place.dart';
 
 class UserCreateOrder extends StatefulWidget {
   const UserCreateOrder({Key? key, required this.user}) : super(key: key);
@@ -33,6 +37,19 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
 
   List<ProductOrder> product = [];
   List<String> vegetables = [];
+
+  GooglePlace googlePlace =
+      GooglePlace('AIzaSyD8pN52ngRkDxuEjI4xYhMvixbJ0nIFIwE');
+
+  String? productError;
+  bool isProductError = false;
+  bool isQntError = false;
+  bool noTagError = false;
+  bool noLocError = true;
+  bool noDateError = true;
+  bool noTimeError = true;
+  bool showLocError = false;
+  bool showDateTimeError = false;
 
   String? location;
   String locChoice = 'Location';
@@ -67,6 +84,29 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
     });
   }
 
+  bool checkProductField() {
+    if (_productName.text.isEmpty) {
+      setState(() {
+        productError = 'Input product name';
+        isProductError = true;
+      });
+    }
+
+    if (noTagError) {
+      setState(() {
+        productError = 'Product was not on the list';
+      });
+    }
+
+    if (_productQnt.text.isEmpty) {
+      setState(() {
+        isQntError = true;
+      });
+    }
+
+    return !isProductError && !noTagError && !isQntError;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -81,8 +121,6 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
 
     vegetables =
         List.from(data['vegetables']).map((e) => e['name'].toString()).toList();
-
-    print(vegetables);
   }
 
   @override
@@ -123,6 +161,47 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
               TextButton(
                 onPressed: () {
                   FocusManager.instance.primaryFocus?.unfocus();
+
+                  final form = _formKey.currentState;
+
+                  if (!form!.validate()) {
+                    return;
+                  }
+
+                  if (noLocError) {
+                    setState(() {
+                      showLocError = true;
+                    });
+
+                    return;
+                  }
+
+                  if (noDateError || noTimeError) {
+                    setState(() {
+                      showDateTimeError = true;
+                    });
+                    return;
+                  }
+
+                  if (product.isEmpty) {
+                    ShoWInfo.showToast(
+                        'Please add atleast one product to order.', 3);
+                    return;
+                  }
+
+                  final tempAddress = Address(
+                      region: "Region X",
+                      province: 'Misamis Oriental',
+                      city: 'Tagoloan',
+                      barangay: 'Santa Ana',
+                      postal: 9001,
+                      precise: LatLng(8.5359226, 124.8019309),
+                      street: 'Zone 2');
+
+                  tempAddress.completeAddress =
+                      Address.toCompleteAddress(tempAddress);
+
+                  print(tempAddress.completeAddress);
                 },
                 child: const Text('ORDER',
                     style: TextStyle(
@@ -137,7 +216,16 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _cTextField(controller: _orderName, hint: 'Order name'),
+                    _cTextField(
+                        controller: _orderName,
+                        hint: 'Order name',
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please input your order name';
+                          }
+
+                          return null;
+                        }),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -145,34 +233,48 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 5),
                             child: TypeAheadField(
+                              minCharsForSuggestions: 1,
                               textFieldConfiguration: TextFieldConfiguration(
-                                  controller: _productName,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: 'Roboto',
-                                      color: linkColor),
-                                  keyboardType: TextInputType.text,
-                                  decoration: const InputDecoration(
-                                    errorText: 'Product must be on the list.',
-                                    suffix: FaIcon(
-                                      FontAwesomeIcons.xmark,
-                                      color: redColor,
-                                      size: 14,
-                                    ),
-                                    contentPadding:
-                                        EdgeInsets.fromLTRB(10, 13, 10, 13),
-                                    hintText: 'Add product name',
-                                    hintStyle: TextStyle(
-                                        fontSize: 14, color: primaryColor),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(5),
-                                            bottomLeft: Radius.circular(5)),
-                                        borderSide: BorderSide.none),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    isDense: true,
-                                  )),
+                                controller: _productName,
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'Roboto',
+                                    color: linkColor),
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  errorText: productError,
+                                  suffix: noTagError
+                                      ? const FaIcon(
+                                          FontAwesomeIcons.xmark,
+                                          color: redColor,
+                                          size: 14,
+                                        )
+                                      : null,
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(10, 13, 10, 13),
+                                  hintText: 'Add product name',
+                                  hintStyle: const TextStyle(
+                                      fontSize: 14, color: primaryColor),
+                                  border: const OutlineInputBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(5),
+                                          bottomLeft: Radius.circular(5)),
+                                      borderSide: BorderSide.none),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  isDense: true,
+                                ),
+                                onChanged: (v) {
+                                  setState(() {
+                                    if (noTagError) {
+                                      productError =
+                                          'Product was not on the list';
+                                    } else {
+                                      productError = null;
+                                    }
+                                  });
+                                },
+                              ),
                               suggestionsCallback: (pattern) async {
                                 List<String> matches = <String>[];
                                 matches.addAll(vegetables);
@@ -182,6 +284,9 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                       .toLowerCase()
                                       .contains(pattern.toLowerCase());
                                 });
+
+                                noTagError = matches.isEmpty ? true : false;
+
                                 return matches;
                               },
                               noItemsFoundBuilder: (context) {
@@ -202,15 +307,18 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                   child: Text(
                                     suggestion.toString(),
                                     style: const TextStyle(
-                                        color: primaryColor, fontSize: 14),
+                                        color: primaryColor, fontSize: 15),
                                   ),
                                 );
                               },
                               onSuggestionSelected: (suggestion) {
                                 setState(() {
                                   _productName.text = suggestion.toString();
+                                  productError = null;
                                 });
                               },
+                              itemSeparatorBuilder: ((context, index) =>
+                                  const Divider()),
                             ),
                           ),
                         ),
@@ -225,15 +333,19 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                   fontFamily: 'Roboto',
                                   color: linkColor),
                               keyboardType: TextInputType.number,
-                              validator: MultiValidator(
-                                [
-                                  RequiredValidator(errorText: 'Required'),
-                                ],
-                              ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  isQntError = false;
+                                });
+                              },
                               onSaved: (value) {
                                 _productName.text = value!;
                               },
                               decoration: InputDecoration(
+                                  errorText: isQntError ? "Required" : null,
                                   contentPadding:
                                       const EdgeInsets.fromLTRB(10, 13, 10, 13),
                                   hintText: 'Qty.',
@@ -315,9 +427,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                             const BorderRadius.all(Radius.circular(5)),
                         child: GestureDetector(
                           onTap: () {
-                            final formState = _formKey.currentState!;
-
-                            if (formState.validate()) {
+                            if (checkProductField()) {
                               addProduct(
                                   _productName.text,
                                   int.parse(_productQnt.text),
@@ -361,7 +471,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                             height: 36,
                             width: double.infinity,
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             color: Colors.white,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -402,7 +512,8 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                 height: 75,
                                 width: double.infinity,
                                 alignment: Alignment.centerLeft,
-                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 color: Colors.white,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,6 +524,8 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                         setState(() {
                                           locChoice = items[0];
                                           selectLocation = false;
+                                          noLocError = false;
+                                          showLocError = false;
                                         });
                                       },
                                       child: const SizedBox(
@@ -428,9 +541,18 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                         thickness: 0.5, color: linkColor),
                                     GestureDetector(
                                       onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UserLocateAddress(),
+                                            ));
+
                                         setState(() {
                                           locChoice = items[1];
                                           selectLocation = false;
+                                          noLocError = false;
+                                          showLocError = false;
                                         });
                                       },
                                       child: const SizedBox(
@@ -446,6 +568,14 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                               ),
                             ),
                           ),
+                        ),
+                      ),
+                    if (showLocError)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10, left: 5),
+                        child: Text(
+                          'Please select your prefered delivery address.',
+                          style: TextStyle(color: Colors.red, fontSize: 12),
                         ),
                       ),
                     const SizedBox(
@@ -479,7 +609,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                             height: 75,
                             width: double.infinity,
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
                             color: Colors.white,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -488,6 +618,13 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                 GestureDetector(
                                   onTap: () {
                                     showDialogPicker(context);
+                                    noDateError = false;
+
+                                    if (!noTimeError) {
+                                      setState(() {
+                                        showDateTimeError = false;
+                                      });
+                                    }
                                   },
                                   child: SizedBox(
                                     width: double.infinity,
@@ -518,16 +655,23 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                 GestureDetector(
                                   onTap: () {
                                     showDialogTimePicker(context);
+                                    noTimeError = false;
+
+                                    if (!noDateError) {
+                                      setState(() {
+                                        showDateTimeError = false;
+                                      });
+                                    }
                                   },
                                   child: SizedBox(
                                     width: double.infinity,
                                     child: time.isEmpty
-                                        ? Text('00:00 AM',
+                                        ? const Text('00:00 AM',
                                             style: TextStyle(
                                                 color: primaryColor,
                                                 fontSize: 15))
                                         : Text(time,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 color: linkColor,
                                                 fontSize: 15)),
                                   ),
@@ -537,7 +681,15 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                           ),
                         ),
                       ),
-                    )
+                    ),
+                    if (showDateTimeError)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10, left: 5),
+                        child: Text(
+                          'Please provide your prefered delivery date and time.',
+                          style: TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      )
                   ],
                 ))
           ]),
@@ -630,7 +782,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
           return DropdownMenuItem(
             value: item.value,
             child: Container(
-              decoration: BoxDecoration(color: Colors.black),
+              decoration: const BoxDecoration(color: Colors.black),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -723,13 +875,15 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
       String? suffix,
       required TextEditingController controller,
       TextInputType? type = TextInputType.text,
-      String? validator}) {
+      String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextFormField(
+        controller: controller,
         style: const TextStyle(
             fontSize: 14, fontFamily: 'Roboto', color: linkColor),
         keyboardType: type,
+        validator: validator,
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.fromLTRB(10, 13, 10, 13),
             hintText: hint,

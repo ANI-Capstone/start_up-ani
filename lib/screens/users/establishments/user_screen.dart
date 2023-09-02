@@ -3,15 +3,18 @@ import 'dart:async';
 import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/api/fcm_notif_api.dart';
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/providers/google_provider.dart';
 import 'package:ani_capstone/screens/components/user/user_basket.dart';
 import 'package:ani_capstone/screens/components/user/user_feeds.dart';
 import 'package:ani_capstone/screens/components/user/user_inbox.dart';
+import 'package:ani_capstone/screens/components/user/user_map.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/components/user/user_store.dart';
 import 'package:ani_capstone/screens/users/establishments/user_create_order.dart';
+import 'package:ani_capstone/screens/users/establishments/user_es_basket.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -37,6 +40,8 @@ class _UserScreenState extends State<UserScreen> {
 
   List<int> badgeCount = [0, 0, 0];
   List<int> eachCount = [0, 0, 0];
+
+  List<Product> addedProducts = [];
 
   String messageBadge = "3";
   late StreamSubscription<bool> keyboardSubscription;
@@ -70,6 +75,12 @@ class _UserScreenState extends State<UserScreen> {
 
     notifInit();
     _timer = Timer(const Duration(seconds: 0), () {});
+  }
+
+  void updateAddedProducts(List<Product> products) {
+    setState(() {
+      addedProducts = products;
+    });
   }
 
   Future<void> notifInit() async {
@@ -156,6 +167,21 @@ class _UserScreenState extends State<UserScreen> {
     }
   }
 
+  Widget _userBasket() {
+    return UserEsBasket(
+      user: user!,
+      updateAddedProducts: (products) {
+        updateAddedProducts(products);
+      },
+      setFeedBadge: ((count, index) {
+        setFeedBadge(count, index);
+      }),
+      toggleBasket: ((open) {
+        toggleBasket(open);
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -181,6 +207,7 @@ class _UserScreenState extends State<UserScreen> {
               toggleBasket(open);
             },
             badgeCount: badgeCount[0],
+            addedProducts: addedProducts,
           ),
           UserInbox(
             user: user!,
@@ -188,32 +215,15 @@ class _UserScreenState extends State<UserScreen> {
               setMessageBadge(count);
             },
           ),
-          UserCreateOrder(user: user!),
-          Container(),
+          _userBasket(),
+          UserMap(),
           UserProfile(
             user: user!,
             getUserData: () {
               getUserData();
             },
           ),
-          user!.userTypeId == 1
-              ? UserStore(
-                  userData: user!,
-                  toggleBasket: (open) {
-                    toggleBasket(open);
-                  },
-                  setFeedBadge: (int count, int index) {
-                    setFeedBadge(count, index);
-                  },
-                )
-              : UserBasket(
-                  userData: user!,
-                  toggleBasket: (open) {
-                    toggleBasket(open);
-                  },
-                  setFeedBadge: (int count, int index) {
-                    setFeedBadge(count, index);
-                  })
+          _userBasket()
         ])),
         bottomNavigationBar: !showBottomNavigation
             ? null
@@ -222,9 +232,9 @@ class _UserScreenState extends State<UserScreen> {
                     .copyWith(iconTheme: const IconThemeData(color: linkColor)),
                 child: CurvedNavigationBar(
                   color: primaryColor,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.white,
                   buttonBackgroundColor: Colors.transparent,
-                  height: 55,
+                  height: 50,
                   index: currentIndex > 4 ? 0 : currentIndex,
                   onTap: (index) {
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -241,7 +251,7 @@ class _UserScreenState extends State<UserScreen> {
                       position: badges.BadgePosition.topEnd(top: -14, end: -12),
                       child: inboxNav,
                     ),
-                    FaIcon(FontAwesomeIcons.circlePlus),
+                    FaIcon(FontAwesomeIcons.bagShopping),
                     badges.Badge(
                         badgeContent: Text(
                           '${badgeCount[2]}',

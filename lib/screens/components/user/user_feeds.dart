@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/models/post.dart';
@@ -13,14 +14,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../constants.dart';
 
 class UserFeed extends StatefulWidget {
-  UserData user;
-  Function(bool open) openBasket;
+  final UserData user;
+  final Function(bool open) openBasket;
 
-  int badgeCount;
-  UserFeed(
+  final int badgeCount;
+  final List<Product> addedProducts;
+
+  const UserFeed(
       {required this.user,
       required this.openBasket,
       required this.badgeCount,
+      required this.addedProducts,
       super.key});
 
   @override
@@ -36,6 +40,7 @@ class _UserFeedState extends State<UserFeed> {
 
   List<Post> posts = [];
   List<Post> searched = [];
+  List<Product> addedProduct = [];
 
   final TextEditingController _searchInput = TextEditingController();
   bool isSearching = false;
@@ -186,7 +191,6 @@ class _UserFeedState extends State<UserFeed> {
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     showBadge: widget.badgeCount > 0,
-          
                     position: badges.BadgePosition.topEnd(top: -13, end: -11),
                     child: user.userTypeId == 1
                         ? const Icon(FontAwesomeIcons.store,
@@ -457,5 +461,6 @@ class _UserFeedState extends State<UserFeed> {
   Widget buildPost(Post post) => PostCard(
         post: post,
         user: user,
+        addedProduct: widget.addedProducts,
       );
 }
