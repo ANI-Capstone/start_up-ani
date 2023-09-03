@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:ani_capstone/constants.dart';
+import 'package:ani_capstone/models/address.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,9 +13,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserLocateAddress extends StatefulWidget {
-  const UserLocateAddress({Key? key, this.isNew = false}) : super(key: key);
+  const UserLocateAddress(
+      {Key? key, this.isNew = false, required this.saveAddress})
+      : super(key: key);
 
   final bool? isNew;
+  final Function(Address address) saveAddress;
   @override
   _UserLocateAddressState createState() => _UserLocateAddressState();
 }
@@ -69,8 +73,6 @@ class _UserLocateAddressState extends State<UserLocateAddress> {
     places = await json.decode(res2);
 
     final loc = await Geolocator.getCurrentPosition();
-
-    print(loc);
 
     final GoogleMapController controller = await _controller.future;
     await controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -136,15 +138,16 @@ class _UserLocateAddressState extends State<UserLocateAddress> {
           color: linkColor,
           size: 20,
         ),
-        title: const Text('NEW ADDRESS',
-            style: TextStyle(color: linkColor, fontWeight: FontWeight.bold)),
+        title: Text(widget.isNew! ? 'NEW ADDRESS' : 'USER ADDRESS',
+            style:
+                const TextStyle(color: linkColor, fontWeight: FontWeight.bold)),
         backgroundColor: primaryColor,
         elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(
-              horizontal: defaultPadding - 5, vertical: 20),
+              horizontal: defaultPadding - 15, vertical: 20),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text(
@@ -360,21 +363,32 @@ class _UserLocateAddressState extends State<UserLocateAddress> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 15),
-              child: Container(
-                height: 40,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: linkColor,
-                  borderRadius: BorderRadius.circular(5),
+              child: GestureDetector(
+                onTap: () {
+                  // final address = Address(
+                  //     region: _region.text.trim(),
+                  //     province: province,
+                  //     city: city,
+                  //     barangay: barangay,
+                  //     postal: postal,
+                  //     precise: precise);
+                },
+                child: Container(
+                  height: 40,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: linkColor,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: const Center(
+                      child: Text(
+                    'Save Address',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold),
+                  )),
                 ),
-                child: Center(
-                    child: Text(
-                  'Save Address',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                )),
               ),
             )
           ]),

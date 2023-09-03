@@ -182,7 +182,7 @@ class _BasketScreenState extends State<BasketScreen> {
     return ProductPost.getProducts(productList: [product.productId])
         .then((value) {
       product.post = value[0];
-      product.tPrice = value[0].price.round();
+      product.tPrice = value[0].price;
 
       return product;
     });
@@ -195,7 +195,7 @@ class _BasketScreenState extends State<BasketScreen> {
         for (int j = 0; j < products.length; j++) {
           if (products[i].productId == post[j].postId) {
             products[i].post = post[j];
-            products[i].tPrice = post[j].price.round();
+            products[i].tPrice = post[j].price;
           }
         }
       }

@@ -33,7 +33,7 @@ class _MyProfileState extends State<MyProfile> {
   void initState() {
     super.initState();
 
-    fetchData();
+    // fetchData();
   }
 
   Future fetchData() async {

@@ -8,6 +8,7 @@ import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/screens/components/basket_pages/basket_card.dart';
 import 'package:ani_capstone/screens/users/establishments/user_components/user_basket/estab_basket_card.dart';
+import 'package:ani_capstone/screens/users/establishments/user_create_order.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import "package:collection/collection.dart";
@@ -33,7 +34,7 @@ class _EstabBasketState extends State<EstabBasket> {
   late UserData user;
 
   List<Basket> basket = [];
-  List<Product> products = [];
+  List<Product> selectedProducts = [];
 
   int fetchState = 0;
 
@@ -62,6 +63,8 @@ class _EstabBasketState extends State<EstabBasket> {
   }
 
   void selectAllItems(bool value) {
+    List<Product> temp = [];
+
     setState(() {
       checkAll = value;
 
@@ -74,20 +77,28 @@ class _EstabBasketState extends State<EstabBasket> {
               : basket[i].products[j].checkBox = false;
 
           itemsCount += 1;
+          temp.add(basket[i].products[j]);
         }
       }
 
       checkAll ? selectedItems = itemsCount : selectedItems = 0;
     });
+
+    checkAll ? selectedProducts = temp : selectedProducts.clear();
   }
 
   void selectedItemsCount() {
     int items = 0;
 
+    List<Product> temp = [];
+
     for (int i = 0; i < basket.length; i++) {
       for (int j = 0; j < basket[i].products.length; j++) {
-        if (basket[i].products[j].checkBox!) {
+        final item = basket[i].products[j];
+
+        if (item.checkBox!) {
           items += 1;
+          temp.add(item);
         } else {
           if (checkAll) {
             setState(() {
@@ -97,6 +108,8 @@ class _EstabBasketState extends State<EstabBasket> {
         }
       }
     }
+
+    selectedProducts = temp;
 
     if (mounted) {
       setState(() {
@@ -190,7 +203,7 @@ class _EstabBasketState extends State<EstabBasket> {
     return ProductPost.getProducts(productList: [product.productId])
         .then((value) {
       product.post = value[0];
-      product.tPrice = value[0].price.round();
+      product.tPrice = value[0].price;
 
       return product;
     });
@@ -203,7 +216,7 @@ class _EstabBasketState extends State<EstabBasket> {
         for (int j = 0; j < products.length; j++) {
           if (products[i].productId == post[j].postId) {
             products[i].post = post[j];
-            products[i].tPrice = post[j].price.round();
+            products[i].tPrice = post[j].price;
           }
         }
       }
@@ -256,12 +269,9 @@ class _EstabBasketState extends State<EstabBasket> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-
     return fetchState != 1
         ? statusBuilder()
         : SizedBox(
-            height: height - 187,
             child: Column(
               children: [
                 Expanded(
@@ -281,11 +291,11 @@ class _EstabBasketState extends State<EstabBasket> {
                 if (createOrder)
                   Container(
                     height: 60,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0xffDDDDDD),
+                          color: userBgColor,
                           blurRadius: 2.0,
                           spreadRadius: 2.0,
                         )
@@ -311,22 +321,32 @@ class _EstabBasketState extends State<EstabBasket> {
                           Expanded(
                               child: Text(
                             '($selectedItems) Items',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: linkColor, fontWeight: FontWeight.bold),
                           )),
-                          Container(
-                            height: 36,
-                            width: 160,
-                            decoration: BoxDecoration(
-                                color: linkColor,
-                                borderRadius: BorderRadius.circular(5)),
-                            child: const Center(
-                              child: Text(
-                                'Create Order',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => UserCreateOrder(
+                                          user: user,
+                                          products: selectedProducts)));
+                            },
+                            child: Container(
+                              height: 36,
+                              width: 160,
+                              decoration: BoxDecoration(
+                                  color: linkColor,
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: const Center(
+                                child: Text(
+                                  'Create Order',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14),
+                                ),
                               ),
                             ),
                           ),

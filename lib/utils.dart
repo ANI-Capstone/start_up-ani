@@ -7,6 +7,9 @@ import 'package:intl/intl.dart';
 import 'models/post.dart';
 
 class Utils {
+  static NumberFormat numberFormat = NumberFormat.decimalPattern('en_us');
+  static const String cn = '\u20B1';
+
   static StreamTransformer transformer<T>(
           T Function(Map<String, dynamic> json) fromJson) =>
       StreamTransformer<QuerySnapshot, List<T>>.fromHandlers(
@@ -55,8 +58,12 @@ class Utils {
   }
 
   static String getFormattedDateSimple(int time) {
-    DateFormat newFormat = DateFormat("MM/dd/yyyy");
+    DateFormat newFormat = DateFormat("MM/dd/yyyy - EEEE");
     return newFormat.format(DateTime.fromMillisecondsSinceEpoch(time));
+  }
+
+  static String specifiedDateTime(DateTime datetime) {
+    return DateFormat('MM/dd/yyyy, hh:mm a').format(datetime);
   }
 }
 

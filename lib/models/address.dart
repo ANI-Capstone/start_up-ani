@@ -12,7 +12,7 @@ class Address {
   final LatLng precise;
 
   Address(
-      {this.completeAddress,
+      {this.completeAddress = '',
       required this.region,
       required this.province,
       required this.city,
@@ -31,17 +31,13 @@ class Address {
       street: json['street'],
       precise: LatLng.fromJson(json['precise'])!);
 
-  static String toCompleteAddress(Address address) {
-    String completeAddress = '';
-
-    if (address.street!.isNotEmpty) {
-      completeAddress += '${address.street}, ';
+  void toCompleteAddress() {
+    if (street!.isNotEmpty) {
+      completeAddress = '${street!}, ';
     }
 
-    completeAddress +=
-        '${address.barangay}, ${address.city}, ${address.province}, ${address.region}, ${address.postal}';
-
-    return completeAddress;
+    completeAddress =
+        '${completeAddress!}$barangay, $city, $province, $region, $postal';
   }
 
   Map<String, dynamic> toJson() => {

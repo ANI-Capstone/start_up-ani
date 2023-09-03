@@ -32,7 +32,8 @@ class _EstabBasketCardState extends State<EstabBasketCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(15)),
       padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       child: Column(children: [
         Row(children: [

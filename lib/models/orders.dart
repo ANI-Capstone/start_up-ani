@@ -6,7 +6,7 @@ class Orders {
   User publisher;
   User costumer;
   List<Product> products;
-  int totalPrice;
+  double totalPrice;
   int status;
   double? rating;
 
@@ -19,16 +19,19 @@ class Orders {
       this.orderId,
       this.rating});
 
-  static Orders fromJson(Map<String, dynamic> json, String orderId) => Orders(
-      orderId: orderId,
-      publisher: User.fromJson(json['publisher']),
-      costumer: User.fromJson(json['costumer']),
-      products: List<Product>.from((json['products'] as Iterable)
-          .map((product) => Product.fromJson(product))
-          .toList()),
-      totalPrice: json['totalPrice'],
-      status: json['status'],
-      rating: double.tryParse('${json['rating']}'));
+  static Orders fromJson(Map<String, dynamic> json, String orderId) {
+    print('yeah');
+    return Orders(
+        orderId: orderId,
+        publisher: User.fromJson(json['publisher']),
+        costumer: User.fromJson(json['costumer']),
+        products: List<Product>.from((json['products'] as Iterable)
+            .map((product) => Product.fromJson(product))
+            .toList()),
+        totalPrice: json['totalPrice'],
+        status: json['status'],
+        rating: double.tryParse('${json['rating']}'));
+  }
 
   Map<String, dynamic> toJson() => {
         'publisher': publisher.toJson(),

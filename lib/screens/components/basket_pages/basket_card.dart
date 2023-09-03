@@ -32,7 +32,7 @@ class _BasketCardState extends State<BasketCard> {
   bool checkAll = false;
   Timer? timer;
 
-  int totalPrice = 0;
+  double totalPrice = 0;
 
   @override
   void initState() {
@@ -42,10 +42,10 @@ class _BasketCardState extends State<BasketCard> {
   void updateTotalPrice() {
     if (mounted) {
       setState(() {
-        int sum = 0;
+        double sum = 0;
         for (int i = 0; i < widget.products.length; i++) {
-          widget.products[i].tPrice = widget.products[i].post!.price.round() *
-              widget.products[i].quantity;
+          widget.products[i].tPrice =
+              widget.products[i].post!.price * widget.products[i].quantity;
           if (widget.products[i].checkBox!) {
             sum += widget.products[i].tPrice!;
           }

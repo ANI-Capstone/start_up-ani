@@ -12,7 +12,7 @@ class Product {
   DateTime addedAt;
   Post? post;
   bool? checkBox;
-  int? tPrice;
+  double? tPrice;
   int? index;
   int? basketIndex;
 
@@ -26,16 +26,18 @@ class Product {
       this.checkBox = false,
       this.tPrice});
 
-  static Product fromJson(Map<String, dynamic> json) => Product(
-      productId: json['productId'],
-      quantity: json['quantity'],
-      orderStatus: json['orderStatus'],
-      publisher: User.fromJson(json['publisher']),
-      addedAt: Utils.toDateTime(json['addedAt']),
-      tPrice: json['tPrice'],
-      post: json['post'] == null
-          ? null
-          : Post.fromJson(json['post'], json['productId']));
+  static Product fromJson(Map<String, dynamic> json) {
+    return Product(
+        productId: json['productId'],
+        quantity: json['quantity'],
+        orderStatus: json['orderStatus'],
+        publisher: User.fromJson(json['publisher']),
+        addedAt: Utils.toDateTime(json['addedAt']),
+        tPrice: json['tPrice'],
+        post: json['post'] == null
+            ? null
+            : Post.fromJson(json['post'], json['productId']));
+  }
 
   Map<String, dynamic> toJson() => {
         'productId': productId,

@@ -1,7 +1,9 @@
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
+import 'package:ani_capstone/screens/users/establishments/user_components/user_active_orders/estab_active_orders.dart';
 import 'package:ani_capstone/screens/users/establishments/user_components/user_basket/estab_basket.dart';
+import 'package:ani_capstone/screens/users/establishments/user_components/user_orders/estab_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
@@ -25,7 +27,7 @@ class UserEsBasket extends StatefulWidget {
 }
 
 class _UserEsBasketState extends State<UserEsBasket> {
-  int tabIndex = 0;
+  int tabIndex = 1;
 
   List<int> badgeCount = [0, 0, 0];
 
@@ -40,74 +42,84 @@ class _UserEsBasketState extends State<UserEsBasket> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
     return Scaffold(
         backgroundColor: userBgColor,
         body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                height: 50,
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                color: primaryColor,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        widget.toggleBasket(false);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: linkColor,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    const Text('BASKET',
-                        style: TextStyle(
-                          fontSize: 20,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  height: 50,
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  color: primaryColor,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          widget.toggleBasket(false);
+                        },
+                        child: const Icon(
+                          Icons.arrow_back,
                           color: linkColor,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Roboto',
-                        )),
-                  ],
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      const Text('BASKET',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: linkColor,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Roboto',
+                          )),
+                    ],
+                  ),
                 ),
-              ),
-              Container(
-                height: 55,
-                decoration: const BoxDecoration(color: primaryColor),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  buildTabs(context, 'Your Basket', tabIndex, index: 0,
-                      onTap: () {
-                    if (mounted) {
-                      setState(() {
-                        tabIndex = 0;
-                      });
-                    }
-                  }, icon: FontAwesomeIcons.bagShopping, count: 0),
-                  buildTabs(context, 'Created Orders', tabIndex, index: 1,
-                      onTap: () {
-                    if (mounted) {
-                      setState(() {
-                        tabIndex = 1;
-                      });
-                    }
-                  }, icon: FontAwesomeIcons.listCheck, count: 0),
-                  buildTabs(context, 'Active Orders', tabIndex, index: 2,
-                      onTap: () {
-                    if (mounted) {
-                      setState(() {
-                        tabIndex = 2;
-                      });
-                    }
-                  }, icon: FontAwesomeIcons.boxOpen, count: 0)
-                ]),
-              ),
-              buildBasketPage(context, tabIndex)
-            ],
+                Container(
+                  height: 55,
+                  decoration: const BoxDecoration(color: primaryColor),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        buildTabs(context, 'Your Basket', tabIndex, index: 0,
+                            onTap: () {
+                          if (mounted) {
+                            setState(() {
+                              tabIndex = 0;
+                            });
+                          }
+                        },
+                            icon: FontAwesomeIcons.bagShopping,
+                            count: badgeCount[0]),
+                        buildTabs(context, 'Created Orders', tabIndex, index: 1,
+                            onTap: () {
+                          if (mounted) {
+                            setState(() {
+                              tabIndex = 1;
+                            });
+                          }
+                        },
+                            icon: FontAwesomeIcons.listCheck,
+                            count: badgeCount[1]),
+                        buildTabs(context, 'Active Orders', tabIndex, index: 2,
+                            onTap: () {
+                          if (mounted) {
+                            setState(() {
+                              tabIndex = 2;
+                            });
+                          }
+                        }, icon: FontAwesomeIcons.boxOpen, count: badgeCount[2])
+                      ]),
+                ),
+                SizedBox(
+                    height: height - 187,
+                    child: buildBasketPage(context, tabIndex))
+              ],
+            ),
           ),
         ));
   }
@@ -170,22 +182,23 @@ class _UserEsBasketState extends State<UserEsBasket> {
   }
 
   Widget buildBasketPage(BuildContext context, int tabIndex) {
-    return Container(
-      width: double.infinity,
-      child: IndexedStack(
-        index: tabIndex,
-        children: [
-          EstabBasket(
-            user: widget.user,
-            updateAddedProducts: (products) {
-              widget.updateAddedProducts(products);
-            },
-            setBadgeCount: (count, index) {
-              setBadgeCount(count, index);
-            },
-          )
-        ],
-      ),
+    return IndexedStack(
+      index: tabIndex,
+      children: [
+        EstabBasket(
+          user: widget.user,
+          updateAddedProducts: (products) {
+            widget.updateAddedProducts(products);
+          },
+          setBadgeCount: (count, index) {
+            setBadgeCount(count, index);
+          },
+        ),
+        EstabOrders(
+          user: widget.user,
+        ),
+        EstabActiveOrders()
+      ],
     );
   }
 }
