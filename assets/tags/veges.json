@@ -1,0 +1,124 @@
+{
+    "vegetables": [
+        {
+            "name": "Ampalaya",
+            "english": "Bitter Gourd"
+        },
+        {
+            "name": "Talong",
+            "english": "Eggplant"
+        },
+        {
+            "name": "Kalabasa",
+            "english": "Squash"
+        },
+        {
+            "name": "Upo",
+            "english": "Bottle Gourd"
+        },
+        {
+            "name": "Patola",
+            "english": "Sponge Gourd"
+        },
+        {
+            "name": "Labanos",
+            "english": "Radish"
+        },
+        {
+            "name": "Singkamas",
+            "english": "Jicama"
+        },
+        {
+            "name": "Sibuyas",
+            "english": "Onion"
+        },
+        {
+            "name": "Bawang",
+            "english": "Garlic"
+        },
+        {
+            "name": "Luya",
+            "english": "Ginger"
+        },
+        {
+            "name": "Kamatis",
+            "english": "Tomato"
+        },
+        {
+            "name": "Mustasa",
+            "english": "Mustard"
+        },
+        {
+            "name": "Sitaw",
+            "english": "String Beans"
+        },
+        {
+            "name": "Okra",
+            "english": "Okra"
+        },
+        {
+            "name": "Sigarilyas",
+            "english": "Winged Bean"
+        },
+        {
+            "name": "Patani",
+            "english": "Lima Bean"
+        },
+        {
+            "name": "Mani",
+            "english": "Peanut"
+        },
+        {
+            "name": "Mais",
+            "english": "Corn"
+        },
+        {
+            "name": "Pechay",
+            "english": "Chinese Cabbage"
+        },
+        {
+            "name": "Repolyo",
+            "english": "Cabbage"
+        },
+        {
+            "name": "Baguio Beans",
+            "english": "Baguio Beans"
+        },
+        {
+            "name": "Alogbati",
+            "english": "Malabar Spinach"
+        },
+        {
+            "name": "Kundol",
+            "english": "Winter Melon"
+        },
+        {
+            "name": "Papaya",
+            "english": "Papaya"
+        },
+        {
+            "name": "Kangkong",
+            "english": "Water Spinach"
+        },
+        {
+            "name": "Tanglad",
+            "english": "Lemongrass"
+        },
+        {
+            "name": "Malunggay",
+            "english": "Moringa"
+        },
+        {
+            "name": "Sili",
+            "english": "Chili Pepper"
+        },
+        {
+            "name": "Aserola",
+            "english": "Barbados Cherry"
+        },
+        {
+            "name": "Kamote",
+            "english": "Sweet Potato"
+        }
+    ]
+}

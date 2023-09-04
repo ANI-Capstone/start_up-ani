@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
@@ -11,14 +12,17 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class UserBasket extends StatefulWidget {
-  UserData userData;
+  final UserData userData;
   final Function(bool open) toggleBasket;
   final Function(int count, int index) setFeedBadge;
-  UserBasket(
+  final Function(List<Product> products) updateAddedProducts;
+
+  const UserBasket(
       {Key? key,
       required this.userData,
       required this.toggleBasket,
-      required this.setFeedBadge})
+      required this.setFeedBadge,
+      required this.updateAddedProducts})
       : super(key: key);
 
   @override
@@ -269,6 +273,9 @@ class _UserBasketState extends State<UserBasket> {
             setBadgeCount: (int count, int index) {
               setBadgeCount(count, index);
             },
+            updateAddedProducts: ((products) {
+              widget.updateAddedProducts(products);
+            }),
           ),
           ActiveOrders(
             user: widget.userData,

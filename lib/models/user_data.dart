@@ -1,3 +1,4 @@
+import 'package:ani_capstone/models/address.dart';
 import 'package:ani_capstone/utils.dart';
 
 class UserData {
@@ -5,6 +6,7 @@ class UserData {
 
   String? id, photoUrl, fcmToken;
   int zipcode, userTypeId;
+  Address? newAddress;
 
   UserData(
       {this.id,
@@ -19,7 +21,8 @@ class UserData {
       required this.province,
       required this.zipcode,
       required this.userTypeId,
-      required this.typeName});
+      required this.typeName,
+      this.newAddress});
 
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -49,5 +52,6 @@ class UserData {
       province: json['address']['province'],
       zipcode: json['address']['zipcode'],
       userTypeId: json['userType']['userTypeId'],
-      typeName: json['userType']['typeName']);
+      typeName: json['userType']['typeName'],
+      newAddress: json['newAddress']);
 }

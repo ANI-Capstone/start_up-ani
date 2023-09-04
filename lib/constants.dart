@@ -92,9 +92,12 @@ class ShoWInfo {
   static showToast(String message, int? seconds) {
     return Fluttertoast.showToast(
         msg: message,
-        toastLength: Toast.LENGTH_LONG,
+        toastLength: seconds == null
+            ? Toast.LENGTH_SHORT
+            : seconds < 3
+                ? Toast.LENGTH_SHORT
+                : Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: seconds ?? 0,
         backgroundColor: Colors.white,
         textColor: linkColor,
         fontSize: 14);

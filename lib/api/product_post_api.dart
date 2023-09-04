@@ -263,7 +263,7 @@ class ProductPost {
       {required User costumer,
       required User publisher,
       required List<Product> products,
-      required int totalPrice}) async {
+      required double totalPrice}) async {
     final orderRef = FirebaseFirestore.instance.collection('orders').doc();
 
     final orders = Orders(

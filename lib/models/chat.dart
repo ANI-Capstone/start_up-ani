@@ -1,6 +1,5 @@
 import 'package:ani_capstone/models/message.dart';
 import 'package:ani_capstone/models/user.dart';
-import 'package:meta/meta.dart';
 
 import '../utils.dart';
 

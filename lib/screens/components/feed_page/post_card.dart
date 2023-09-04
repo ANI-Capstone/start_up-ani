@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:ani_capstone/api/product_post_api.dart';
 import 'package:ani_capstone/constants.dart';
@@ -18,10 +19,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class PostCard extends StatefulWidget {
-  Post post;
-  UserData user;
-  VoidCallback? fetchData;
-  PostCard({Key? key, required this.post, required this.user, this.fetchData})
+  final Post post;
+  final UserData user;
+  final VoidCallback? fetchData;
+  final List<Product> addedProduct;
+  const PostCard(
+      {Key? key,
+      required this.post,
+      required this.user,
+      this.fetchData,
+      required this.addedProduct})
       : super(key: key);
 
   @override
@@ -29,12 +36,12 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
-  late Timer _timer;
+  late Timer _likeTimer;
   late User user;
   String textButton = 'See more';
   bool liked = false;
 
-  int duration = 0;
+  int likeDuration = 0;
 
   late SharedPreferences prefs;
   Color? like = unLikeColor;
@@ -46,6 +53,10 @@ class _PostCardState extends State<PostCard> {
   final _formKey = GlobalKey<FormState>();
   final _newPrice = TextEditingController();
 
+  bool alreadyAdded(String id) {
+    return widget.addedProduct.any((product) => product.productId == id);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +67,7 @@ class _PostCardState extends State<PostCard> {
         photoUrl: widget.user.photoUrl!);
 
     setLiked();
-    _timer = Timer(Duration(seconds: duration), () {});
+    _likeTimer = Timer(Duration(seconds: likeDuration), () {});
   }
 
   void setLiked() async {
@@ -72,9 +83,9 @@ class _PostCardState extends State<PostCard> {
   }
 
   void saveLike() async {
-    _timer = Timer(Duration(seconds: duration), () async {
+    _likeTimer = Timer(Duration(seconds: likeDuration), () async {
       setState(() {
-        duration = 10;
+        likeDuration = 10;
         ProductPost.updateLike(
             user: user,
             publisher: widget.post.publisher,
@@ -135,7 +146,7 @@ class _PostCardState extends State<PostCard> {
   @override
   void dispose() {
     super.dispose();
-    _timer.cancel();
+    _likeTimer.cancel();
   }
 
   @override
@@ -446,7 +457,7 @@ class _PostCardState extends State<PostCard> {
                             }
                           });
 
-                          if (!_timer.isActive) saveLike();
+                          if (!_likeTimer.isActive) saveLike();
                         },
                         child: RichText(
                           text: TextSpan(
@@ -509,6 +520,11 @@ class _PostCardState extends State<PostCard> {
                       child: GestureDetector(
                         onTap: () {
                           if (widget.post.publisher.userId != user.userId) {
+                            if (alreadyAdded(widget.post.postId!)) {
+                              ShoWInfo.showToast('Already added to basket.', 1);
+                              return;
+                            }
+
                             ProductPost.addToBasket(
                                     userId: user.userId!, post: widget.post)
                                 .whenComplete(() {

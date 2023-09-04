@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ani_capstone/api/account_api.dart';
+import 'package:ani_capstone/api/fcm_notif_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/user_data.dart';
@@ -9,86 +10,27 @@ import 'package:ani_capstone/screens/components/user/user_basket.dart';
 import 'package:ani_capstone/screens/components/user/user_feeds.dart';
 import 'package:ani_capstone/screens/components/user/user_inbox.dart';
 import 'package:ani_capstone/screens/components/user/user_map.dart';
-import 'package:ani_capstone/screens/components/user/user_notification.dart';
 import 'package:ani_capstone/screens/components/user/user_post.dart';
 import 'package:ani_capstone/screens/components/user/user_profile.dart';
 import 'package:ani_capstone/screens/components/user/user_store.dart';
-import 'package:ani_capstone/screens/user_type_select.dart';
-import 'package:ani_capstone/screens/users/establishments/user_screen.dart';
-import 'package:badges/badges.dart' as badges;
+import 'package:ani_capstone/screens/users/establishments/user_create_order.dart';
+import 'package:ani_capstone/screens/users/establishments/user_es_basket.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:badges/badges.dart' as badges;
 
-import '../api/fcm_notif_api.dart';
+class UserScreen extends StatefulWidget {
+  const UserScreen({Key? key, required this.user}) : super(key: key);
 
-class UserControl extends StatefulWidget {
-  const UserControl({Key? key}) : super(key: key);
-
-  @override
-  State<UserControl> createState() => _UserControlState();
-}
-
-class _UserControlState extends State<UserControl> {
-  UserData? _userData;
-
-  Future getUserData() async {
-    return AccountControl.accountCheck(context);
-  }
-
-  Widget checkUserType() {
-    final userType = _userData?.userTypeId;
-
-    if (userType == 3) {
-      return UserScreen(
-        user: _userData!,
-      );
-    }
-
-    if (userType != 0) {
-      return UserViewScreen(
-        userType: userType,
-        user: _userData,
-      );
-    }
-
-    return UserSelect();
-  }
+  final UserData user;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-        future: getUserData(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return ShoWInfo.errorAlert(context, snapshot.error.toString(), 5);
-          } else if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            _userData = snapshot.data;
-            return checkUserType();
-          }
-        },
-      ),
-    );
-  }
+  _UserScreenState createState() => _UserScreenState();
 }
 
-class UserViewScreen extends StatefulWidget {
-  int? userType;
-  UserData? user;
-
-  UserViewScreen({Key? key, this.userType, this.user}) : super(key: key);
-
-  @override
-  State<UserViewScreen> createState() => _UserViewScreenState();
-}
-
-class _UserViewScreenState extends State<UserViewScreen> {
+class _UserScreenState extends State<UserScreen> {
   int currentIndex = 2;
   int? userType;
   UserData? user;
@@ -118,7 +60,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
   void initState() {
     super.initState();
 
-    userType = widget.userType!;
     user = widget.user;
 
     var keyboardVisibilityController = KeyboardVisibilityController();
@@ -145,13 +86,13 @@ class _UserViewScreenState extends State<UserViewScreen> {
   Future<void> notifInit() async {
     await NotifAPI.initNotification();
 
-    if (widget.user!.fcmToken == null) {
+    if (widget.user.fcmToken == null) {
       final fcmToken = await NotifAPI.firebaseMessaging.getToken();
 
       AccountApi.setFcmToken(userId: user!.id!, fcmToken: fcmToken!)
           .then((value) {
         setState(() {
-          widget.user!.fcmToken = fcmToken;
+          widget.user.fcmToken = fcmToken;
         });
       });
     }
@@ -227,17 +168,17 @@ class _UserViewScreenState extends State<UserViewScreen> {
   }
 
   Widget _userBasket() {
-    return UserBasket(
-      userData: user!,
-      toggleBasket: (open) {
-        toggleBasket(open);
-      },
-      setFeedBadge: (int count, int index) {
-        setFeedBadge(count, index);
-      },
+    return UserEsBasket(
+      user: user!,
       updateAddedProducts: (products) {
         updateAddedProducts(products);
       },
+      setFeedBadge: ((count, index) {
+        setFeedBadge(count, index);
+      }),
+      toggleBasket: ((open) {
+        toggleBasket(open);
+      }),
     );
   }
 
@@ -274,30 +215,15 @@ class _UserViewScreenState extends State<UserViewScreen> {
               setMessageBadge(count);
             },
           ),
-          userType == 1 ? UserPost(user: user!) : _userBasket(),
-          UserNotificaiton(
-            user: user!,
-            setBadge: (int count) {
-              setNotifBadge(count);
-            },
-          ),
+          _userBasket(),
+          UserMap(),
           UserProfile(
             user: user!,
             getUserData: () {
               getUserData();
             },
           ),
-          user!.userTypeId == 1
-              ? UserStore(
-                  userData: user!,
-                  toggleBasket: (open) {
-                    toggleBasket(open);
-                  },
-                  setFeedBadge: (int count, int index) {
-                    setFeedBadge(count, index);
-                  },
-                )
-              : _userBasket()
+          _userBasket()
         ])),
         bottomNavigationBar: !showBottomNavigation
             ? null
@@ -306,9 +232,9 @@ class _UserViewScreenState extends State<UserViewScreen> {
                     .copyWith(iconTheme: const IconThemeData(color: linkColor)),
                 child: CurvedNavigationBar(
                   color: primaryColor,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.white,
                   buttonBackgroundColor: Colors.transparent,
-                  height: 55,
+                  height: 50,
                   index: currentIndex > 4 ? 0 : currentIndex,
                   onTap: (index) {
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -325,7 +251,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
                       position: badges.BadgePosition.topEnd(top: -14, end: -12),
                       child: inboxNav,
                     ),
-                    userType == 1 ? postNav : reviewNav,
+                    FaIcon(FontAwesomeIcons.bagShopping),
                     badges.Badge(
                         badgeContent: Text(
                           '${badgeCount[2]}',
