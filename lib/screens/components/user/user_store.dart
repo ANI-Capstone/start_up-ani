@@ -44,9 +44,8 @@ class _UserStoreState extends State<UserStore> {
 
   @override
   void dispose() {
-    super.dispose();
-
     listener.cancel();
+    super.dispose();
   }
 
   void setBadgeCount(int count, int index) {

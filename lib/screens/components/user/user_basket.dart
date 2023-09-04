@@ -45,9 +45,8 @@ class _UserBasketState extends State<UserBasket> {
 
   @override
   void dispose() {
-    super.dispose();
-
     listener.cancel();
+    super.dispose();
   }
 
   void orderListener() {

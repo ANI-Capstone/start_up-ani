@@ -65,8 +65,8 @@ class _ChatBoxState extends State<ChatBox> {
 
   @override
   void dispose() {
-    super.dispose();
     listener.cancel();
+    super.dispose();
   }
 
   void readMessage() {

@@ -55,8 +55,8 @@ class _UserFeedState extends State<UserFeed> {
 
   @override
   void dispose() {
-    super.dispose();
     listener.cancel();
+    super.dispose();
   }
 
   void feedListener() async {
@@ -186,7 +186,6 @@ class _UserFeedState extends State<UserFeed> {
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     showBadge: widget.badgeCount > 0,
-          
                     position: badges.BadgePosition.topEnd(top: -13, end: -11),
                     child: user.userTypeId == 1
                         ? const Icon(FontAwesomeIcons.store,

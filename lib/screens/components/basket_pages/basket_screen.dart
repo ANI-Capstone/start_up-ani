@@ -44,8 +44,8 @@ class _BasketScreenState extends State<BasketScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     listener.cancel();
+    super.dispose();
   }
 
   Future removeProduct(

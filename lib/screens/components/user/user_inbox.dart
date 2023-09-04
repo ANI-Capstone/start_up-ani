@@ -54,8 +54,8 @@ class _UserInboxState extends State<UserInbox> {
 
   @override
   void dispose() {
-    super.dispose();
     listener.cancel();
+    super.dispose();
   }
 
   Future loadChats() async {

@@ -134,8 +134,8 @@ class _PostCardState extends State<PostCard> {
 
   @override
   void dispose() {
-    super.dispose();
     _timer.cancel();
+    super.dispose();
   }
 
   @override

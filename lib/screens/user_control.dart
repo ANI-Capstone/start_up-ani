@@ -142,10 +142,11 @@ class _UserViewScreenState extends State<UserViewScreen> {
   @override
   void dispose() {
     keyboardSubscription.cancel();
-    super.dispose();
     NotifAPI.notifListener.cancel();
 
     _timer.cancel();
+
+    super.dispose();
   }
 
   void getUserData() async {
