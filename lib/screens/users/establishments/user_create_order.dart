@@ -660,7 +660,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                             borderRadius: BorderRadius.circular(5)),
                         child: const Center(
                             child: Text(
-                          'Save Order',
+                          'Checkout Order',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,

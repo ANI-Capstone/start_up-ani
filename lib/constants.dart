@@ -15,6 +15,9 @@ const plusColor = Color(0xFFD5D5D5);
 const unLikeColor = Color(0xFFB5B5B5);
 const likeColor = Color(0xFF315300);
 final bannerBgColor = const Color(0xFFC6D8AF).withOpacity(0.4);
+final pendingColor = const Color(0xFFFFB800).withOpacity(0.5);
+const acceptedColor = Color(0xFFC6D8AF);
+const deniedColor = Color(0xFFF24537);
 
 const defaultPadding = 32.0;
 

@@ -76,7 +76,7 @@ class _BasketCardState extends State<BasketCard> {
     }
 
     return ProductPost.checkOutOrder(
-      costumer: widget.user,
+      customer: widget.user,
       publisher: publisher,
       products: checkoutProducts,
       totalPrice: totalPrice,

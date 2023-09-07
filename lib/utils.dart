@@ -71,3 +71,7 @@ User sampleUser = User(
     name: 'Mark Zuckmyberd',
     photoUrl: 'https://i.ibb.co/StGZh5F/20180411134321-zuck.webp',
     userId: '32');
+
+class Policy {
+  static const double minimumOrder = 0;
+}

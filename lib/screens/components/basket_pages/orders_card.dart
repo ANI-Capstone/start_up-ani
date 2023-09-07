@@ -49,11 +49,11 @@ class _OrdersCardState extends State<OrdersCard> {
                   leading: CircleAvatar(
                       radius: 18,
                       backgroundImage: NetworkImage(widget.user.userTypeId == 1
-                          ? widget.order.costumer.photoUrl
+                          ? widget.order.customer.photoUrl
                           : widget.order.publisher.photoUrl)),
                   title: Text(
                     widget.user.userTypeId == 1
-                        ? widget.order.costumer.name
+                        ? widget.order.customer.name
                         : widget.order.publisher.name,
                     style: const TextStyle(
                         color: linkColor,
@@ -439,7 +439,7 @@ class _OrdersCardState extends State<OrdersCard> {
               MaterialPageRoute(
                   builder: (context) => ChatBox(
                         receiver: widget.user.userTypeId == 1
-                            ? widget.order.costumer
+                            ? widget.order.customer
                             : widget.order.publisher,
                         author: user,
                       )),

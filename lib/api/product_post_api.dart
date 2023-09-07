@@ -181,7 +181,7 @@ class ProductPost {
       .snapshots(includeMetadataChanges: false);
 
   static orderStream({required String userId, required int userType}) {
-    final id = userType == 1 ? 'publisher.id' : 'costumer.id';
+    final id = userType == 1 ? 'publisher.id' : 'customer.id';
     return FirebaseFirestore.instance
         .collection('orders')
         .where(id, isEqualTo: userId)
@@ -190,7 +190,7 @@ class ProductPost {
 
   static Future<List<Orders>> getOrders(
       {required String userId, required int userType}) {
-    final id = userType == 1 ? 'publisher.id' : 'costumer.id';
+    final id = userType == 1 ? 'publisher.id' : 'customer.id';
 
     return FirebaseFirestore.instance
         .collection('orders')
@@ -204,7 +204,7 @@ class ProductPost {
   static Future<List<Orders>> getUserOrders({required String userId}) {
     return FirebaseFirestore.instance
         .collection('orders')
-        .where('costumer.id', isEqualTo: userId)
+        .where('customer.id', isEqualTo: userId)
         .where('status', isGreaterThanOrEqualTo: 3)
         .get()
         .then((snapshot) => snapshot.docs
@@ -241,7 +241,7 @@ class ProductPost {
     await orderRef.update(update).whenComplete(() {
       if (userTypeId == 1) {
         NotificationApi.addNotification(
-            notifTo: orders.costumer.userId!,
+            notifTo: orders.customer.userId!,
             notifFrom: orders.publisher,
             title: orders.publisher.name,
             body: '',
@@ -250,7 +250,7 @@ class ProductPost {
       } else {
         NotificationApi.addNotification(
             notifTo: orders.publisher.userId!,
-            notifFrom: orders.costumer,
+            notifFrom: orders.customer,
             title: orders.publisher.name,
             body: '',
             payload: orderRef.id,
@@ -260,7 +260,7 @@ class ProductPost {
   }
 
   static Future checkOutOrder(
-      {required User costumer,
+      {required User customer,
       required User publisher,
       required List<Product> products,
       required double totalPrice}) async {
@@ -268,7 +268,7 @@ class ProductPost {
 
     final orders = Orders(
             publisher: publisher,
-            costumer: costumer,
+            customer: customer,
             products: products,
             totalPrice: totalPrice,
             status: 0)
@@ -277,8 +277,8 @@ class ProductPost {
     return await orderRef.set(orders).whenComplete(() =>
         NotificationApi.addNotification(
             notifTo: publisher.userId!,
-            notifFrom: costumer,
-            title: costumer.name,
+            notifFrom: customer,
+            title: customer.name,
             body: '',
             payload: orderRef.id,
             notifType: 2));

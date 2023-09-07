@@ -45,13 +45,12 @@ class _ToRateState extends State<ToRate> {
                 dense: true,
                 leading: CircleAvatar(
                     radius: 18,
-                    backgroundImage: NetworkImage(
-                        widget.user.userTypeId == 1
-                            ? widget.order.costumer.photoUrl
-                            : widget.order.publisher.photoUrl)),
+                    backgroundImage: NetworkImage(widget.user.userTypeId == 1
+                        ? widget.order.customer.photoUrl
+                        : widget.order.publisher.photoUrl)),
                 title: Text(
                   widget.user.userTypeId == 1
-                      ? widget.order.costumer.name
+                      ? widget.order.customer.name
                       : widget.order.publisher.name,
                   style: const TextStyle(
                       color: linkColor,
@@ -251,7 +250,6 @@ class _ToRateState extends State<ToRate> {
               width: 32,
               height: 32,
               fit: BoxFit.cover,
-              
               errorBuilder: (context, url, error) =>
                   const Icon(Icons.error, size: 12, color: linkColor),
             ),

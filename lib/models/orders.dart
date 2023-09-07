@@ -4,7 +4,7 @@ import 'package:ani_capstone/models/user.dart';
 class Orders {
   String? orderId;
   User publisher;
-  User costumer;
+  User customer;
   List<Product> products;
   double totalPrice;
   int status;
@@ -12,7 +12,7 @@ class Orders {
 
   Orders(
       {required this.publisher,
-      required this.costumer,
+      required this.customer,
       required this.products,
       required this.totalPrice,
       required this.status,
@@ -24,7 +24,7 @@ class Orders {
     return Orders(
         orderId: orderId,
         publisher: User.fromJson(json['publisher']),
-        costumer: User.fromJson(json['costumer']),
+        customer: User.fromJson(json['customer']),
         products: List<Product>.from((json['products'] as Iterable)
             .map((product) => Product.fromJson(product))
             .toList()),
@@ -35,7 +35,7 @@ class Orders {
 
   Map<String, dynamic> toJson() => {
         'publisher': publisher.toJson(),
-        'costumer': costumer.toJson(),
+        'customer': customer.toJson(),
         'products': products.map((product) => product.toJson()).toList(),
         'totalPrice': totalPrice,
         'status': status,

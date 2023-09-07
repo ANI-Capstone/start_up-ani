@@ -95,7 +95,7 @@ class _UserEsBasketState extends State<UserEsBasket> {
                         },
                             icon: FontAwesomeIcons.bagShopping,
                             count: badgeCount[0]),
-                        buildTabs(context, 'Created Orders', tabIndex, index: 1,
+                        buildTabs(context, 'Active Orders', tabIndex, index: 1,
                             onTap: () {
                           if (mounted) {
                             setState(() {
@@ -103,16 +103,18 @@ class _UserEsBasketState extends State<UserEsBasket> {
                             });
                           }
                         },
-                            icon: FontAwesomeIcons.listCheck,
+                            icon: FontAwesomeIcons.boxOpen,
                             count: badgeCount[1]),
-                        buildTabs(context, 'Active Orders', tabIndex, index: 2,
+                        buildTabs(context, 'To Rate', tabIndex, index: 2,
                             onTap: () {
                           if (mounted) {
                             setState(() {
                               tabIndex = 2;
                             });
                           }
-                        }, icon: FontAwesomeIcons.boxOpen, count: badgeCount[2])
+                        },
+                            icon: FontAwesomeIcons.solidStar,
+                            count: badgeCount[2])
                       ]),
                 ),
                 SizedBox(
@@ -197,7 +199,7 @@ class _UserEsBasketState extends State<UserEsBasket> {
         EstabOrders(
           user: widget.user,
         ),
-        EstabActiveOrders()
+        Container()
       ],
     );
   }

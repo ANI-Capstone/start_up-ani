@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:ani_capstone/api/product_order_api.dart';
 import 'package:ani_capstone/models/estab_order.dart';
 import 'package:ani_capstone/models/user_data.dart';
-import 'package:ani_capstone/screens/users/establishments/user_components/user_orders/created_orders_card.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ani_capstone/screens/users/establishments/user_components/user_orders/active_orders_card.dart';
 import 'package:flutter/material.dart';
 
 class EstabOrders extends StatefulWidget {
@@ -60,11 +59,7 @@ class _EstabOrdersState extends State<EstabOrders> {
         ProductOrderApi.createdOrderStream(userId: widget.user.id!);
 
     listener = orderRef.listen((event) async {
-      for (var change in event.docChanges) {
-        if (change.type == DocumentChangeType.added) {
-          fetchCreatedOrder();
-        }
-      }
+      fetchCreatedOrder();
     });
   }
 
@@ -80,7 +75,7 @@ class _EstabOrdersState extends State<EstabOrders> {
                 physics: const BouncingScrollPhysics(),
                 itemCount: orders.length,
                 itemBuilder: (context, index) {
-                  return CreatedOrdersCard(order: orders[index]);
+                  return ActiveOrdersCard(order: orders[index]);
                 }),
           );
   }
@@ -89,7 +84,7 @@ class _EstabOrdersState extends State<EstabOrders> {
     if (fetchState == 2) {
       return SizedBox(
           height: (MediaQuery.of(context).size.height) * 0.6,
-          child: const Center(child: Text('Basket is empty.')));
+          child: const Center(child: Text('You have no active orders.')));
     } else if (fetchState == -1) {
       return SizedBox(
           height: (MediaQuery.of(context).size.height) * 0.6,
