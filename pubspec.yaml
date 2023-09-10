@@ -85,6 +85,7 @@ dependencies:
   fdottedline_nullsafety: ^2.0.1
   flutter_typeahead: ^4.6.2
   geocoding: ^2.1.0
+  sliding_up_panel: ^2.0.0+1
 
 flutter_native_splash:
   image: assets/images/ani_splash.png

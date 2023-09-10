@@ -9,7 +9,8 @@ import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/product_order.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/models/user_data.dart';
-import 'package:ani_capstone/screens/components/user/user_locate_address.dart';
+import 'package:ani_capstone/screens/components/user/checkout_order.dart';
+import 'package:ani_capstone/screens/components/user/user_address.dart';
 import 'package:ani_capstone/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
@@ -431,10 +432,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                                                 MaterialPageRoute(
                                                                     builder:
                                                                         (context) {
-                                                              return UserLocateAddress(
-                                                                saveAddress:
-                                                                    (address) {},
-                                                              );
+                                                              return UserAddress();
                                                             }));
                                                           });
                                                         }
@@ -465,10 +463,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                                             context,
                                                             MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  UserLocateAddress(
-                                                                saveAddress:
-                                                                    (address) {},
-                                                              ),
+                                                                  UserAddress(),
                                                             ));
 
                                                         setState(() {
@@ -650,7 +645,10 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: GestureDetector(
                       onTap: () {
-                        saveOrder();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CheckoutOrder()));
                       },
                       child: Container(
                         height: 40,

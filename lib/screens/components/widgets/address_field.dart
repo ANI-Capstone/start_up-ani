@@ -12,18 +12,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class UserLocateAddress extends StatefulWidget {
-  const UserLocateAddress(
-      {Key? key, this.isNew = false, required this.saveAddress})
+class AddressField extends StatefulWidget {
+  const AddressField({Key? key, this.isNew = true, required this.openMapView})
       : super(key: key);
 
   final bool? isNew;
-  final Function(Address address) saveAddress;
+  final Function(bool open) openMapView;
   @override
-  _UserLocateAddressState createState() => _UserLocateAddressState();
+  _AddressFieldState createState() => _AddressFieldState();
 }
 
-class _UserLocateAddressState extends State<UserLocateAddress> {
+class _AddressFieldState extends State<AddressField> {
   final _region = TextEditingController();
   final _province = TextEditingController();
   final _city = TextEditingController();
@@ -336,24 +335,24 @@ class _UserLocateAddressState extends State<UserLocateAddress> {
               dashPattern: const [3, 2],
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    height: 140,
-                    width: double.infinity,
-                    alignment: Alignment.centerLeft,
-                    color: Colors.white,
-                    child: GoogleMap(
-                      zoomControlsEnabled: false,
-                      mapToolbarEnabled: false,
-                      compassEnabled: false,
-                      mapType: MapType.terrain,
-                      initialCameraPosition: _kGooglePlex,
-                      markers: _markers,
-                      onMapCreated: (GoogleMapController controller) {
-                        _controller.complete(controller);
-                      },
-                    ),
+                child: Container(
+                  height: 140,
+                  width: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  color: Colors.white,
+                  child: GoogleMap(
+                    zoomControlsEnabled: false,
+                    mapToolbarEnabled: false,
+                    compassEnabled: false,
+                    mapType: MapType.terrain,
+                    initialCameraPosition: _kGooglePlex,
+                    markers: _markers,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
+                    onTap: (_) {
+                      widget.openMapView(true);
+                    },
                   ),
                 ),
               ),
