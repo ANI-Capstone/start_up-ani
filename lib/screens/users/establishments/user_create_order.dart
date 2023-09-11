@@ -9,7 +9,7 @@ import 'package:ani_capstone/models/product.dart';
 import 'package:ani_capstone/models/product_order.dart';
 import 'package:ani_capstone/models/user.dart';
 import 'package:ani_capstone/models/user_data.dart';
-import 'package:ani_capstone/screens/components/user/checkout_order.dart';
+import 'package:ani_capstone/screens/components/user/user_checkout_order.dart';
 import 'package:ani_capstone/screens/components/user/user_address.dart';
 import 'package:ani_capstone/utils.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -38,7 +38,8 @@ class UserCreateOrder extends StatefulWidget {
 class _UserCreateOrderState extends State<UserCreateOrder> {
   final _formKey = GlobalKey<FormState>();
   final _orderName = TextEditingController();
-  final _address = TextEditingController();
+
+  Address? _address;
 
   bool selectLocation = false;
   bool checkAll = false;
@@ -94,10 +95,17 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
     super.dispose();
   }
 
+  void setAddress(Address address) {
+    setState(() {
+      _address = address;
+    });
+  }
+
   void checkLocation() {
     if (widget.user.newAddress != null) {
       if (mounted) {
         setState(() {
+          _address = widget.user.newAddress;
           noLocError = false;
         });
       }
@@ -432,7 +440,13 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                                                 MaterialPageRoute(
                                                                     builder:
                                                                         (context) {
-                                                              return UserAddress();
+                                                              return UserAddress(
+                                                                setAddress:
+                                                                    (address) {
+                                                                  setAddress(
+                                                                      address);
+                                                                },
+                                                              );
                                                             }));
                                                           });
                                                         }
@@ -462,8 +476,15 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                                         Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  UserAddress(),
+                                                              builder:
+                                                                  (context) =>
+                                                                      UserAddress(
+                                                                setAddress:
+                                                                    (address) {
+                                                                  setAddress(
+                                                                      address);
+                                                                },
+                                                              ),
                                                             ));
 
                                                         setState(() {
