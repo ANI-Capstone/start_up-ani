@@ -1,3 +1,4 @@
+import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/address.dart';
 import 'package:ani_capstone/screens/components/widgets/address_field.dart';
 import 'package:ani_capstone/screens/components/widgets/map_view.dart';
@@ -20,6 +21,8 @@ class _UserAddressState extends State<UserAddress> {
   late bool serviceEnabled;
   late LocationPermission permission;
 
+  int fetchState = 0;
+
   @override
   void initState() {
     getCurrentLocation();
@@ -36,23 +39,34 @@ class _UserAddressState extends State<UserAddress> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        if (mounted) {
+          setState(() {
+            fetchState = -1;
+          });
+        }
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        setState(() {
+          fetchState = -1;
+        });
+      }
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    final loc = await Geolocator.getCurrentPosition();
-
-    setPrecise(LatLng(loc.latitude, loc.longitude));
+    Geolocator.getCurrentPosition().then((loc) {
+      setPrecise(LatLng(loc.latitude, loc.longitude));
+    });
   }
 
   void setPrecise(LatLng loc) async {
     setState(() {
       precise = loc;
+      fetchState = 1;
     });
   }
 
@@ -68,26 +82,54 @@ class _UserAddressState extends State<UserAddress> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: IndexedStack(
-      index: index,
-      children: [
-        AddressField(
-          setAddress: (address) {
-            widget.setAddress(address);
-          },
-          openMapView: (open) {
-            openMapView(open);
-          },
-          precise: precise!,
-          setPrecise: (precise) {
-            setPrecise(precise);
-          },
-        ),
-        MapView(openMapView: (open) {
-          openMapView(open);
-        }),
-      ],
-    ));
+    return Scaffold(
+      backgroundColor: userBgColor,
+      body: SafeArea(
+          child: fetchState != 1
+              ? statusBuilder()
+              : IndexedStack(
+                  index: index,
+                  children: [
+                    AddressField(
+                      setAddress: (address) {
+                        widget.setAddress(address);
+                      },
+                      openMapView: (open) {
+                        openMapView(open);
+                      },
+                      precise: precise!,
+                      setPrecise: (precise) {
+                        setPrecise(precise);
+                      },
+                    ),
+                    MapView(openMapView: (open) {
+                      openMapView(open);
+                    }),
+                  ],
+                )),
+    );
+  }
+
+  Widget statusBuilder() {
+    if (fetchState == -1) {
+      return const Center(child: Text('An error occurred, please try again.'));
+    } else {
+      return const SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 15),
+                child: Text(
+                  'Loading, please wait...',
+                  style: TextStyle(color: linkColor, fontSize: 14),
+                ),
+              )
+            ],
+          ));
+    }
   }
 }
