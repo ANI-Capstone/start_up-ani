@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/api/firebase_firestore.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/screens/home_page.dart';
@@ -188,8 +189,7 @@ class AccountControl extends ChangeNotifier {
                     ))
               });
     } else {
-      return await FirebaseFirestoreDb.getUser(context,
-          userId: user.uid, email: user.email);
+      return await AccountApi.getUserData(user.uid);
     }
   }
 }

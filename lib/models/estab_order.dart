@@ -13,6 +13,8 @@ class EstabOrder {
   final DateTime dateTime;
   final DateTime createdAt;
   final int? orderStatus;
+  double? transactionFee;
+  double? totalPayment;
 
   EstabOrder(
       {this.orderId,
@@ -23,7 +25,9 @@ class EstabOrder {
       required this.location,
       required this.dateTime,
       required this.createdAt,
-      this.orderStatus = 0});
+      this.orderStatus = 0,
+      this.transactionFee,
+      this.totalPayment});
 
   static EstabOrder fromJson(String id, Map<String, dynamic> json) =>
       EstabOrder(
@@ -37,7 +41,9 @@ class EstabOrder {
           location: Address.fromJson(json['location']),
           dateTime: Utils.toDateTime(json['dateTime']),
           createdAt: Utils.toDateTime(json['createdAt']),
-          orderStatus: json['orderStatus'] ?? 0);
+          orderStatus: json['orderStatus'] ?? 0,
+          totalPayment: json['totalPayment'],
+          transactionFee: json['transactionFee']);
 
   Map<String, dynamic> toJson() => {
         'orderFrom': orderFrom.toJson(),
@@ -47,6 +53,8 @@ class EstabOrder {
         'location': location.toJson(),
         'dateTime': Utils.fromDateTimeToJson(dateTime),
         'createdAt': Utils.fromDateTimeToJson(createdAt),
-        'orderStaus': orderStatus
+        'orderStaus': orderStatus,
+        'transactionFee': transactionFee,
+        'totalPayment': totalPayment
       };
 }

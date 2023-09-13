@@ -1,3 +1,4 @@
+import 'package:ani_capstone/models/address.dart';
 import 'package:ani_capstone/models/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -25,10 +26,18 @@ class AccountApi {
     return await userRef.update({'fcmToken': fcmToken});
   }
 
-  static Future<UserData> getUserData(String userId) =>
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get()
-          .then((value) => UserData.fromJson(value.data()!));
+  static Future<UserData> getUserData(String userId) async {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((value) => UserData.fromJson(value.data()!));
+  }
+
+  static Future setUserNewAddress(
+      {required String userId, required Address address}) async {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+
+    return await userRef.update({'newAddress': address.toJson()});
+  }
 }

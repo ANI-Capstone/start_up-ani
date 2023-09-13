@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ani_capstone/api/account_api.dart';
 import 'package:ani_capstone/api/product_order_api.dart';
 import 'package:ani_capstone/constants.dart';
 import 'package:ani_capstone/models/address.dart';
@@ -40,6 +41,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
   final _orderName = TextEditingController();
 
   Address? _address;
+  EstabOrder? _order;
 
   bool selectLocation = false;
   bool checkAll = false;
@@ -85,6 +87,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
 
     products = widget.products;
     updateTotalPrice();
+    checkLocation();
   }
 
   @override
@@ -96,7 +99,22 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
   }
 
   void setAddress(Address address) {
+    AccountApi.setUserNewAddress(userId: widget.user.id!, address: address)
+        .whenComplete(() {
+      ShoWInfo.showToast('Address has been set successfully.', 3);
+    }).onError((error, stackTrace) {
+      ShoWInfo.showToast('Failed to set address.', 3);
+      setState(() {
+        locChoice = 'No Location';
+        noLocError = true;
+      });
+      return;
+    });
+
     setState(() {
+      selectLocation = false;
+      noLocError = false;
+      showLocError = false;
       _address = address;
     });
   }
@@ -112,7 +130,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
     }
   }
 
-  Future<void> saveOrder() async {
+  bool checkOrder() {
     final form = _formKey.currentState;
 
     form!.validate();
@@ -128,38 +146,26 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
       });
     }
 
-    final tempAddress = Address(
-        region: "Region X",
-        province: 'Misamis Oriental',
-        city: 'Tagoloan',
-        barangay: 'Santa Ana',
-        postal: 9001,
-        precise: LatLng(8.5359226, 124.8019309),
-        street: 'Zone 2');
-
-    tempAddress.toCompleteAddress();
-
     final user = User(
         name: widget.user.name,
         fcmToken: widget.user.fcmToken,
         photoUrl: widget.user.photoUrl!);
 
-    final order = EstabOrder(
-        orderFrom: user,
-        orderName: _orderName.text.trim(),
-        products: widget.products,
-        totalAmount: totalPrice,
-        location: tempAddress,
-        dateTime: DateTime(selectedDate!.year, selectedDate!.month,
-            selectedDate!.day, selectedTime!.hour, selectedTime!.minute),
-        createdAt: DateTime.now());
-
     if (!noLocError && !noDateError && !noTimeError) {
-      ProductOrderApi.addOrder(userId: widget.user.id!, order: order)
-          .whenComplete(() {
-        ShoWInfo.showToast('Your order has been saved.', 3);
-      });
+      _order = EstabOrder(
+          orderFrom: user,
+          orderName: _orderName.text.trim(),
+          products: widget.products,
+          totalAmount: totalPrice,
+          location: _address!,
+          dateTime: DateTime(selectedDate!.year, selectedDate!.month,
+              selectedDate!.day, selectedTime!.hour, selectedTime!.minute),
+          createdAt: DateTime.now());
+
+      return true;
     }
+
+    return false;
   }
 
   void updateTotalPrice() {
@@ -450,6 +456,7 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                                             }));
                                                           });
                                                         }
+
                                                         setState(() {
                                                           locChoice = items[0];
                                                           selectLocation =
@@ -491,8 +498,6 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                                                           locChoice = items[1];
                                                           selectLocation =
                                                               false;
-                                                          noLocError = false;
-                                                          showLocError = false;
                                                         });
                                                       },
                                                       child: const SizedBox(
@@ -666,10 +671,14 @@ class _UserCreateOrderState extends State<UserCreateOrder> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CheckoutOrder()));
+                        if (checkOrder()) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CheckoutOrder(
+                                        order: _order!,
+                                      )));
+                        }
                       },
                       child: Container(
                         height: 40,

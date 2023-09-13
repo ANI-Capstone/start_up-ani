@@ -37,6 +37,8 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
+  bool isGettingLoc = false;
+
   @override
   void initState() {
     widget.centerMap(widget.location, 1);
@@ -82,8 +84,13 @@ class _MapViewState extends State<MapView> {
                 alignment: Alignment.topRight,
                 child: GestureDetector(
                   onTap: () async {
+                    setState(() {
+                      isGettingLoc = true;
+                    });
                     final loc = await Geolocator.getCurrentPosition();
-
+                    setState(() {
+                      isGettingLoc = false;
+                    });
                     widget.centerMap(LatLng(loc.latitude, loc.longitude), 1);
                   },
                   child: Container(
@@ -233,6 +240,29 @@ class _MapViewState extends State<MapView> {
                       ),
                     ),
             ),
+            if (isGettingLoc)
+              Container(
+                height: height,
+                width: double.infinity,
+                color: Colors.white.withOpacity(0.8),
+                child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          )),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          'Getting location...',
+                          style: TextStyle(color: linkColor, fontSize: 14),
+                        ),
+                      )
+                    ]),
+              ),
           ],
         ),
       ),

@@ -135,6 +135,11 @@ class _UserAddressState extends State<UserAddress> {
     });
   }
 
+  Future<void> saveAddress(Address address) async {
+    widget.setAddress(address);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,8 +151,8 @@ class _UserAddressState extends State<UserAddress> {
                   index: index,
                   children: [
                     AddressField(
-                      setAddress: (address) {
-                        widget.setAddress(address);
+                      saveAddress: (address) {
+                        saveAddress(address);
                       },
                       openMapView: (open) {
                         openMapView(open);

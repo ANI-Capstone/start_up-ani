@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AddressField extends StatefulWidget {
@@ -17,7 +16,7 @@ class AddressField extends StatefulWidget {
       {Key? key,
       this.isNew = true,
       required this.openMapView,
-      required this.setAddress,
+      required this.saveAddress,
       required this.precise,
       required this.setPrecise,
       required this.googleMap})
@@ -26,7 +25,7 @@ class AddressField extends StatefulWidget {
   final bool? isNew;
   final LatLng precise;
   final Function(bool open) openMapView;
-  final Function(Address address) setAddress;
+  final Function(Address address) saveAddress;
   final Function(LatLng precise) setPrecise;
   final Widget googleMap;
   @override
@@ -378,8 +377,7 @@ class _AddressFieldState extends State<AddressField> {
 
                   address.toCompleteAddress();
 
-                  print(widget.precise);
-                  print(address.completeAddress);
+                  widget.saveAddress(address);
                 },
                 child: Container(
                   height: 40,

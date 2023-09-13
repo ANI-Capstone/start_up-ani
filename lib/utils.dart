@@ -74,4 +74,5 @@ User sampleUser = User(
 
 class Policy {
   static const double minimumOrder = 0;
+  static const double transactionFee = 0.10;
 }

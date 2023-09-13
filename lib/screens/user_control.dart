@@ -70,6 +70,7 @@ class _UserControlState extends State<UserControl> {
             return const Center(child: CircularProgressIndicator());
           } else {
             _userData = snapshot.data;
+
             return checkUserType();
           }
         },

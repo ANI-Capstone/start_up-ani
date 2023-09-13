@@ -43,6 +43,7 @@ class UserData {
   static UserData fromJson(Map<String, dynamic> json) => UserData(
       id: json['id'],
       fcmToken: json['fcmToken'],
+      photoUrl: json['imageUrl'],
       name: json['name'],
       email: json['email'],
       phone: json['phone'],
@@ -53,5 +54,7 @@ class UserData {
       zipcode: json['address']['zipcode'],
       userTypeId: json['userType']['userTypeId'],
       typeName: json['userType']['typeName'],
-      newAddress: json['newAddress']);
+      newAddress: json['newAddress'] == null
+          ? null
+          : Address.fromJson(json['newAddress']));
 }
