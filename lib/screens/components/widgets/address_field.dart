@@ -19,7 +19,8 @@ class AddressField extends StatefulWidget {
       required this.openMapView,
       required this.setAddress,
       required this.precise,
-      required this.setPrecise})
+      required this.setPrecise,
+      required this.googleMap})
       : super(key: key);
 
   final bool? isNew;
@@ -27,6 +28,7 @@ class AddressField extends StatefulWidget {
   final Function(bool open) openMapView;
   final Function(Address address) setAddress;
   final Function(LatLng precise) setPrecise;
+  final Widget googleMap;
   @override
   _AddressFieldState createState() => _AddressFieldState();
 }
@@ -37,16 +39,6 @@ class _AddressFieldState extends State<AddressField> {
   List<TextEditingController> textController =
       List.generate(6, (i) => TextEditingController());
   List<bool> errors = List.generate(5, (i) => false);
-
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14,
-  );
-
-  final Set<Marker> _markers = {};
 
   List<Map> regions = [];
   Map? selectedRegion;
@@ -75,18 +67,6 @@ class _AddressFieldState extends State<AddressField> {
 
     final res2 = await rootBundle.loadString('assets/tags/ph_places.json');
     places = await json.decode(res2);
-
-    final GoogleMapController controller = await _controller.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(bearing: 0, target: widget.precise, tilt: 0, zoom: 18)));
-
-    _markers.clear();
-    setState(() {
-      _markers.add(Marker(
-          markerId: MarkerId(widget.precise.toString()),
-          position: LatLng(widget.precise.latitude, widget.precise.longitude),
-          icon: BitmapDescriptor.defaultMarker));
-    });
   }
 
   Future<List<String>> getProvinces() async {
@@ -362,20 +342,7 @@ class _AddressFieldState extends State<AddressField> {
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   color: Colors.white,
-                  child: GoogleMap(
-                    zoomControlsEnabled: false,
-                    mapToolbarEnabled: false,
-                    compassEnabled: false,
-                    mapType: MapType.terrain,
-                    initialCameraPosition: _kGooglePlex,
-                    markers: _markers,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                    },
-                    onTap: (_) {
-                      widget.openMapView(true);
-                    },
-                  ),
+                  child: widget.googleMap,
                 ),
               ),
             ),
@@ -411,6 +378,7 @@ class _AddressFieldState extends State<AddressField> {
 
                   address.toCompleteAddress();
 
+                  print(widget.precise);
                   print(address.completeAddress);
                 },
                 child: Container(
